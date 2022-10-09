@@ -16,6 +16,8 @@
 
     <modules>
         <module>core</module>
+        <module>auth</module>
+        <module>some-others</module>
     </modules>
 
     <properties>
