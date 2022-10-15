@@ -1,8 +1,13 @@
 package com.commons.someothers.config;
 
+import com.commons.someothers.properties.RedisProperties;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.jsontype.impl.LaissezFaireSubTypeValidator;
+import org.redisson.Redisson;
+import org.redisson.api.RedissonClient;
+import org.redisson.config.Config;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
@@ -10,6 +15,8 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.RedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
+
+import java.io.IOException;
 
 /**
  * Title:
@@ -20,22 +27,12 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
  */
 @Configuration
 public class RedisConfig {
+
+    @Autowired
+    RedisProperties redisProperties;
+
     @Bean
     public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory factory) {
-        //RedisTemplate<String, Object> template = new RedisTemplate<>();
-        //template.setConnectionFactory(factory);
-        //
-        //// 设置key的序列化方式
-        //template.setKeySerializer(StringRedisSerializer.UTF_8);
-        //// 设置value的序列化方式
-        //template.setValueSerializer(StringRedisSerializer.UTF_8);
-        //// 设置hash的key的序列化方式
-        //template.setHashKeySerializer(RedisSerializer.string());
-        //// 设置hash的value的序列化方式
-        //template.setHashValueSerializer(RedisSerializer.json());
-        //
-        //template.afterPropertiesSet();
-        //return template;
 
 
         RedisTemplate<String, Object> template = new RedisTemplate<>();
@@ -46,11 +43,11 @@ public class RedisConfig {
                 ObjectMapper.DefaultTyping.NON_FINAL, JsonTypeInfo.As.WRAPPER_ARRAY);
         jackson2JsonRedisSerializer.setObjectMapper(om);
         template.setConnectionFactory(factory);
-//key序列化方式
+        //key序列化方式
         template.setKeySerializer(redisSerializer);
-//value序列化
+        //value序列化
         template.setValueSerializer(jackson2JsonRedisSerializer);
-//value hashmap序列化
+        //value hashmap序列化
         template.setHashValueSerializer(jackson2JsonRedisSerializer);
 
         template.afterPropertiesSet();
@@ -58,6 +55,15 @@ public class RedisConfig {
     }
 
 
+    @Bean(destroyMethod = "shutdown")
+    RedissonClient redisson() throws IOException {
+        Config config = new Config();
+        //config.useClusterServers().addNodeAddress("127.0.0.1:6379");
+        config.useSingleServer()
+                .setAddress("redis://" + redisProperties.getHost() + ":" + redisProperties.getPort())
+                .setDatabase(Integer.parseInt(redisProperties.getDatabase()))
+                .setPassword(redisProperties.getPassword());
 
-
+        return Redisson.create(config);
+    }
 }
