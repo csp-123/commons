@@ -1,23 +1,26 @@
-server:
-  port: 8080
 spring:
   profiles:
     active: test
   application:
     name: some-others
-  thymeleaf:
-    cache: true
-    check-template: true
-    check-template-location: true
-    servlet:
-      content-type: text/html
-    enabled: true
-    encoding: UTF-8
-    excluded-view-names: ''
-    mode: HTML5
-    prefix: classpath:/templates/
-    suffix: .html
-
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    name: defaultDataSource
+    password: root
+    url: jdbc:mysql://120.48.35.213:3307/commons?useUnicode=true&characterEncoding=utf8&autoReconnect=true&failOverReadOnly=false&serverTimezone=Asia/Shanghai
+    username: root
+  redis:
+    port: 6379
+    host: 180.76.153.74
+    lettuce:
+      pool:
+        max-active: 8
+        max-idle: 8
+        min-idle: 0
+        max-wait: 1000ms
+      shutdown-timeout: 100ms
+    database: 0
+    password: 1234
 
 
 
