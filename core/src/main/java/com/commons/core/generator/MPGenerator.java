@@ -28,9 +28,12 @@ public class MPGenerator {
 
 
     public static void main(String[] args) {
+        // 配置信息
         String password = "root";
         String userName = "root";
         String url = "jdbc:mysql://120.48.35.213:3307/commons?useUnicode=true&characterEncoding=utf8&autoReconnect=true&failOverReadOnly=false&serverTimezone=Asia/Shanghai";
+
+
         System.out.println("请输入模块名：");
         String moduleName = new Scanner(System.in).next();
         System.out.println("请输入表名，多个英文逗号分隔 所有输入 all：");
@@ -59,6 +62,7 @@ public class MPGenerator {
                         // entity 策略配置
                         .entityBuilder()
                         .enableLombok()
+                        .enableChainModel()
                         //.logicDeleteColumnName("isDeleted") //逻辑删除字段名
                         .naming(NamingStrategy.underline_to_camel)  //数据库表映射到实体的命名策略：下划线转驼峰命
                         .columnNaming(NamingStrategy.underline_to_camel)    //数据库表字段映射到实体的命名策略：下划线转驼峰命

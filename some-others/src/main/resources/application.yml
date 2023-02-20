@@ -5,12 +5,6 @@ spring:
     active: test
   application:
     name: some-others
-  datasource:
-    driver-class-name: com.mysql.cj.jdbc.Driver
-    name: defaultDataSource
-    password: root
-    url: jdbc:mysql://127.0.0.1:3306/some-others?useUnicode=true&characterEncoding=utf8&autoReconnect=true&failOverReadOnly=false&serverTimezone=Asia/Shanghai
-    username: root
   thymeleaf:
     cache: true
     check-template: true
