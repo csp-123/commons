@@ -1,0 +1,9 @@
+name: 魂土
+teamType: 1
+hangUpType:
+  type: 2
+  times: 5
+producerBean: RoyalSoul
+config:
+  imgPath: D://
+  level: 11

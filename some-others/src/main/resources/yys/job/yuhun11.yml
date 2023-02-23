@@ -1,0 +1,12 @@
+name: 魂土挂机
+# 组队类型 1.单刷 2. 组队
+teamType: 1
+# 挂机类型 1. 限时 2. 限次 3. 不限（不关程序刷到断电）
+hangUpType:
+  type: 2
+  times: 5
+# 打开buff
+openBuff: false
+hangUpJob:
+  level: 11
+  hangUpJobBeanName: yuhun
