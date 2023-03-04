@@ -1,5 +1,6 @@
 package com.commons.onmyoji.job;
 
+import com.alibaba.fastjson.JSON;
 import com.commons.onmyoji.config.OnmyojiScriptConfig;
 import com.commons.onmyoji.loader.YmlLoader;
 import com.commons.onmyoji.producer.InstanceZoneProducer;
@@ -14,16 +15,14 @@ import org.springframework.util.Assert;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.util.StringUtils;
+import org.yaml.snakeyaml.Yaml;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -70,6 +69,9 @@ public class JobLoader {
         OnmyojiJob job = new OnmyojiJob();
         job.setId(source.getName().replace(".yml", ""));
         job.setName((String) source.getProperty("name"));
+        job.setTeamType((Integer) source.getProperty("teamType"));
+
+        job.setHangUpType(buildHangUpType(source));
         logger.info("开始加载任务文件："  + job.getId());
         logger.info("任务名称：" + job.getName());
         InstanceZoneProducer producer = producerMap.get(source.getProperty("producerBean"));
@@ -77,7 +79,22 @@ public class JobLoader {
         job.setProducer(producer);
         logger.info("处理器：" + producer.getProcuderName() + " 加载成功！ ");
         job.setConfig(buildConfig(source, producer));
+        logger.info(JSON.toJSONString(job));
         return job;
+    }
+
+    private HangUpType buildHangUpType(PropertiesPropertySource source) {
+        HangUpType hangUpType = new HangUpType();
+        source.getSource().entrySet().stream()
+                .filter(s -> s.getKey().startsWith("hangUpType"))
+                .forEach(e -> {
+                    try {
+                        setValue(hangUpType, e.getKey().replace("hangUpType.", ""), e.getValue());
+                    } catch (Exception ex) {
+                        throw new RuntimeException(ex);
+                    }
+                });
+        return hangUpType;
     }
 
     @SneakyThrows

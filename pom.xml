@@ -18,6 +18,7 @@
         <module>core</module>
         <module>auth</module>
         <module>some-others</module>
+        <module>onmyoji</module>
     </modules>
 
     <properties>

@@ -2,8 +2,12 @@ package com.commons.onmyoji.job;
 
 import com.commons.onmyoji.config.OnmyojiScriptConfig;
 import com.commons.onmyoji.producer.InstanceZoneProducer;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
+
+import java.util.Objects;
 
 /**
  * Title:
@@ -14,6 +18,7 @@ import lombok.Setter;
  */
 @Getter
 @Setter
+@EqualsAndHashCode
 public class OnmyojiJob <JOB_CONFIG extends OnmyojiScriptConfig> {
 
     private String id;

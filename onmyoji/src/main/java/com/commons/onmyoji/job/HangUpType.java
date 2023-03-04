@@ -1,5 +1,8 @@
 package com.commons.onmyoji.job;
 
+import lombok.Getter;
+import lombok.Setter;
+
 /**
  * Title: 挂机类型
  * Description:
@@ -7,6 +10,8 @@ package com.commons.onmyoji.job;
  * Author: csp
  * Create Time:2023/2/20 17:12
  */
+@Getter
+@Setter
 public class HangUpType {
 
     /**
