@@ -47,11 +47,30 @@ public class OnmyojiConstant {
     public static String ROYAL_IMG_PATH = "onmyoji/src/main/resources/img/royalsoul/";
 
 
+    /**
+     * 单刷开始图片
+     */
     public static String ROYAL_SOUL_SOLO_START_BUTTON = "solo.png";
+
+    /**
+     * 组队开始图片
+     */
     public static String ROYAL_SOUL_TEAM_START_BUTTON = "team.png";
+
+    /**
+     * 结束图片
+     */
     public static String ROYAL_SOUL_END_BUTTON = "end.png";
 
+    /**
+     * 组队结束图片
+     */
     public static String ROYAL_SOUL_TEAM_END_BUTTON = "teamEnd.png";
+
+    /**
+     * 获取奖励图片
+     */
+    public static String ROYAL_SOUL_REWARD_BUTTON = "reward.png";
 
 
 }

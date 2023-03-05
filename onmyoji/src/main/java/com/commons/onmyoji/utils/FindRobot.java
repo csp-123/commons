@@ -1,5 +1,6 @@
 package com.commons.onmyoji.utils;
  
+import com.alibaba.fastjson.JSON;
 import com.google.common.collect.Lists;
 import lombok.Getter;
 import org.slf4j.Logger;
@@ -73,6 +74,7 @@ public class FindRobot {
      * 查找图片
      */
     public void findImageXY(int a ,int b) {
+        map.clear();
         //遍历屏幕截图像素点数据
         for (int y = b; y < scrShotImgHeight - keyImgHeight; y++) {
             for (int x = a; x < scrShotImgWidth - keyImgWidth; x++) {
@@ -262,17 +264,17 @@ public class FindRobot {
     public static boolean touchPic(String path) {
         //移动到定位
         boolean res = findPoint(path);
-        logger.info("移动到定位:"+res);
+
         if(!res){
+            logger.info("移动鼠标失败");
             return false;
+        } else {
+            logger.info("移动鼠标成功");
         }
         // 移动后随机停顿100-130ms
         waitSomeTime(100, 130);
-
         leftClick(0);
-
-
-        logger.info("移动点击完成...");
+        logger.info("点击鼠标完成");
         return true;
     }
 
@@ -310,17 +312,21 @@ public class FindRobot {
      * @param path
      */
     public static boolean touchAllPic(String path) {
-
+        map.clear();
         FindRobot findRobot = new FindRobot(path, null, 0, 0);
-
+        logger.info("匹配结果" + JSON.toJSONString(map));
         for (String value : FindRobot.map.values()) {
             String[] location = value.split(",");
             int x = Integer.parseInt(location[0]);
             int y = Integer.parseInt(location[1]);
-            robot.mouseMove(x, y);
+            int randomX = buildRandomLocation(x, findRobot.keyImgWidth);
+            int randomY = buildRandomLocation(y, findRobot.keyImgHeight);
+            robot.mouseMove(randomX, randomY);
+            logger.info("移动鼠标成功");
             // 停顿随机时间 100 - 130 ms
             waitSomeTime(100, 130);
             leftClick(0);
+            logger.info("点击鼠标成功");
             // 多开时停顿
             waitSomeTime(200, 400);
         }
@@ -360,16 +366,17 @@ public class FindRobot {
         map.clear();
         FindRobot demo = new FindRobot(path,"",0,0);
         if(map==null||map.size()==0){
+            logger.info("未找到");
             return false;
         } else {
             logger.info("找到:"+demo.findX+","+demo.findY);
-            // 点击图像内随机位置
+            // 移动图像内随机位置
             if(move){
                 int imgHeight = demo.getKeyImgHeight();
                 int imgWidth = demo.getKeyImgWidth();
                 int clickX = buildRandomLocation(demo.findX, imgWidth);
                 int clickY = buildRandomLocation(demo.findY, imgHeight);
-                logger.info("点击:"+clickX+","+clickY);
+                logger.info("移动到位置:"+clickX+","+clickY);
                 robot.mouseMove(clickX, clickY);
             }
             return true;

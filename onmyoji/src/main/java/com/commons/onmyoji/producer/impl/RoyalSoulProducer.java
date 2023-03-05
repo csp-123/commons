@@ -26,9 +26,20 @@ public class RoyalSoulProducer extends InstanceZoneBaseProducer<RoyalSoulConfig>
 
     private static final Logger logger = LoggerFactory.getLogger(RoyalSoulProducer.class);
 
+    /**
+     * 开始图片路径
+     */
     private String start;
 
+    /**
+     * 结束图片路径
+     */
     private String end;
+
+    /**
+     * 获取奖励图片路径
+     */
+    private String reward;
 
 
     @Autowired
@@ -77,23 +88,23 @@ public class RoyalSoulProducer extends InstanceZoneBaseProducer<RoyalSoulConfig>
             end = imgDirectory + OnmyojiConstant.ROYAL_SOUL_TEAM_END_BUTTON;
 
         }
-
+        reward = imgDirectory + OnmyojiConstant.ROYAL_SOUL_REWARD_BUTTON;
         // 处理挂机时长
         if (job.getHangUpType().getType() == 2) {
             // 限次
             for (int i = 1; i <= job.getHangUpType().getTimes(); i++) {
-                excuteOnce(start, end, job);
+                excuteOnce(start, end, reward, job);
             }
         } else if (job.getHangUpType().getType() == 1) {
             // 限时
             long endTime = new Date().getTime() + 60 * 1000 * 1000;
             if (new Date().getTime() <= endTime) {
-                excuteOnce(start, end, job);
+                excuteOnce(start, end, reward, job);
             }
         } else if (job.getHangUpType().getType() == 3) {
             // 不限
             while (true) {
-                excuteOnce(start, end, job);
+                excuteOnce(start, end, reward, job);
             }
         }
 
@@ -107,35 +118,33 @@ public class RoyalSoulProducer extends InstanceZoneBaseProducer<RoyalSoulConfig>
      * @param end
      * @param job
      */
-    private void excuteOnce(String start, String end, OnmyojiJob<RoyalSoulConfig> job) {
+    private void excuteOnce(String start, String end, String reward, OnmyojiJob<RoyalSoulConfig> job) {
         if (job.getTeamType() == 1) {
-            excuteOnceInSoloMod(start, end, job);
+            excuteOnceInSoloMod(start, end, reward, job);
         }
         if (job.getTeamType() == 2) {
-            excuteOnceInTeamMod(start, end, job);
+            excuteOnceInTeamMod(start, end, reward, job);
         }
     }
 
     /**
      * 执行一次挂机脚本 - 单刷模式
      */
-    private void excuteOnceInSoloMod(String start, String end, OnmyojiJob job) {
+    private void excuteOnceInSoloMod(String start, String end, String reward, OnmyojiJob job) {
 
-        logger.info(String.format("======开始执行一次挂机脚本,处理器：[%s],挂机任务配置：[%s}]", getProcuderName(), JSON.toJSON(job)));
+        logger.info(String.format("======开始执行一次单刷挂机脚本,处理器：[%s],挂机任务配置：[%s}]", getProcuderName(), JSON.toJSON(job)));
         boolean foundStart = false;
         do {
             foundStart = FindRobot.touchPic(start);
         } while (!foundStart);
-        // 每三秒扫描一次至匹配到目标图片
+        //扫描至匹配到目标图片
         boolean foundEnd = false;
         do {
-            foundEnd = FindRobot.findPoint(end, false);
-            try {
-                Thread.sleep(3000);
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
-            }
+            foundEnd = FindRobot.findPoint(reward, false);
         } while (!foundEnd);
+        // 点击获取奖励
+        FindRobot.touchPic(reward);
+        // 点击结束
         FindRobot.touchPic(end);
         logger.info("===执行结束===");
 
@@ -149,27 +158,23 @@ public class RoyalSoulProducer extends InstanceZoneBaseProducer<RoyalSoulConfig>
      * @param end
      * @param job
      */
-    private void excuteOnceInTeamMod(String start, String end, OnmyojiJob job) {
+    private void excuteOnceInTeamMod(String start, String end, String reward, OnmyojiJob job) {
         logger.info(String.format("======开始执行一次挂机脚本,处理器：[%s],挂机任务配置：[%s}]", getProcuderName(), JSON.toJSON(job)));
         boolean foundStart = false;
         do {
             foundStart = FindRobot.touchPic(start);
         } while (!foundStart);
-        // 每三秒扫描一次至匹配到目标图片
-
-        int foundTimes = 0;
+        //有两个匹配结果时再执行点击
         do {
-            boolean foundEnd = FindRobot.findPoint(end, false);
-
-            if (foundEnd) {
-                foundTimes ++;
-            }
-            try {
-                Thread.sleep(3000);
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
-            }
-        } while (foundTimes <= 1);
+            FindRobot findRobot = new FindRobot(reward, null, 0, 0);
+        } while (FindRobot.map.size() <= 1);
+        // 点击所有获取奖励
+        FindRobot.touchAllPic(reward);
+        //有两个匹配结果时再执行点击
+        do {
+            FindRobot findRobot = new FindRobot(end, null, 0, 0);
+        } while (FindRobot.map.size() <= 1);
+        // 点击所有结束
         FindRobot.touchAllPic(end);
         logger.info("===执行结束===");
     }
