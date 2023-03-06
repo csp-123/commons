@@ -23,22 +23,11 @@ public class ForTest {
         System.out.println(findRobot.getFindY());
         OnmyojiJob job = new OnmyojiJob();
         ConcurrentHashMap map = new ConcurrentHashMap();
+        StringBuilder sb = new StringBuilder();
+        String s = "a;";
         map.put("a", "a");
-//        String projectPath = System.getProperty("user.dir");
-//        System.out.println(projectPath);
-//        boolean success = false;
-//        for (String backButton : OnmyojiConstant.BACK_BUTTONS) {
-//            String path = projectPath + "\\" + OnmyojiConstant.COMMON_IMG_PATH + backButton;
-//            success = FindRobot.touchPic(path);
-//            if (success) {
-//                break;
-//            }
-//        }
-//
-//        if (!success) {
-//            throw new RuntimeException();
-//        }
-
+        ThreadLocal tl = new ThreadLocal();
+        tl.set("s");
 
 
     }
