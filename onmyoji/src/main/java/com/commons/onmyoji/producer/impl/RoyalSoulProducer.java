@@ -3,16 +3,16 @@ package com.commons.onmyoji.producer.impl;
 import com.alibaba.fastjson.JSON;
 import com.commons.onmyoji.config.RoyalSoulConfig;
 import com.commons.onmyoji.constant.OnmyojiConstant;
+import com.commons.onmyoji.enums.HangUpTypeEnum;
+import com.commons.onmyoji.enums.TeamTypeEnum;
 import com.commons.onmyoji.job.OnmyojiJob;
+import com.commons.onmyoji.matcher.ImgMatcher;
 import com.commons.onmyoji.producer.InstanceZoneBaseProducer;
 import com.commons.onmyoji.service.CommonService;
-import com.commons.onmyoji.utils.FindRobot;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
-import java.util.Date;
 
 /**
  * Title: 御魂脚本处理器
@@ -25,6 +25,8 @@ import java.util.Date;
 public class RoyalSoulProducer extends InstanceZoneBaseProducer<RoyalSoulConfig> {
 
     private static final Logger logger = LoggerFactory.getLogger(RoyalSoulProducer.class);
+
+    ThreadLocal threadLocal = new ThreadLocal<>();
 
     /**
      * 开始图片路径
@@ -45,19 +47,27 @@ public class RoyalSoulProducer extends InstanceZoneBaseProducer<RoyalSoulConfig>
     @Autowired
     CommonService commonService;
 
+    @Autowired
+    ImgMatcher imgMatcher;
+
     /**
      * 从哪个界面开始，庭院？还是御魂界面？ 或者兼容？
-     *                 1. 单刷 or 组队？
-     *                 2. 限时 or 限次 or 刷到死？
-     *             容错机制：
-     *                 1. 宠物发现额外奖励
-     *                 2. 组队时队友超时，重新邀请队友
+     * 1. 单刷 or 组队？
+     * 2. 限时 or 限次 or 刷到死？
+     * 容错机制：
+     * 1. 宠物发现额外奖励
+     * 2. 组队时队友超时，重新邀请队友
+     *
      * @param job
      */
     @Override
     public void produce(OnmyojiJob<RoyalSoulConfig> job) {
+        // 脚本执行次数
+        Integer count = 0;
+        threadLocal.set(count);
         // todo 1. 目前仅支持御魂界面开始挂机 庭院相关处理后续提供一个公共方法
         // todo 2. 组队逻辑待补全
+        // todo 3. 容错机制：好友邀请悬赏
 //        // 当前位置是否为庭院
 //        boolean inYard = commonService.isInYardNow();
 //        boolean inYardNow = inYard;
@@ -73,109 +83,95 @@ public class RoyalSoulProducer extends InstanceZoneBaseProducer<RoyalSoulConfig>
 
         // 配置： 层数、截图存放位置
         RoyalSoulConfig jobConfig = job.getConfig();
-
-
-        // 处理组队类型
         String imgDirectory = System.getProperty("user.dir") + "\\" + jobConfig.imgPath + "\\";
-        if (job.getTeamType() == 1) {
+
+
+        // 根据组队类型 start end 赋值
+        if (job.getTeamType().equals(TeamTypeEnum.SOLO.getCode())) {
             // solo
             start = imgDirectory + OnmyojiConstant.ROYAL_SOUL_SOLO_START_BUTTON;
             end = imgDirectory + OnmyojiConstant.ROYAL_SOUL_END_BUTTON;
 
-        } else if (job.getTeamType() == 2) {
+        } else if (job.getTeamType().equals(TeamTypeEnum.TEAM.getCode())) {
             // 组队
             start = imgDirectory + OnmyojiConstant.ROYAL_SOUL_TEAM_START_BUTTON;
             end = imgDirectory + OnmyojiConstant.ROYAL_SOUL_TEAM_END_BUTTON;
 
         }
+        // 奖励图片
         reward = imgDirectory + OnmyojiConstant.ROYAL_SOUL_REWARD_BUTTON;
+
         // 处理挂机时长
-        if (job.getHangUpType().getType() == 2) {
+        if (job.getHangUpType().getType().equals(HangUpTypeEnum.TIMES.getCode())) {
             // 限次
             for (int i = 1; i <= job.getHangUpType().getTimes(); i++) {
-                excuteOnce(start, end, reward, job);
+
+                executeOnce(start, end, reward, job);
             }
-        } else if (job.getHangUpType().getType() == 1) {
+        } else if (job.getHangUpType().getType().equals(HangUpTypeEnum.TIME.getCode())) {
             // 限时
-            long endTime = new Date().getTime() + 60 * 1000 * 1000;
-            if (new Date().getTime() <= endTime) {
-                excuteOnce(start, end, reward, job);
+            long endTime = System.currentTimeMillis() + 60 * 1000 * 1000;
+            while (System.currentTimeMillis() <= endTime) {
+                executeOnce(start, end, reward, job);
             }
-        } else if (job.getHangUpType().getType() == 3) {
+        } else if (job.getHangUpType().getType().equals(HangUpTypeEnum.FOREVER.getCode())) {
             // 不限
             while (true) {
-                excuteOnce(start, end, reward, job);
+                executeOnce(start, end, reward, job);
             }
         }
-
 
 
     }
 
     /**
      * 执行脚本
+     *
      * @param start
      * @param end
      * @param job
      */
-    private void excuteOnce(String start, String end, String reward, OnmyojiJob<RoyalSoulConfig> job) {
+    private void executeOnce(String start, String end, String reward, OnmyojiJob<RoyalSoulConfig> job) {
+        int count = (Integer) threadLocal.get() + 1;
+        logger.info(String.format("=============执行第%s次挂机脚本，处理器：[%s]=============", count));
         if (job.getTeamType() == 1) {
-            excuteOnceInSoloMod(start, end, reward, job);
+            executeOnceInSoloMod(start, end, reward, job);
         }
         if (job.getTeamType() == 2) {
-            excuteOnceInTeamMod(start, end, reward, job);
+            executeOnceInTeamMod(start, end, reward, job);
         }
+        logger.info("=============执行结束=============");
+        threadLocal.set(++count);
     }
 
     /**
      * 执行一次挂机脚本 - 单刷模式
      */
-    private void excuteOnceInSoloMod(String start, String end, String reward, OnmyojiJob job) {
-
-        logger.info(String.format("======开始执行一次单刷挂机脚本,处理器：[%s],挂机任务配置：[%s}]", getProcuderName(), JSON.toJSON(job)));
-        boolean foundStart = false;
-        do {
-            foundStart = FindRobot.touchPic(start);
-        } while (!foundStart);
-        //扫描至匹配到目标图片
-        boolean foundEnd = false;
-        do {
-            foundEnd = FindRobot.findPoint(reward, false);
-        } while (!foundEnd);
-        // 点击获取奖励
-        FindRobot.touchPic(reward);
+    private void executeOnceInSoloMod(String start, String end, String reward, OnmyojiJob<RoyalSoulConfig> job) {
+        // 点击开始
+        imgMatcher.matchAndClick(null, start, 1, true);
+        // 点击获得奖励
+        imgMatcher.matchAndClick(null, start, 1, true);
         // 点击结束
-        FindRobot.touchPic(end);
-        logger.info("===执行结束===");
-
-
+        imgMatcher.matchAndClick(null, start, 1, true);
     }
 
     /**
      * 执行一次挂机脚本 - 组队模式
-     *      组队模式下，需要对屏幕内的所有命中位置进行点击，适配多开的情况
-     * @param start
-     * @param end
-     * @param job
+     * 组队模式下，需要对屏幕内的所有命中位置进行点击，适配多开的情况
+     *
+     * @param start 开始图片路径
+     * @param end   结束图片路径
+     * @param job   job配置
      */
-    private void excuteOnceInTeamMod(String start, String end, String reward, OnmyojiJob job) {
+    private void executeOnceInTeamMod(String start, String end, String reward, OnmyojiJob<RoyalSoulConfig> job) {
         logger.info(String.format("======开始执行一次挂机脚本,处理器：[%s],挂机任务配置：[%s}]", getProcuderName(), JSON.toJSON(job)));
-        boolean foundStart = false;
-        do {
-            foundStart = FindRobot.touchPic(start);
-        } while (!foundStart);
-        //有两个匹配结果时再执行点击
-        do {
-            FindRobot findRobot = new FindRobot(reward, null, 0, 0);
-        } while (FindRobot.map.size() <= 1);
-        // 点击所有获取奖励
-        FindRobot.touchAllPic(reward);
-        //有两个匹配结果时再执行点击
-        do {
-            FindRobot findRobot = new FindRobot(end, null, 0, 0);
-        } while (FindRobot.map.size() <= 1);
-        // 点击所有结束
-        FindRobot.touchAllPic(end);
+        // 点击开始
+        imgMatcher.matchAndClick(null, start, 1, true);
+        // 点击获取奖励
+        imgMatcher.matchAndClick(null, reward, 2, true);
+        // 点击结束
+        imgMatcher.matchAndClick(null, end, 2, true);
         logger.info("===执行结束===");
     }
 

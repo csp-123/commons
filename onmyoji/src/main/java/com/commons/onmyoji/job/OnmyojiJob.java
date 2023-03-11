@@ -34,6 +34,11 @@ public class OnmyojiJob <JOB_CONFIG extends OnmyojiScriptConfig> {
     private Integer teamType;
 
     /**
+     * 队伍人数，默认为2
+     */
+    private Integer teamMembers = 2;
+
+    /**
      * 挂机类型
      */
     private HangUpType hangUpType;

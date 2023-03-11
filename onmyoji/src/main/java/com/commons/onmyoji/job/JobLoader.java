@@ -70,7 +70,7 @@ public class JobLoader {
         job.setId(source.getName().replace(".yml", ""));
         job.setName((String) source.getProperty("name"));
         job.setTeamType((Integer) source.getProperty("teamType"));
-
+        job.setTeamMembers((Integer) source.getProperty("teamMembers"));
         job.setHangUpType(buildHangUpType(source));
         logger.info("开始加载任务文件："  + job.getId());
         logger.info("任务名称：" + job.getName());

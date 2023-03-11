@@ -335,6 +335,39 @@ public class FindRobot {
     }
 
     /**
+     * 匹配并点击图片
+     * @param path 图片路径
+     * @param count 图片数量
+     * @return 是否完成点击动作
+     */
+    public static boolean matchAndClick(String path, Integer count) {
+        map.clear();
+        FindRobot findRobot = new FindRobot(path, null, 0, 0);
+        do {
+            findRobot.findImageXY(0, 0);
+        } while (map.size() != count);
+
+        logger.info("匹配到所有结果" + JSON.toJSONString(map));
+        for (String value : FindRobot.map.values()) {
+            String[] location = value.split(",");
+            int x = Integer.parseInt(location[0]);
+            int y = Integer.parseInt(location[1]);
+            int randomX = buildRandomLocation(x, findRobot.keyImgWidth);
+            int randomY = buildRandomLocation(y, findRobot.keyImgHeight);
+            robot.mouseMove(randomX, randomY);
+            logger.info("移动鼠标成功");
+            // 停顿随机时间 100 - 130 ms
+            waitSomeTime(100, 130);
+            leftClick(0);
+            logger.info("点击鼠标成功");
+            // 多开时停顿
+            waitSomeTime(200, 400);
+        }
+
+        return true;
+    }
+
+    /**
      * 等待一段时间
      * @param time1
      * @param time2
