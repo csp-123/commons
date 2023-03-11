@@ -14,9 +14,6 @@ public class OnmyojiConstant {
     // 通用图片位置
     public static String COMMON_IMG_PATH = "onmyoji/src/main/resources/img/common/";
 
-    // 御魂相关图片位置
-    public static String ROYAL_SOUL_IMG_PATH = "onmyoji/src/main/resources/img/royalsoul/";
-
 
     // 庭院灯笼图片名称
     public static String YARD_LANTERN = "yardLantern.png";
@@ -43,8 +40,6 @@ public class OnmyojiConstant {
         add("backButton13.png");
 
     }};
-
-    public static String ROYAL_IMG_PATH = "onmyoji/src/main/resources/img/royalsoul/";
 
 
     /**
