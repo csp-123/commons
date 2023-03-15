@@ -2,6 +2,7 @@ package com.commons.onmyoji.job;
 
 import com.commons.onmyoji.config.OnmyojiScriptConfig;
 import com.commons.onmyoji.producer.InstanceZoneProducer;
+import com.commons.onmyoji.thread.OnmyojiDeamonThread;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
@@ -57,6 +58,9 @@ public class OnmyojiJob <JOB_CONFIG extends OnmyojiScriptConfig> {
     public void start() {
         System.out.println("开始执行脚本");
         producer.produce(this);
+
+        OnmyojiDeamonThread thread = new OnmyojiDeamonThread();
+        thread.start();
     }
 
 }

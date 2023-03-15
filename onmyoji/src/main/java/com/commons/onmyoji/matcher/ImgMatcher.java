@@ -1,7 +1,6 @@
 package com.commons.onmyoji.matcher;
 
 import com.alibaba.fastjson.JSON;
-import com.commons.onmyoji.utils.FindRobot;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -25,70 +24,11 @@ import static org.springframework.boot.autoconfigure.condition.ConditionOutcome.
  * Author: chish
  * Date: 2023/3/12 1:07
  */
-@Component
 public class ImgMatcher {
 
     private static final Logger logger = LoggerFactory.getLogger(ImgMatcher.class);
 
-    private static final Robot robot;
-
-    static {
-        try {
-            robot = new Robot();
-        } catch (AWTException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    /**
-     * 屏幕
-     */
-    private BufferedImage screen = getFullScreenShot();
-
-    /**
-     * 来源图片
-     */
-    private BufferedImage srcImg;
-
-    /**
-     * 目标图片
-     */
-    private BufferedImage targetImg;
-
-    /**
-     * 目标图宽度
-     */
-    private int targetImgWidth;
-
-    /**
-     * 目标图高度
-     */
-    private int targetImgHeight;
-
-    /**
-     * 来源图宽度
-     */
-    private int srcImgWidth;
-
-    /**
-     * 来源图高度
-     */
-    private int srcImgHeight;
-
-    /**
-     * 来源图RGB数据
-     */
-    private int[][] srcImgRGBData;
-
-    /**
-     * 目标图RGB数据
-     */
-    private int[][] targetImgRGBData;
-
-    /**
-     * 匹配结果
-     */
-    private List<MatchResult> results = new ArrayList<>();
+    private static final Robot robot = getRobot();
 
     /**
      * 匹配并点击
@@ -99,12 +39,12 @@ public class ImgMatcher {
      * @param random        是否需要进行随机处理
      * @return 是否完成点击事件
      */
-    public boolean matchAndClick(String srcImgPath, String targetImgPath, Integer count, boolean random) {
-        // 重新加载匹配器
-        reloadMatcher(srcImgPath, targetImgPath);
+    public static void matchAndClick(String srcImgPath, String targetImgPath, Integer count, boolean random) {
         // 循环匹配
         do {
-            this.match();
+            // 重新加载匹配器
+            reloadMatcher(srcImgPath, targetImgPath);
+            match();
         } while (results.size() != count);
         // 点击
         results.stream()
@@ -114,13 +54,193 @@ public class ImgMatcher {
                     leftClick(300, true);
                 });
 
-        return true;
+
     }
+
+    /**
+     * 匹配并点击
+     *
+     * @param srcBfImg    来源图BufferedImage
+     * @param targetImgPath 目标图路径
+     * @param count         需要点击的数量
+     * @param random        是否需要进行随机处理
+     * @return 是否完成点击事件
+     */
+    public static void matchAndClick(BufferedImage srcBfImg, String targetImgPath, Integer count, boolean random) {
+        // 循环匹配
+        do {
+            // 重新加载匹配器
+            reloadMatcher(srcBfImg, targetImgPath);
+            match();
+        } while (results.size() != count);
+        // 点击
+        results.stream()
+                // 移动鼠标并点击
+                .forEach(matchResult -> {
+                    mouseMove(matchResult.locationX, matchResult.locationY, random, targetImgWidth, targetImgHeight);
+                    leftClick(300, true);
+                });
+
+
+    }
+
+    /**
+     * 匹配并点击
+     *
+     * @param targetImgPath 目标图路径
+     * @param count         需要点击的数量
+     * @param random        是否需要进行随机处理
+     * @return 是否完成点击事件
+     */
+    public static void matchAndClick(String targetImgPath, Integer count, boolean random) {
+        // 循环匹配
+        do {
+            // 重新加载匹配器
+            reloadMatcher(targetImgPath);
+            match();
+        } while (results.size() != count);
+        // 点击
+        results.stream()
+                // 移动鼠标并点击
+                .forEach(matchResult -> {
+                    mouseMove(matchResult.locationX, matchResult.locationY, random, targetImgWidth, targetImgHeight);
+                    leftClick(300, true);
+                });
+
+
+    }
+
+
+
+    /**
+     * 是否匹配到目标图片
+     * @param srcImgPath 源图片
+     * @param targetImgPath 目标图片
+     * @param count 预期匹配次数
+     * @return true or false
+     */
+    public static boolean match(String srcImgPath, String targetImgPath, Integer count) {
+        reloadMatcher(srcImgPath, targetImgPath);
+        match();
+        return results.size() == count;
+    }
+
+    /**
+     * 是否匹配到目标图片
+     * @param bfImg 源图片
+     * @param targetImgPath 目标图片
+     * @param count 预期匹配次数
+     * @return true or false
+     */
+    public static boolean match(BufferedImage bfImg, String targetImgPath, Integer count) {
+        reloadMatcher(bfImg, targetImgPath);
+        match();
+        return results.size() == count;
+    }
+
+    /**
+     * 是否匹配到目标图片
+     * @param targetImgPath 目标图片
+     * @param count 预期匹配次数
+     * @return true or false
+     */
+    public static boolean match(String targetImgPath, Integer count) {
+        reloadMatcher(targetImgPath);
+        match();
+        return results.size() == count;
+    }
+
+    /**
+     * 全屏截图
+     *
+     * @return 返回BufferedImage
+     */
+    public static BufferedImage getFullScreenShot(Integer count) {
+        BufferedImage bfImage = null;
+        int width = (int) Toolkit.getDefaultToolkit().getScreenSize().getWidth();
+        int height = (int) Toolkit.getDefaultToolkit().getScreenSize().getHeight();
+        try {
+            Robot robot = new Robot();
+            bfImage = robot.createScreenCapture(new Rectangle(0, 0, width/count, height/count));
+        } catch (AWTException e) {
+            e.printStackTrace();
+        }
+        return bfImage;
+    }
+
+
+    /**
+     * 点击目标图右上角
+     * @param imgDirectory
+     */
+    public static void ClickImgRU(String imgDirectory) {
+        // 循环匹配
+        do {
+            // 重新加载匹配器
+            reloadMatcher(imgDirectory);
+            match();
+        } while (results.isEmpty());
+        // 点击
+        results.stream()
+                // 移动鼠标并点击
+                .forEach(matchResult -> {
+                    mouseMove(matchResult.locationX + targetImgWidth/2, matchResult.locationY - targetImgHeight/2, false, targetImgWidth, targetImgHeight);
+                    leftClick(300, true);
+                });
+    }
+
+    // ====================================================================================================
+
+    /**
+     * 来源图片
+     */
+    private static BufferedImage srcImg;
+
+    /**
+     * 目标图片
+     */
+    private static BufferedImage targetImg;
+
+    /**
+     * 目标图宽度
+     */
+    private static int targetImgWidth;
+
+    /**
+     * 目标图高度
+     */
+    private static int targetImgHeight;
+
+    /**
+     * 来源图宽度
+     */
+    private static int srcImgWidth;
+
+    /**
+     * 来源图高度
+     */
+    private static int srcImgHeight;
+
+    /**
+     * 来源图RGB数据
+     */
+    private static int[][] srcImgRGBData;
+
+    /**
+     * 目标图RGB数据
+     */
+    private static int[][] targetImgRGBData;
+
+    /**
+     * 匹配结果
+     */
+    private static List<MatchResult> results = new ArrayList<>();
+
 
     /**
      * 进行匹配
      */
-    private void match() {
+    private static void match() {
         if (!CollectionUtils.isEmpty(results)) {
             results.clear();
         }
@@ -138,6 +258,7 @@ public class ImgMatcher {
                     boolean found = isMatchAll(y, x);
 
                     if (found) {
+                        logger.info("found one！");
                         //y
                         int minY = y;
                         int maxY = y + targetImgHeight;
@@ -158,14 +279,47 @@ public class ImgMatcher {
     /**
      * 重新加载匹配器
      *
+     * @param targetImgPath 目标图片路径
+     */
+    private static void reloadMatcher(String targetImgPath) {
+        srcImg = getFullScreenShot();
+        targetImg = getBfImageFromPath(targetImgPath);
+        srcImgRGBData = getImageRGB(srcImg);
+        targetImgRGBData = getImageRGB(targetImg);
+        srcImgWidth = srcImg.getWidth();
+        srcImgHeight = srcImg.getHeight();
+        targetImgWidth = targetImg.getWidth();
+        targetImgHeight = targetImg.getHeight();
+    }
+
+    /**
+     * 重新加载匹配器
+     *
      * @param srcImgPath    来源图片路径
      * @param targetImgPath 目标图片路径
      */
-    private void reloadMatcher(String srcImgPath, String targetImgPath) {
-        srcImg = StringUtils.hasText(srcImgPath) ? getBfImageFromPath(srcImgPath) : screen;
+    private static void reloadMatcher(String srcImgPath, String targetImgPath) {
+        srcImg = getBfImageFromPath(srcImgPath);
         targetImg = getBfImageFromPath(targetImgPath);
-        srcImgRGBData = this.getImageGRB(srcImg);
-        targetImgRGBData = this.getImageGRB(targetImg);
+        srcImgRGBData = getImageRGB(srcImg);
+        targetImgRGBData = getImageRGB(targetImg);
+        srcImgWidth = srcImg.getWidth();
+        srcImgHeight = srcImg.getHeight();
+        targetImgWidth = targetImg.getWidth();
+        targetImgHeight = targetImg.getHeight();
+    }
+
+    /**
+     * 重新加载匹配器
+     *
+     * @param srcBfImg    来源图片BufferedImage
+     * @param targetImgPath 目标图片路径
+     */
+    private static void reloadMatcher(BufferedImage srcBfImg, String targetImgPath) {
+        srcImg = srcBfImg;
+        targetImg = getBfImageFromPath(targetImgPath);
+        srcImgRGBData = getImageRGB(srcImg);
+        targetImgRGBData = getImageRGB(targetImg);
         srcImgWidth = srcImg.getWidth();
         srcImgHeight = srcImg.getHeight();
         targetImgWidth = targetImg.getWidth();
@@ -177,7 +331,7 @@ public class ImgMatcher {
      *
      * @return 返回BufferedImage
      */
-    public BufferedImage getFullScreenShot() {
+    private static BufferedImage getFullScreenShot() {
         BufferedImage bfImage = null;
         int width = (int) Toolkit.getDefaultToolkit().getScreenSize().getWidth();
         int height = (int) Toolkit.getDefaultToolkit().getScreenSize().getHeight();
@@ -190,13 +344,14 @@ public class ImgMatcher {
         return bfImage;
     }
 
+
     /**
      * 从本地文件读取目标图片
      *
      * @param path - 图片绝对路径
      * @return 本地图片的BufferedImage对象
      */
-    public BufferedImage getBfImageFromPath(String path) {
+    private static BufferedImage getBfImageFromPath(String path) {
         BufferedImage bfImage = null;
         try {
             bfImage = ImageIO.read(new File(path));
@@ -213,7 +368,7 @@ public class ImgMatcher {
      * @param bfImage
      * @return
      */
-    public int[][] getImageGRB(BufferedImage bfImage) {
+    private static int[][] getImageRGB(BufferedImage bfImage) {
         int width = bfImage.getWidth();
         int height = bfImage.getHeight();
         int[][] result = new int[height][width];
@@ -233,7 +388,7 @@ public class ImgMatcher {
      * @param x - 与目标图左上角像素点想匹配的屏幕截图x坐标
      * @return
      */
-    public boolean isMatchAll(int y, int x) {
+    private static boolean isMatchAll(int y, int x) {
         int biggerY = 0;
         int biggerX = 0;
         int xor = 0;
@@ -258,7 +413,7 @@ public class ImgMatcher {
     /**
      * 单击鼠标左键
      */
-    private void leftClick(int time, boolean random) {
+    private static void leftClick(int time, boolean random) {
         leftDown();
         int delayTime = setAutoDelay(time == 0 ? 100 : time, random);
         leftUp();
@@ -273,7 +428,7 @@ public class ImgMatcher {
      * @param targetImgWidth 图片宽度
      * @param targetImgHeight 图片高度
      */
-    private void mouseMove(int x, int y, boolean random, int targetImgWidth, int targetImgHeight) {
+    private static void mouseMove(int x, int y, boolean random, int targetImgWidth, int targetImgHeight) {
         int trueX = random ? buildRandomLocation(x, targetImgWidth) : x;
         int trueY = random ? buildRandomLocation(y, targetImgHeight) : y;
         robot.mouseMove(trueX, trueY);
@@ -285,14 +440,14 @@ public class ImgMatcher {
     /**
      * 左击按下
      */
-    private void leftDown() {
+    private static void leftDown() {
         robot.mousePress(InputEvent.BUTTON1_MASK);
     }
 
     /**
      * 左击释放
      */
-    private void leftUp() {
+    private static void leftUp() {
         robot.mouseRelease(InputEvent.BUTTON1_MASK);
     }
 
@@ -302,7 +457,7 @@ public class ImgMatcher {
      * @param time   延时
      * @param random 是否进行随机处理
      */
-    private int setAutoDelay(int time, boolean random) {
+    private static int setAutoDelay(int time, boolean random) {
         // 500 -> 250~500
         int delayTime = new Random().nextInt(time - time / 2 + 1) + time / 2;
 
@@ -317,7 +472,7 @@ public class ImgMatcher {
      * @param time1
      * @param time2
      */
-    private void waitSomeTime(int time1, int time2) {
+    private static void waitSomeTime(int time1, int time2) {
         Random random = new Random();
         int max = Math.max(time1, time2);
         int min = Math.max(time1, time2);
@@ -338,17 +493,28 @@ public class ImgMatcher {
      * @param length 图像单维度长度
      * @return 最终坐标
      */
-    private int buildRandomLocation(int position, int length) {
+    private static int buildRandomLocation(int position, int length) {
         Random random = new Random();
         int min = position - length / 2;
         int max = position + length / 2;
         return random.nextInt(max - min + 1) + min;
     }
 
+    private static Robot getRobot() {
+        try {
+            return new Robot();
+        } catch (AWTException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+
+
+
     /**
-     * 匹配结果
+     * 匹配结果静态内部类
      */
-    class MatchResult {
+    static class MatchResult {
 
         /**
          * x坐标

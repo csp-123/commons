@@ -2,7 +2,10 @@ package com.commons.onmyoji.utils;
 
 import com.commons.onmyoji.constant.OnmyojiConstant;
 import com.commons.onmyoji.job.OnmyojiJob;
+import com.commons.onmyoji.matcher.ImgMatcher;
+import com.commons.onmyoji.thread.OnmyojiDeamonThread;
 import com.google.common.collect.Maps;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.File;
 import java.util.*;
@@ -15,19 +18,21 @@ import java.util.stream.Collectors;
  * @date: 2023/2/23 17:08
  */
 public class ForTest {
+
+
+
     public static void main(String[] args) {
 
-        String projectPath = System.getProperty("user.dir");
-        FindRobot findRobot = new FindRobot("D:\\java\\JavaProjects\\commons\\onmyoji\\src\\main\\resources\\img\\royalsoul\\team.png", null, 0, 0);
-        System.out.println(findRobot.getFindX());
-        System.out.println(findRobot.getFindY());
-        OnmyojiJob job = new OnmyojiJob();
-        ConcurrentHashMap map = new ConcurrentHashMap();
-        StringBuilder sb = new StringBuilder();
-        String s = "a;";
-        map.put("a", "a");
-        ThreadLocal tl = new ThreadLocal();
-        tl.set("s");
+//        String projectPath = System.getProperty("user.dir");
+//        FindRobot findRobot = new FindRobot("D:\\java\\JavaProjects\\commons\\onmyoji\\src\\main\\resources\\img\\royalsoul\\team.png", null, 0, 0);
+//        System.out.println(findRobot.getFindX());
+//        System.out.println(findRobot.getFindY());
+//        OnmyojiJob job = new OnmyojiJob();
+
+//        ImgMatcher.matchAndClick("D:\\java\\JavaProjects\\GitHub\\commons\\onmyoji\\src\\main\\resources\\img\\common\\backButton6.png", 1, true);
+
+        OnmyojiDeamonThread thread = new OnmyojiDeamonThread();
+        thread.start();
 
 
     }

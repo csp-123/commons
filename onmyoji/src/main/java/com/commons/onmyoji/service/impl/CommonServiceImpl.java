@@ -1,14 +1,14 @@
 package com.commons.onmyoji.service.impl;
 
 import com.commons.onmyoji.constant.OnmyojiConstant;
+import com.commons.onmyoji.matcher.ImgMatcher;
 import com.commons.onmyoji.service.CommonService;
-import com.commons.onmyoji.utils.FindRobot;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.stream.Collectors;
+import java.awt.*;
+import java.awt.image.BufferedImage;
 
 /**
  * @description:
@@ -19,25 +19,37 @@ import java.util.stream.Collectors;
 public class CommonServiceImpl implements CommonService {
     Logger logger = LoggerFactory.getLogger(CommonServiceImpl.class);
 
+
     @Override
-    public boolean isInYardNow() {
+    public boolean isInYardNow(Integer teamMemberCount) {
 
         String projectPath = System.getProperty("user.dir");
-        FindRobot findRobot = new FindRobot(projectPath + "/" + OnmyojiConstant.COMMON_IMG_PATH + OnmyojiConstant.YARD_LANTERN, null, 0, 0);
+        String targetImgPath = projectPath + "/" + OnmyojiConstant.COMMON_IMG_PATH + OnmyojiConstant.YARD_LANTERN;
 
-        return findRobot.isFound();
+        if (teamMemberCount > 1) {
+            return ImgMatcher.match(ImgMatcher.getFullScreenShot(teamMemberCount), targetImgPath, 1);
+        } else {
+            return ImgMatcher.match(targetImgPath, 1);
+        }
     }
 
     @Override
-    public void backToUpper() {
+    public void backToUpper(Integer teamMemberCount) {
 
         String projectPath = System.getProperty("user.dir");
 
+        String path = "";
 
         boolean success = false;
         for (String backButton : OnmyojiConstant.BACK_BUTTONS) {
-            String path = projectPath + "\\" + OnmyojiConstant.COMMON_IMG_PATH + backButton;
-            success = FindRobot.touchPic(path);
+            path = projectPath + "\\" + OnmyojiConstant.COMMON_IMG_PATH + backButton;
+            if (teamMemberCount > 1) {
+
+               success = ImgMatcher.match(ImgMatcher.getFullScreenShot(teamMemberCount), path, 1);
+            } else {
+                success = ImgMatcher.match(path, 1);
+            }
+
             if (success) {
                 break;
             }
@@ -46,9 +58,34 @@ public class CommonServiceImpl implements CommonService {
         if (!success) {
             logger.error("返回上一级时发生异常,存在未匹配成功的界面");
             throw new RuntimeException();
+        } else {
+            ImgMatcher.matchAndClick(path, 1, true);
         }
 
+        // 点击后等待0.5s 阴阳师需要加载
+        try {
+            Thread.sleep(5000);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
+    @Override
+    public void backToYard(Integer teamMemberCounts) {
+        // 当前位置是否为庭院
+        boolean inYard = isInYardNow(teamMemberCounts);
+
+        if (inYard) {
+            return;
+        }
+
+        // 返回至庭院
+        do {
+            // 返回上一层
+            backToUpper(teamMemberCounts);
+            // 判断当前是否在庭院
+            inYard = isInYardNow(teamMemberCounts);
+        } while (!inYard);
     }
 
 
