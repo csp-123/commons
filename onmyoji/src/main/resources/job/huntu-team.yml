@@ -2,7 +2,7 @@ name: 魂土
 teamType: 2
 hangUpType:
   type: 2
-  times: 150
+  times: 500
 producerBean: RoyalSoul
 config:
   imgPath: onmyoji\src\main\resources\img\\royalsoul\

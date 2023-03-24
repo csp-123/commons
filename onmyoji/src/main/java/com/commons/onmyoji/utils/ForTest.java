@@ -29,10 +29,7 @@ public class ForTest {
 //        System.out.println(findRobot.getFindY());
 //        OnmyojiJob job = new OnmyojiJob();
 
-//        ImgMatcher.matchAndClick("D:\\java\\JavaProjects\\GitHub\\commons\\onmyoji\\src\\main\\resources\\img\\common\\backButton6.png", 1, true);
-
-        OnmyojiDeamonThread thread = new OnmyojiDeamonThread();
-        thread.start();
+        System.out.println(ImgMatcher.similarCount("D:\\java\\JavaProjects\\GitHub\\commons\\onmyoji\\src\\main\\resources\\img\\tansuo\\challengeBoss.png"));
 
 
     }

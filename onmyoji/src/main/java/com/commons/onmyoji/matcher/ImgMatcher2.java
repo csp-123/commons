@@ -3,9 +3,7 @@ package com.commons.onmyoji.matcher;
 import com.alibaba.fastjson.JSON;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
-import org.springframework.util.StringUtils;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -13,10 +11,9 @@ import java.awt.event.InputEvent;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
 import java.util.List;
-
-import static org.springframework.boot.autoconfigure.condition.ConditionOutcome.match;
+import java.util.Random;
 
 /**
  * Description:
@@ -24,9 +21,9 @@ import static org.springframework.boot.autoconfigure.condition.ConditionOutcome.
  * Author: chish
  * Date: 2023/3/12 1:07
  */
-public class ImgMatcher {
+public class ImgMatcher2 {
 
-    private static final Logger logger = LoggerFactory.getLogger(ImgMatcher.class);
+    private static final Logger logger = LoggerFactory.getLogger(ImgMatcher2.class);
 
     private static final Robot robot = getRobot();
 
@@ -105,7 +102,6 @@ public class ImgMatcher {
                 .forEach(matchResult -> {
                     mouseMove(matchResult.locationX, matchResult.locationY, random, targetImgWidth, targetImgHeight);
                     leftClick(300, true);
-                    waitSomeTime(200, 400);
                 });
 
 
@@ -172,41 +168,6 @@ public class ImgMatcher {
     }
 
     /**
-     * 是否近似匹配到目标图片
-     * @param targetImgPath 目标图片
-     * @param count 预期匹配次数
-     * @return true or false
-     */
-    public static boolean similarMatch(String targetImgPath, Integer count) {
-        reloadMatcher(targetImgPath);
-        similarMatch();
-        return results.size() == count;
-    }
-
-    /**
-     * 近似匹配并点击第一个
-     *
-     * @param targetImgPath 目标图路径
-     * @param random        是否需要进行随机处理
-     * @return 是否完成点击事件
-     */
-    public static boolean similarMatchAndClickFirst(String targetImgPath, boolean random) {
-        // 循环匹配
-        do {
-            // 重新加载匹配器
-            reloadMatcher(targetImgPath);
-            similarMatch();
-        } while (results.size() == 0);
-        // 点击
-        MatchResult result = results.get(0);
-        mouseMoveNoDelay(result.locationX, result.locationY, random, targetImgWidth, targetImgHeight);
-        leftClick(100, true);
-        return true;
-
-    }
-
-
-    /**
      * 匹配目标图片结果
      * @param targetImgPath 目标图片
      * @return count
@@ -265,21 +226,7 @@ public class ImgMatcher {
         return results;
     }
 
-
-    /**
-     * 匹配目标图片结果
-     * @param targetImgPath 目标图片
-     * @return count
-     */
-    public static int similarCount(String targetImgPath) {
-        reloadMatcher(targetImgPath);
-        similarMatch();
-        return results.size();
-    }
-
     // ====================================================================================================
-
-    private static String targetImgPath;
 
     /**
      * 来源图片
@@ -363,46 +310,23 @@ public class ImgMatcher {
             }
         }
 
-        logger.info(String.format("匹配图片：%s，结果：%s", targetImgPath, JSON.toJSONString(results)));
-    }
-
-    /**
-     * 近似匹配
-     */
-    private static void similarMatch() {
-        if (!CollectionUtils.isEmpty(results)) {
-            results.clear();
-        }
-        // 近似匹配 只匹配中心点
-
-        for (int y = 0; y < srcImgHeight - targetImgHeight; y++) {
-            for (int x = 0; x < srcImgWidth - targetImgWidth; x++) {
-                if ((targetImgRGBData[targetImgHeight/2][targetImgWidth/2] ^ srcImgRGBData[y][x]) == 0) {
-                    logger.info(" similar found one！");
-                    results.add(new MatchResult(x, y));
-                }
-            }
-        }
-
-        logger.info(String.format("近似匹配图片：%s，结果：%s", targetImgPath, JSON.toJSONString(results)));
-
+        logger.info(String.format("匹配结果：%s", JSON.toJSONString(results)));
     }
 
     /**
      * 重新加载匹配器
      *
-     * @param targetImagePath 目标图片路径
+     * @param targetImgPath 目标图片路径
      */
-    private static void reloadMatcher(String targetImagePath) {
+    private static void reloadMatcher(String targetImgPath) {
         srcImg = getFullScreenShot();
-        targetImg = getBfImageFromPath(targetImagePath);
+        targetImg = getBfImageFromPath(targetImgPath);
         srcImgRGBData = getImageRGB(srcImg);
         targetImgRGBData = getImageRGB(targetImg);
         srcImgWidth = srcImg.getWidth();
         srcImgHeight = srcImg.getHeight();
         targetImgWidth = targetImg.getWidth();
         targetImgHeight = targetImg.getHeight();
-        targetImgPath = targetImagePath;
     }
 
     /**
@@ -551,21 +475,6 @@ public class ImgMatcher {
     }
 
     /**
-     * 鼠标移动
-     * @param x x坐标
-     * @param y y坐标
-     * @param random 是否需要进行随机处理
-     * @param targetImgWidth 图片宽度
-     * @param targetImgHeight 图片高度
-     */
-    private static void mouseMoveNoDelay(int x, int y, boolean random, int targetImgWidth, int targetImgHeight) {
-        int trueX = random ? buildRandomLocation(x, targetImgWidth) : x;
-        int trueY = random ? buildRandomLocation(y, targetImgHeight) : y;
-        robot.mouseMove(trueX, trueY);
-        logger.info(String.format("鼠标移动成功！指定移动位置：[%s][%s]，是否随机处理：[%s]，实际移动位置：[%s][%s]", x, y, random, trueX, trueY));
-    }
-
-    /**
      * 左击按下
      */
     private static void leftDown() {
@@ -647,7 +556,6 @@ public class ImgMatcher {
     public static void click(int x, int y, int width, int length, boolean random) {
         mouseMove(x, y, random, width, length);
         leftClick(300, true);
-        waitSomeTime(200, 400);
     }
 
 

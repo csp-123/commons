@@ -56,11 +56,11 @@ public class OnmyojiJob <JOB_CONFIG extends OnmyojiScriptConfig> {
     private JOB_CONFIG config;
 
     public void start() {
-        System.out.println("开始执行脚本");
-        producer.produce(this);
-
         OnmyojiDeamonThread thread = new OnmyojiDeamonThread();
         thread.start();
+        producer.produce(this);
+        thread.interrupt();
+
     }
 
 }

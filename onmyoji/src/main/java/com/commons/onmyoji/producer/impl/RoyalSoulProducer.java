@@ -25,7 +25,7 @@ public class RoyalSoulProducer extends InstanceZoneBaseProducer<RoyalSoulConfig>
 
     private static final Logger logger = LoggerFactory.getLogger(RoyalSoulProducer.class);
 
-    ThreadLocal threadLocal = new ThreadLocal<>();
+    ThreadLocal<Integer> threadLocal = new ThreadLocal<>();
 
     /**
      * 开始图片路径
@@ -60,16 +60,15 @@ public class RoyalSoulProducer extends InstanceZoneBaseProducer<RoyalSoulConfig>
     @Override
     public void produce(OnmyojiJob<RoyalSoulConfig> job) {
         // 脚本执行次数
-        Integer count = 0;
+        int count = 0;
         threadLocal.set(count);
         // todo 1. 目前仅支持御魂界面开始挂机 庭院相关处理后续提供一个公共方法
         // todo 2. 组队逻辑待补全
-        // todo 3. 容错机制：好友邀请悬赏
+        // todo 3. 容错机制：好友邀请悬赏（完成） 宠物发现额外奖励、组队超市重新邀请
 
         // 返回至庭院
-//        commonService.backToYard(job.getTeamType());
+        //commonService.backToYard(job.getTeamType());
         // 从庭院进入御魂
-
 
         // 配置： 层数、截图存放位置
         RoyalSoulConfig jobConfig = job.getConfig();
@@ -121,7 +120,11 @@ public class RoyalSoulProducer extends InstanceZoneBaseProducer<RoyalSoulConfig>
      * @param job
      */
     private void executeOnce(String start, String end, String reward, OnmyojiJob<RoyalSoulConfig> job) {
-        int count = (Integer) threadLocal.get() + 1;
+        Integer count = threadLocal.get();
+        if (count == null) {
+            count = 1;
+        }
+
         logger.info(String.format("=============执行第%s次挂机脚本，处理器：[%s]，组队类型：[%s]=============", count, getProcuderName(), job.getTeamType(), TeamTypeEnum.find(job.getTeamType())));
         if (job.getTeamType().equals(TeamTypeEnum.SOLO.getCode())) {
             executeOnceInSoloMod(start, end, reward, job);
