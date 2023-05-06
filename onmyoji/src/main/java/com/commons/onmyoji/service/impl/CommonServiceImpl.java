@@ -27,7 +27,8 @@ public class CommonServiceImpl implements CommonService {
         String targetImgPath = projectPath + "/" + OnmyojiConstant.COMMON_IMG_PATH + OnmyojiConstant.YARD_LANTERN;
 
         if (teamMemberCount > 1) {
-            return ImgMatcher.match(ImgMatcher.getFullScreenShot(teamMemberCount), targetImgPath, 1);
+            // todo
+            return ImgMatcher.match(ImgMatcher.getFullScreenShot(), targetImgPath, 1);
         } else {
             return ImgMatcher.match(targetImgPath, 1);
         }
@@ -44,8 +45,8 @@ public class CommonServiceImpl implements CommonService {
         for (String backButton : OnmyojiConstant.BACK_BUTTONS) {
             path = projectPath + "\\" + OnmyojiConstant.COMMON_IMG_PATH + backButton;
             if (teamMemberCount > 1) {
-
-               success = ImgMatcher.match(ImgMatcher.getFullScreenShot(teamMemberCount), path, 1);
+                // todo
+               success = ImgMatcher.match(ImgMatcher.getFullScreenShot(), path, 1);
             } else {
                 success = ImgMatcher.match(path, 1);
             }

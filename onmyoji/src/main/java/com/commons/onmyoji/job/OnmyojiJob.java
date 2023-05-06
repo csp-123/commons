@@ -56,10 +56,10 @@ public class OnmyojiJob <JOB_CONFIG extends OnmyojiScriptConfig> {
     private JOB_CONFIG config;
 
     public void start() {
-        OnmyojiDeamonThread thread = new OnmyojiDeamonThread();
-        thread.start();
+//        OnmyojiDeamonThread thread = new OnmyojiDeamonThread();
+//        thread.start();
         producer.produce(this);
-        thread.interrupt();
+//        thread.interrupt();
 
     }
 

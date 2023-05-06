@@ -3,9 +3,9 @@ package com.commons.onmyoji.matcher;
 import com.alibaba.fastjson.JSON;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Component;
+
 import org.springframework.util.CollectionUtils;
-import org.springframework.util.StringUtils;
+
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -16,7 +16,6 @@ import java.io.IOException;
 import java.util.*;
 import java.util.List;
 
-import static org.springframework.boot.autoconfigure.condition.ConditionOutcome.match;
 
 /**
  * Description:
@@ -25,6 +24,8 @@ import static org.springframework.boot.autoconfigure.condition.ConditionOutcome.
  * Date: 2023/3/12 1:07
  */
 public class ImgMatcher {
+
+    public static final double scale = 1.5D;
 
     private static final Logger logger = LoggerFactory.getLogger(ImgMatcher.class);
 
@@ -219,16 +220,16 @@ public class ImgMatcher {
 
     /**
      * 全屏截图
-     *
      * @return 返回BufferedImage
      */
-    public static BufferedImage getFullScreenShot(Integer count) {
+    public static BufferedImage getFullScreenShot() {
         BufferedImage bfImage = null;
-        int width = (int) Toolkit.getDefaultToolkit().getScreenSize().getWidth();
-        int height = (int) Toolkit.getDefaultToolkit().getScreenSize().getHeight();
+        Dimension screenSize = getScreenSize();
+        int width = (int) screenSize.getWidth();
+        int height = (int) screenSize.getHeight();
         try {
             Robot robot = new Robot();
-            bfImage = robot.createScreenCapture(new Rectangle(0, 0, width/count, height/count));
+            bfImage = robot.createScreenCapture(new Rectangle(0, 0, width, height));
         } catch (AWTException e) {
             e.printStackTrace();
         }
@@ -350,12 +351,16 @@ public class ImgMatcher {
                     if (found) {
                         logger.info("found one！");
                         //y
-                        int minY = y;
-                        int maxY = y + targetImgHeight;
+                        double v = y / scale;
+                        long round = Math.round(v);
+                        int minY = (int) round;
+                        int maxY = minY + targetImgHeight;
                         int locationY = ((minY + maxY) / 2);
                         //x
-                        int minX = x;
-                        int maxX = x + targetImgWidth;
+                        double v1 = x / scale;
+                        long round1 = Math.round(v1);
+                        int minX = (int) round1;
+                        int maxX = minX + targetImgWidth;
                         int locationX = ((minX + maxX) / 2);
                         results.add(new MatchResult(locationX, locationY));
                     }
@@ -366,6 +371,7 @@ public class ImgMatcher {
         logger.info(String.format("匹配图片：%s，结果：%s", targetImgPath, JSON.toJSONString(results)));
     }
 
+
     /**
      * 近似匹配
      */
@@ -373,13 +379,32 @@ public class ImgMatcher {
         if (!CollectionUtils.isEmpty(results)) {
             results.clear();
         }
-        // 近似匹配 只匹配中心点
+        // 近似匹配 匹配中心点及其上下左右一像素点 相似度超60%即认定为匹配
+        for (int y = 0; y < srcImgHeight; y++) {
+            for (int x = 0; x < srcImgWidth; x++) {
+                if ((srcImgRGBData[y][x] ^ targetImgRGBData[targetImgHeight/2][targetImgWidth/2]) == 0) {
+                    int matchCount = 1;
+                    // 上
+                    if ((srcImgRGBData[y-1][x] ^ targetImgRGBData[targetImgHeight/2 - 1][targetImgWidth/2]) == 0) {
+                        matchCount++;
+                    }
+                    // 下
+                    if ((srcImgRGBData[y+1][x] ^ targetImgRGBData[targetImgHeight/2 + 1][targetImgWidth/2]) == 0) {
+                        matchCount++;
+                    }
+                    // 左
+                    if ((srcImgRGBData[y][x-1] ^ targetImgRGBData[targetImgHeight/2][targetImgWidth/2 - 1]) == 0) {
+                        matchCount++;
+                    }
+                    // 右
+                    if ((srcImgRGBData[y][x+1] ^ targetImgRGBData[targetImgHeight/2][targetImgWidth/2 + 1]) == 0) {
+                        matchCount++;
+                    }
+                    if (matchCount >= 3) {
+                        logger.info("found one！");
+                        results.add(new MatchResult(x, y));
+                    }
 
-        for (int y = 0; y < srcImgHeight - targetImgHeight; y++) {
-            for (int x = 0; x < srcImgWidth - targetImgWidth; x++) {
-                if ((targetImgRGBData[targetImgHeight/2][targetImgWidth/2] ^ srcImgRGBData[y][x]) == 0) {
-                    logger.info(" similar found one！");
-                    results.add(new MatchResult(x, y));
                 }
             }
         }
@@ -387,6 +412,7 @@ public class ImgMatcher {
         logger.info(String.format("近似匹配图片：%s，结果：%s", targetImgPath, JSON.toJSONString(results)));
 
     }
+
 
     /**
      * 重新加载匹配器
@@ -439,23 +465,23 @@ public class ImgMatcher {
         targetImgHeight = targetImg.getHeight();
     }
 
-    /**
-     * 全屏截图
-     *
-     * @return 返回BufferedImage
-     */
-    private static BufferedImage getFullScreenShot() {
-        BufferedImage bfImage = null;
-        int width = (int) Toolkit.getDefaultToolkit().getScreenSize().getWidth();
-        int height = (int) Toolkit.getDefaultToolkit().getScreenSize().getHeight();
-        try {
-            Robot robot = new Robot();
-            bfImage = robot.createScreenCapture(new Rectangle(0, 0, width, height));
-        } catch (AWTException e) {
-            e.printStackTrace();
-        }
-        return bfImage;
-    }
+//    /**
+//     * 全屏截图
+//     *
+//     * @return 返回BufferedImage
+//     */
+//    public static BufferedImage getFullScreenShot() {
+//        BufferedImage bfImage = null;
+//        int width = (int) Toolkit.getDefaultToolkit().getScreenSize().getWidth();
+//        int height = (int) Toolkit.getDefaultToolkit().getScreenSize().getHeight();
+//        try {
+//            Robot robot = new Robot();
+//            bfImage = robot.createScreenCapture(new Rectangle(0, 0, width, height));
+//        } catch (AWTException e) {
+//            e.printStackTrace();
+//        }
+//        return bfImage;
+//    }
 
 
     /**
@@ -686,6 +712,58 @@ public class ImgMatcher {
         public void setLocationY(Integer locationY) {
             this.locationY = locationY;
         }
+    }
+
+
+
+    public static BufferedImage getScreenImage(int x, int y, int width, int height) {
+        try {
+            return (new Robot()).createScreenCapture(new Rectangle(x, y, width, height));
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    public static Dimension getScreenSize() {
+        return getScreenSizeFromImage(getScreenImage(0, 0, 10000, 5000));
+    }
+
+    private static Dimension getScreenSizeFromImage(BufferedImage image) {
+        if (image == null) {
+            return Toolkit.getDefaultToolkit().getScreenSize();
+        }
+        int width = image.getWidth();
+        int height = image.getHeight();
+        long[] w = new long[width];
+        long[] h = new long[height];
+        for (int i = 0; i < width; i++) {
+            long value = 0;
+            for (int j = 0; j < height; j++) {
+                value += image.getRGB(i, j);
+            }
+            w[i] = value;
+        }
+        for (int i = 0; i < height; i++) {
+            long value = 0;
+            for (int j = 0; j < width; j++) {
+                value += image.getRGB(j, i);
+            }
+            h[i] = value;
+        }
+        return new Dimension(getValidSize(w), getValidSize(h));
+    }
+
+    private static int getValidSize(long[] v) {
+        if (v == null || v.length == 0) {
+            return 0;
+        }
+        long last = v[v.length - 1];
+        for (int i = v.length - 1; i >= 0; i--) {
+            if (last != v[i]) {
+                return i + 1;
+            }
+        }
+        return 0;
     }
 
 }

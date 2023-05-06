@@ -26,8 +26,6 @@ public class OnmyojiConstant {
     // 被好友邀请悬赏图片
     public static final String OFFER_REWARD = "offerReward.png";
 
-    public static final String SCROLL_IN_YARD = "scrollInYard.png";
-
     // 返回按钮
     public static List<String> BACK_BUTTONS = new ArrayList<String>() {{
         add("backButton.png");
@@ -50,47 +48,32 @@ public class OnmyojiConstant {
     // 御魂 =================================================================================================================
 
     /**
-     * 单刷开始图片
+     * 开始图片
      */
-    public static String ROYAL_SOUL_SOLO_START_BUTTON = "solo.png";
+    public static String ROYAL_SOUL_START_BUTTON = "start.png";
 
-    /**
-     * 组队开始图片
-     */
-    public static String ROYAL_SOUL_TEAM_START_BUTTON = "team.png";
-
-    /**
-     * 结束图片
-     */
-    public static String ROYAL_SOUL_END_BUTTON = "end.png";
-
-    /**
-     * 组队结束图片
-     */
-    public static String ROYAL_SOUL_TEAM_END_BUTTON = "teamEnd.png";
 
     /**
      * 获取奖励图片
      */
     public static String ROYAL_SOUL_REWARD_BUTTON = "reward.png";
 
+    /**
+     * 结束图片
+     */
+    public static String ROYAL_SOUL_END_BUTTON = "end.png";
+
+
+
+
 
     // 困28 =================================================================================================================
 
     /**
-     * 困28章节按钮
+     * 开始探索按钮
      */
-    public static String TAN_SUO_CHAPTER_K28_BUTTON = "k28.png";
+    public static String TAN_SUO_START_BUTTON = "startTanSuo_solo.png";
 
-    /**
-     * 开始探索按钮 - 单刷
-     */
-    public static String TAN_SUO_START_SOLO_BUTTON = "startTanSuo.png";
-
-    /**
-     * 开始探索按钮 - 组队
-     */
-    public static String TAN_SUO_START_TEAM_BUTTON = "startTanSuoTeam.png";
 
     /**
      * 挑战怪物按钮
@@ -122,20 +105,28 @@ public class OnmyojiConstant {
      */
     public static String TAN_SUO_FULL_DEMARCATION_BUTTON = "fullDemarcation.png";
 
-    /**
-     * move
-     */
-    public static String TAN_SUO_MOVE_BUTTON = "move.png";
 
-    /**
-     * move2
-     */
-    public static String TAN_SUO_MOVE2_BUTTON = "move2.png";
+    public static String TAN_SUO_MOVE_POINT_BUTTON = "movePoint.png";
+
 
     /**
-     * 模拟器阴阳师标题图片
+     * 关闭探索准备界面
      */
-    public static String TAN_SUO_TITLE_BUTTON = "title.png";
+    public static String TAN_SUO_CLOSE_BUTTON = "closeTanSuo.png";
+
+    /**
+     * 28章
+     */
+    public static String TAN_SUO_CHAPTER_28_BUTTON = "chapter28.png";
 
 
+    /**
+     * 结束探索
+     */
+    public static String TAN_SUO_END_TANSUO_BUTTON = "endTanSuo.png";
+
+    /**
+     * 确认结束探索
+     */
+    public static String TAN_SUO_CONFIRM_END_TANSUO_BUTTON = "confirmEndTanSuo.png";
 }

@@ -1,6 +1,8 @@
 package com.commons.onmyoji.producer;
 
 import com.commons.onmyoji.config.OnmyojiScriptConfig;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
 /**
  * Title:
@@ -9,5 +11,25 @@ import com.commons.onmyoji.config.OnmyojiScriptConfig;
  * Author: csp
  * Create Time:2023/2/21 23:01
  */
+@Component
 public abstract class InstanceZoneBaseProducer<CONFIG extends OnmyojiScriptConfig> implements InstanceZoneProducer<CONFIG> {
+
+    /**
+     * 屏幕高度 默认1600
+     */
+    @Value("${screen.height}")
+    public int height = 1080;
+
+    /**
+     * 屏幕高度 默认1920
+     */
+    @Value("${screen.width}")
+    public final int width = 1920;
+
+    /**
+     * 缩放比例 默认1.0
+     */
+    @Value("${screen.scale}")
+    public double scale = 1.0D;
+
 }

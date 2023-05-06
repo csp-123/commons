@@ -15,6 +15,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+import static com.commons.onmyoji.matcher.ImgMatcher.getScreenSize;
+
 /**
  * Description:
  * 图片匹配器
@@ -23,6 +25,7 @@ import java.util.Random;
  */
 public class ImgMatcher2 {
 
+    public static final double scale = 1.5D;
     private static final Logger logger = LoggerFactory.getLogger(ImgMatcher2.class);
 
     private static final Robot robot = getRobot();
@@ -177,19 +180,18 @@ public class ImgMatcher2 {
         match();
         return results.size();
     }
-
     /**
      * 全屏截图
-     *
      * @return 返回BufferedImage
      */
-    public static BufferedImage getFullScreenShot(Integer count) {
+    public static BufferedImage getFullScreenShot() {
         BufferedImage bfImage = null;
-        int width = (int) Toolkit.getDefaultToolkit().getScreenSize().getWidth();
-        int height = (int) Toolkit.getDefaultToolkit().getScreenSize().getHeight();
+        Dimension screenSize = getScreenSize();
+        int width = (int) screenSize.getWidth();
+        int height = (int) screenSize.getHeight();
         try {
             Robot robot = new Robot();
-            bfImage = robot.createScreenCapture(new Rectangle(0, 0, width/count, height/count));
+            bfImage = robot.createScreenCapture(new Rectangle(0, 0, width, height));
         } catch (AWTException e) {
             e.printStackTrace();
         }
@@ -363,23 +365,23 @@ public class ImgMatcher2 {
         targetImgHeight = targetImg.getHeight();
     }
 
-    /**
-     * 全屏截图
-     *
-     * @return 返回BufferedImage
-     */
-    private static BufferedImage getFullScreenShot() {
-        BufferedImage bfImage = null;
-        int width = (int) Toolkit.getDefaultToolkit().getScreenSize().getWidth();
-        int height = (int) Toolkit.getDefaultToolkit().getScreenSize().getHeight();
-        try {
-            Robot robot = new Robot();
-            bfImage = robot.createScreenCapture(new Rectangle(0, 0, width, height));
-        } catch (AWTException e) {
-            e.printStackTrace();
-        }
-        return bfImage;
-    }
+//    /**
+//     * 全屏截图
+//     *
+//     * @return 返回BufferedImage
+//     */
+//    private static BufferedImage getFullScreenShot() {
+//        BufferedImage bfImage = null;
+//        int width = (int) Toolkit.getDefaultToolkit().getScreenSize().getWidth();
+//        int height = (int) Toolkit.getDefaultToolkit().getScreenSize().getHeight();
+//        try {
+//            Robot robot = new Robot();
+//            bfImage = robot.createScreenCapture(new Rectangle(0, 0, width, height));
+//        } catch (AWTException e) {
+//            e.printStackTrace();
+//        }
+//        return bfImage;
+//    }
 
 
     /**

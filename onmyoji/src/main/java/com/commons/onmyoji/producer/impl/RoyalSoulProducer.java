@@ -6,12 +6,16 @@ import com.commons.onmyoji.enums.HangUpTypeEnum;
 import com.commons.onmyoji.enums.TeamTypeEnum;
 import com.commons.onmyoji.job.OnmyojiJob;
 import com.commons.onmyoji.matcher.ImgMatcher;
+import com.commons.onmyoji.matcher.Matcher;
 import com.commons.onmyoji.producer.InstanceZoneBaseProducer;
 import com.commons.onmyoji.service.CommonService;
+import lombok.SneakyThrows;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import java.util.Arrays;
 
 /**
  * Title: 御魂脚本处理器
@@ -43,8 +47,11 @@ public class RoyalSoulProducer extends InstanceZoneBaseProducer<RoyalSoulConfig>
     private String reward;
 
 
+
     @Autowired
     CommonService commonService;
+
+
     
 
     /**
@@ -75,41 +82,52 @@ public class RoyalSoulProducer extends InstanceZoneBaseProducer<RoyalSoulConfig>
         String imgDirectory = System.getProperty("user.dir") + "\\" + jobConfig.imgPath + "\\";
 
 
-        // 根据组队类型 start end 赋值
-        if (job.getTeamType().equals(TeamTypeEnum.SOLO.getCode())) {
-            // solo
-            start = imgDirectory + OnmyojiConstant.ROYAL_SOUL_SOLO_START_BUTTON;
-            end = imgDirectory + OnmyojiConstant.ROYAL_SOUL_END_BUTTON;
-
-        } else if (job.getTeamType().equals(TeamTypeEnum.TEAM.getCode())) {
-            // 组队
-            start = imgDirectory + OnmyojiConstant.ROYAL_SOUL_TEAM_START_BUTTON;
-            end = imgDirectory + OnmyojiConstant.ROYAL_SOUL_TEAM_END_BUTTON;
-
-        }
+        // 开始图片
+        start = imgDirectory + OnmyojiConstant.ROYAL_SOUL_START_BUTTON;
         // 奖励图片
         reward = imgDirectory + OnmyojiConstant.ROYAL_SOUL_REWARD_BUTTON;
+        // 结束图片
+        end = imgDirectory + OnmyojiConstant.ROYAL_SOUL_END_BUTTON;
+        // start拼接上solo or team
+        if (job.getTeamType().equals(TeamTypeEnum.SOLO.getCode())) {
+            String[] split = start.split("\\.");
+            start = Arrays.asList(split).stream()
+                    .reduce((s1, s2) -> s1 + "_solo." + s2)
+                    .orElse(start);
+        }
+        if (job.getTeamType().equals(TeamTypeEnum.TEAM.getCode())) {
+            String[] split = start.split("\\.");
+            start = Arrays.asList(split).stream()
+                    .reduce((s1, s2) -> s1 + "_team." + s2)
+                    .orElse(start);
+        }
+
+        //图片匹配器
+        System.out.println(height);
+        System.out.println(width);
+        System.out.println(scale);
+        Matcher matcher = new Matcher(height, width, scale);
 
         // 处理挂机时长
         if (job.getHangUpType().getType().equals(HangUpTypeEnum.TIMES.getCode())) {
             // 限次
             for (int i = 1; i <= job.getHangUpType().getTimes(); i++) {
-                executeOnce(start, end, reward, job);
+                executeOnce(start, end, reward, job, matcher);
             }
         } else if (job.getHangUpType().getType().equals(HangUpTypeEnum.TIME.getCode())) {
             // 限时
             long endTime = System.currentTimeMillis() + 60 * 1000 * 1000;
             while (System.currentTimeMillis() <= endTime) {
-                executeOnce(start, end, reward, job);
+                executeOnce(start, end, reward, job, matcher);
             }
         } else if (job.getHangUpType().getType().equals(HangUpTypeEnum.FOREVER.getCode())) {
             // 不限
             while (true) {
-                executeOnce(start, end, reward, job);
+                executeOnce(start, end, reward, job, matcher);
             }
         }
 
-
+        threadLocal.remove();
     }
 
     /**
@@ -119,18 +137,19 @@ public class RoyalSoulProducer extends InstanceZoneBaseProducer<RoyalSoulConfig>
      * @param end
      * @param job
      */
-    private void executeOnce(String start, String end, String reward, OnmyojiJob<RoyalSoulConfig> job) {
+    private void executeOnce(String start, String end, String reward, OnmyojiJob<RoyalSoulConfig> job, Matcher matcher) {
+        //  计数器
         Integer count = threadLocal.get();
         if (count == null) {
             count = 1;
         }
 
-        logger.info(String.format("=============执行第%s次挂机脚本，处理器：[%s]，组队类型：[%s]=============", count, getProcuderName(), job.getTeamType(), TeamTypeEnum.find(job.getTeamType())));
+        logger.info(String.format("=============执行第%s次挂机脚本，处理器：[%s]，组队类型：[%s]=============", count, getProcuderName(), TeamTypeEnum.find(job.getTeamType()).getDesc()));
         if (job.getTeamType().equals(TeamTypeEnum.SOLO.getCode())) {
-            executeOnceInSoloMod(start, end, reward, job);
+            executeOnceInSoloMod(start, end, reward, job, matcher);
         }
         if (job.getTeamType().equals(TeamTypeEnum.TEAM.getCode())) {
-            executeOnceInTeamMod(start, end, reward, job);
+            executeOnceInTeamMod(start, end, reward, job, matcher);
         }
         logger.info("=============执行结束=============");
         threadLocal.set(++count);
@@ -139,7 +158,8 @@ public class RoyalSoulProducer extends InstanceZoneBaseProducer<RoyalSoulConfig>
     /**
      * 执行一次挂机脚本 - 单刷模式
      */
-    private void executeOnceInSoloMod(String start, String end, String reward, OnmyojiJob<RoyalSoulConfig> job) {
+    private void executeOnceInSoloMod(String start, String end, String reward, OnmyojiJob<RoyalSoulConfig> job, Matcher matcher) {
+        // todo 尚未改造，单刷较少
         // 点击开始
         ImgMatcher.matchAndClick(start, 1, true);
         // 点击获得奖励
@@ -156,13 +176,31 @@ public class RoyalSoulProducer extends InstanceZoneBaseProducer<RoyalSoulConfig>
      * @param end   结束图片路径
      * @param job   job配置
      */
-    private void executeOnceInTeamMod(String start, String end, String reward, OnmyojiJob<RoyalSoulConfig> job) {
+    @SneakyThrows
+    private void executeOnceInTeamMod(String start, String end, String reward, OnmyojiJob<RoyalSoulConfig> job, Matcher matcher) {
+        // 匹配开始
+        int count;
+        do {
+           count = matcher.count(start, false);
+           Thread.sleep(1000);
+        } while (count != 1);
         // 点击开始
-        ImgMatcher.matchAndClick(start, 1, true);
-        // 点击获取奖励
-        ImgMatcher.matchAndClick(reward, 2, true);
+        matcher.clickFirst(start, true, false);
+        // 睡眠10s，不会有人能15s刷魂吧
+
+        Thread.sleep(15000);
+        // 匹配领奖
+        do {
+            count = matcher.count(reward, false);
+        } while (count != 2);
+        // 领取奖励
+        matcher.click(reward, true, false);
+        // 匹配结束
+        do {
+            count = matcher.count(end, false);
+        } while (count != 2);
         // 点击结束
-        ImgMatcher.matchAndClick(end, 2, true);
+        matcher.click(end, true, false);
     }
 
     @Override

@@ -4,3 +4,17 @@ spring:
     name: onmyoji
 
 
+# 屏幕相关
+screen:
+  # 屏幕宽度
+  width: 2560
+  # 屏幕高度
+  height: 1600
+  # 缩放比例
+  scale: 1.5D
+
+
+
+
+
+

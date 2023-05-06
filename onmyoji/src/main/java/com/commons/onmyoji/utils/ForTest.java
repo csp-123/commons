@@ -3,10 +3,13 @@ package com.commons.onmyoji.utils;
 import com.commons.onmyoji.constant.OnmyojiConstant;
 import com.commons.onmyoji.job.OnmyojiJob;
 import com.commons.onmyoji.matcher.ImgMatcher;
+import com.commons.onmyoji.matcher.ImgMatcher2;
+import com.commons.onmyoji.matcher.Matcher;
 import com.commons.onmyoji.thread.OnmyojiDeamonThread;
 import com.google.common.collect.Maps;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.awt.*;
 import java.io.File;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -20,16 +23,16 @@ import java.util.stream.Collectors;
 public class ForTest {
 
 
-
     public static void main(String[] args) {
 
-//        String projectPath = System.getProperty("user.dir");
-//        FindRobot findRobot = new FindRobot("D:\\java\\JavaProjects\\commons\\onmyoji\\src\\main\\resources\\img\\royalsoul\\team.png", null, 0, 0);
-//        System.out.println(findRobot.getFindX());
-//        System.out.println(findRobot.getFindY());
-//        OnmyojiJob job = new OnmyojiJob();
 
-        System.out.println(ImgMatcher.similarCount("D:\\java\\JavaProjects\\GitHub\\commons\\onmyoji\\src\\main\\resources\\img\\tansuo\\challengeBoss.png"));
+        String path = "D:\\softs\\ProjectRepository\\commons\\onmyoji\\src\\main\\resources\\img\\royalsoul\\start_team.png";
+
+        Matcher matcher = new Matcher(2560, 1600, 1.5D);
+
+//        matcher.count(path);
+
+        matcher.count(path, false);
 
 
     }
