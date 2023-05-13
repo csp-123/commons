@@ -15,7 +15,7 @@ import org.springframework.stereotype.Component;
 public abstract class InstanceZoneBaseProducer<CONFIG extends OnmyojiScriptConfig> implements InstanceZoneProducer<CONFIG> {
 
     /**
-     * 屏幕高度 默认1600
+     * 屏幕高度 默认1080
      */
     @Value("${screen.height}")
     public int height = 1080;
@@ -26,10 +26,5 @@ public abstract class InstanceZoneBaseProducer<CONFIG extends OnmyojiScriptConfi
     @Value("${screen.width}")
     public final int width = 1920;
 
-    /**
-     * 缩放比例 默认1.0
-     */
-    @Value("${screen.scale}")
-    public double scale = 1.0D;
 
 }

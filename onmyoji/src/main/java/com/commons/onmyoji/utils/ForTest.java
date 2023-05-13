@@ -26,13 +26,13 @@ public class ForTest {
     public static void main(String[] args) {
 
 
-        String path = "D:\\softs\\ProjectRepository\\commons\\onmyoji\\src\\main\\resources\\img\\royalsoul\\start_team.png";
+        String path = "D:\\IdeaProjects\\onmyoji\\src\\main\\resources\\img\\tansuo\\challengeBoss.png";
 
-        Matcher matcher = new Matcher(2560, 1600, 1.5D);
+        Matcher matcher = new Matcher(1920, 1080);
 
 //        matcher.count(path);
 
-        matcher.count(path, false);
+        matcher.count(path,  false);
 
 
     }

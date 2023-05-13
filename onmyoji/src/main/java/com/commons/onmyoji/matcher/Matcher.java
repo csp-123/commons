@@ -1,7 +1,9 @@
 package com.commons.onmyoji.matcher;
 
 import com.alibaba.fastjson.JSON;
+import com.commons.onmyoji.utils.ImageSimilarity;
 import lombok.Getter;
+import lombok.SneakyThrows;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.Assert;
@@ -30,7 +32,26 @@ public class Matcher {
 
     private static final Logger logger = LoggerFactory.getLogger(Matcher.class);
 
+
     private static final Robot robot = getRobot();
+
+    // 近似匹配阈值
+    private static final double SIMILAR_THRESHOLD = 0.9D;
+
+    /**
+     * RGB数据缓存
+     */
+    private static Map<String, int[][]> RGBDataMap = new HashMap<>(16);
+
+    /**
+     * 近似匹配RBG数据缓存
+     */
+    private static Map<String, int[][]> similarRGBDataMap = new HashMap<>(16);
+
+    /**
+     * BufferedImage 数据缓存
+     */
+    private static Map<String, BufferedImage> imgMap = new HashMap<>(16);
 
     /**
      * 全屏高
@@ -41,11 +62,6 @@ public class Matcher {
      * 全屏宽
      */
     private final int fullScreenWidth;
-
-    /**
-     * 全屏缩放比
-     */
-    private final double fullScreenScale;
 
     /**
      * 来源图片路径
@@ -103,19 +119,19 @@ public class Matcher {
     private List<Matcher.MatchResult> results = new ArrayList<>();
 
 
-    public Matcher(String targetImgPath, String srcImgPath, int screenHeight, int screenWidth, double scale) {
+    public Matcher(String targetImgPath, String srcImgPath, int screenHeight, int screenWidth) {
         this.targetImgPath = targetImgPath;
         this.srcImgPath = srcImgPath;
         this.fullScreenHeight = screenHeight;
         this.fullScreenWidth = screenWidth;
-        this.fullScreenScale = scale;
+
         this.reload(targetImgPath);
     }
 
-    public Matcher(int screenHeight, int screenWidth, double scale) {
+    public Matcher(int screenWidth, int screenHeight) {
         this.fullScreenHeight = screenHeight;
         this.fullScreenWidth = screenWidth;
-        this.fullScreenScale = scale;
+
     }
 
 
@@ -143,9 +159,34 @@ public class Matcher {
         results.stream()
                 // 移动鼠标并点击
                 .forEach(matchResult -> {
-                    mouseMove(matchResult.locationX, matchResult.locationY, random, targetImgWidth, targetImgHeight);
+                    mouseMove(matchResult.locationX, matchResult.locationY, random, targetImgWidth, targetImgHeight, true);
                     leftClick(300, true);
                 });
+    }
+
+    /**
+     * 点击指定位置
+     * @param x x坐标
+     * @param y y坐标
+     * @param targetImgPath 目标图路径，为空则代表精确点击，不需随机处理
+     */
+
+    public void click(Integer x, Integer y, String targetImgPath) {
+        Integer height = 0;
+        Integer width = 0;
+        boolean random = StringUtils.hasText(targetImgPath);
+        if (random) {
+            BufferedImage bfImageFromPath = getBfImageFromPath(targetImgPath);
+            height = bfImageFromPath.getHeight();
+            width = bfImageFromPath.getWidth();
+        }
+
+        // 移动
+        mouseMove(x, y, random, width, height, true);
+        // 点击
+        leftClick(0, false);
+
+
     }
 
     /**
@@ -161,10 +202,26 @@ public class Matcher {
             return;
         }
         MatchResult matchResult = results.get(0);
-        mouseMove(matchResult.locationX, matchResult.locationY, random, targetImgWidth, targetImgHeight);
+        mouseMove(matchResult.locationX, matchResult.locationY, random, targetImgWidth, targetImgHeight, false);
         leftClick(300, true);
     }
 
+    /**
+     * 点击一个匹配点
+     * @param targetImgPath 目标图路径
+     * @param random 是否随机处理
+     * @param isSimilar 是否近似匹配
+     */
+    public void clickFirst(String targetImgPath, boolean random, boolean isSimilar, boolean delay) {
+        match(targetImgPath, isSimilar);
+        // 点击
+        if (results.isEmpty()) {
+            return;
+        }
+        MatchResult matchResult = results.get(0);
+        mouseMove(matchResult.locationX, matchResult.locationY, random, targetImgWidth, targetImgHeight, delay);
+        leftClick(null, delay);
+    }
 
 
 
@@ -173,7 +230,10 @@ public class Matcher {
      * @param time 按下持续时间
      * @param random 按下持续时间是否进行随机处理
      */
-    private static void leftClick(int time, boolean random) {
+    private static void leftClick(Integer time, boolean random) {
+        // 默认300
+        if (time == null)
+            time = 300;
         leftDown();
         int delayTime = setAutoDelay(time == 0 ? 100 : time, random);
         leftUp();
@@ -218,14 +278,16 @@ public class Matcher {
      * @param random 是否需要进行随机处理
      * @param targetImgWidth 图片宽度
      * @param targetImgHeight 图片高度
+     * @param delay 是否需要延时
      */
-    private static void mouseMove(int x, int y, boolean random, int targetImgWidth, int targetImgHeight) {
+    private static void mouseMove(int x, int y, boolean random, int targetImgWidth, int targetImgHeight, boolean delay) {
         int trueX = random ? buildRandomLocation(x, targetImgWidth) : x;
         int trueY = random ? buildRandomLocation(y, targetImgHeight) : y;
         robot.mouseMove(trueX, trueY);
         logger.info(String.format("鼠标移动成功！指定移动位置：[%s][%s]，是否随机处理：[%s]，实际移动位置：[%s][%s]", x, y, random, trueX, trueY));
         // 鼠标移动后停顿一段时间，防止被检测
-        waitSomeTime(200, 400);
+        if (delay)
+            waitSomeTime(200, 400);
     }
 
     /**
@@ -268,6 +330,7 @@ public class Matcher {
      * @param targetImgPath 目标图片
      * @param isSimilar 是否近似匹配
      */
+    @SneakyThrows
     private void match(String targetImgPath, boolean isSimilar) {
 
         reload(targetImgPath);
@@ -279,69 +342,30 @@ public class Matcher {
         }
 
         if (isSimilar) {
-            ColorConvertOp convertOp = new ColorConvertOp(ColorSpace.getInstance(ColorSpace.CS_GRAY), null);
-            convertOp.filter(targetImg, targetImg);
-            convertOp.filter(srcImg, srcImg);
-            int[][] newTargetRGB = getImageRGB(targetImg);
-            int[][] newSrcRGB = getImageRGB(srcImg);
-
             // 近似匹配规则：
-            // 匹配中心点及其上下左右一像素点 相似度超60%即认定为匹配
-
-            // 近似匹配 匹配中心点及其上下左右一像素点 相似度超60%即认定为匹配
-//            for (int y = 0; y < srcImgHeight; y++) {
-//                for (int x = 0; x < srcImgWidth; x++) {
-//                    if ((newSrcRGB[y][x] ^ newTargetRGB[targetImgHeight/2][targetImgWidth/2]) == 0) {
-//                        int matchCount = 1;
-//                        // 上
-//                        if ((newSrcRGB[y-1][x] ^ newTargetRGB[targetImgHeight/2 - 1][targetImgWidth/2]) == 0) {
-//                            matchCount++;
-//                        }
-//                        // 下
-//                        if ((newSrcRGB[y+1][x] ^ newTargetRGB[targetImgHeight/2 + 1][targetImgWidth/2]) == 0) {
-//                            matchCount++;
-//                        }
-//                        // 左
-//                        if ((newSrcRGB[y][x-1] ^ newTargetRGB[targetImgHeight/2][targetImgWidth/2 - 1]) == 0) {
-//                            matchCount++;
-//                        }
-//                        // 右
-//                        if ((newSrcRGB[y][x+1] ^ newTargetRGB[targetImgHeight/2][targetImgWidth/2 + 1]) == 0) {
-//                            matchCount++;
-//                        }
-//                        if (matchCount >= 3) {
-//                            logger.info("found one！");
-//                            Double realX = Math.floor(x / fullScreenScale);
-//                            Double realY = Math.floor(y / fullScreenScale);
-//                            results.add(new Matcher.MatchResult(realX.intValue(), realY.intValue()));
-//                        }
-//
-//                    }
-//                }
-//            }
-
+            // 灰度匹配，相似度超过阈值即认定为匹配成功
             for (int y = 0; y < srcImgHeight - targetImgHeight; y++) {
                 for (int x = 0; x < srcImgWidth - targetImgWidth; x++) {
-                    if ((newTargetRGB[0][0] ^ newSrcRGB[y][x]) == 0
-                            && (newTargetRGB[0][targetImgWidth - 1] ^ newSrcRGB[y][x + targetImgWidth - 1]) == 0
-                            && (newTargetRGB[targetImgHeight - 1][targetImgWidth - 1] ^ newSrcRGB[y + targetImgHeight - 1][x + targetImgWidth - 1]) == 0
-                            && (newTargetRGB[targetImgHeight - 1][0] ^ newSrcRGB[y + targetImgHeight - 1][x]) == 0) {
 
-                        //如果比较结果完全相同，则说明图片找到，填充查找到的位置坐标数据到查找结果数组。
-
-                        logger.error("y:" + y);
-                        logger.error("x:" + x);
-                        //y
-                        int realY = ((Double) Math.floor(y / fullScreenScale)).intValue();
-                        int maxY = realY + targetImgHeight;
-                        int locationY = ((realY + maxY) / 2);
-                        //x
-                        int realX = ((Double) Math.floor(x / fullScreenScale)).intValue();
-                        int maxX = realX + targetImgWidth;
-                        int locationX = ((realX + maxX) / 2);
-                        results.add(new MatchResult(locationX, locationY));
-
+                    // 首个位点相同时 进一步判断，节省性能，加快速度
+                    if (srcImgRGBData[y][x] == targetImgRGBData[0][0]) {
+                        BufferedImage image = robot.createScreenCapture(new Rectangle(x, y, targetImgWidth, targetImgHeight));
+                        // 相似度
+                        double similarity = ImageSimilarity.calSimilarity(image, targetImg);
+                        logger.error("相似度为" + similarity);
+                        if (similarity > SIMILAR_THRESHOLD) {
+                            //y
+                            int maxY = y + targetImgHeight;
+                            int locationY = ((y + maxY) / 2);
+                            //x
+                            int maxX = x + targetImgWidth;
+                            int locationX = ((x + maxX) / 2);
+                            results.add(new Matcher.MatchResult(locationX, locationY));
+                            x += targetImgWidth;
+                            y += targetImgHeight;
+                        }
                     }
+
                 }
             }
         } else {
@@ -349,28 +373,26 @@ public class Matcher {
             // 精确匹配规则：
             //根据目标图的尺寸，得到目标图四个角映射到屏幕截图上的四个点，
             //判断截图上对应的四个点与图B的四个角像素点的值是否相同，
-            //如果相同就将屏幕截图上映射范围内的所有的点与目标图的所有的点进行比较。
+            //如果相同就将屏幕截图上映射范围内的所有的点与目标图的所有的点进行比较。 --- 暂时舍弃
+
             for (int y = 0; y < srcImgHeight - targetImgHeight; y++) {
                 for (int x = 0; x < srcImgWidth - targetImgWidth; x++) {
+
                     if ((targetImgRGBData[0][0] ^ srcImgRGBData[y][x]) == 0
                             && (targetImgRGBData[0][targetImgWidth - 1] ^ srcImgRGBData[y][x + targetImgWidth - 1]) == 0
                             && (targetImgRGBData[targetImgHeight - 1][targetImgWidth - 1] ^ srcImgRGBData[y + targetImgHeight - 1][x + targetImgWidth - 1]) == 0
                             && (targetImgRGBData[targetImgHeight - 1][0] ^ srcImgRGBData[y + targetImgHeight - 1][x]) == 0) {
-
+                        logger.error("found one!!!!");
                         //如果比较结果完全相同，则说明图片找到，填充查找到的位置坐标数据到查找结果数组。
 //                        boolean found = isMatchAll(y, x);
                         boolean found = true;
                         if (found) {
-                            logger.error("y:" + y);
-                            logger.error("x:" + x);
                             //y
-                            int realY = ((Double) Math.floor(y / fullScreenScale)).intValue();
-                            int maxY = realY + targetImgHeight;
-                            int locationY = ((realY + maxY) / 2);
+                            int maxY = y + targetImgHeight;
+                            int locationY = ((y + maxY) / 2);
                             //x
-                            int realX = ((Double) Math.floor(x / fullScreenScale)).intValue();
-                            int maxX = realX + targetImgWidth;
-                            int locationX = ((realX + maxX) / 2);
+                            int maxX = x + targetImgWidth;
+                            int locationX = ((x + maxX) / 2);
                             results.add(new Matcher.MatchResult(locationX, locationY));
 
                         }
@@ -419,10 +441,29 @@ public class Matcher {
     private void reload(String targetImgPath) {
 
         if (StringUtils.hasText(targetImgPath)) {
-            this.targetImg = getBfImageFromPath(targetImgPath);
+
+
+            // 查询BufferedImage缓存
+            if (imgMap.containsKey(targetImgPath)) {
+                targetImg = imgMap.get(targetImgPath);
+            } else {
+                // 加载并刷新缓存
+                this.targetImg = getBfImageFromPath(targetImgPath);
+                imgMap.put(targetImgPath, targetImg);
+            }
+            // 查询RGB缓存
+            if (RGBDataMap.containsKey(targetImgPath)) {
+                targetImgRGBData = RGBDataMap.get(targetImgPath);
+            } else {
+                // 加载，并刷新缓存
+                this.targetImgRGBData = getImageRGB(targetImg);
+                RGBDataMap.put(targetImgPath, targetImgRGBData);
+
+            }
             this.targetImgHeight = targetImg.getHeight();
             this.targetImgWidth = targetImg.getWidth();
-            this.targetImgRGBData = getImageRGB(targetImg);
+
+
         }
 
         if (StringUtils.hasText(srcImgPath)) {
@@ -495,12 +536,9 @@ public class Matcher {
      */
     private BufferedImage getFullScreenShot() {
         BufferedImage bfImage = null;
-        try {
-            Robot robot = new Robot();
-            bfImage = robot.createScreenCapture(new Rectangle(0, 0, this.fullScreenWidth, this.fullScreenHeight));
-        } catch (AWTException e) {
-            e.printStackTrace();
-        }
+
+        bfImage = robot.createScreenCapture(new Rectangle(0, 0, this.fullScreenWidth, this.fullScreenHeight));
+
         return bfImage;
     }
 

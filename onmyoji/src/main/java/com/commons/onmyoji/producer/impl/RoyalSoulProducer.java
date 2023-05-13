@@ -46,12 +46,6 @@ public class RoyalSoulProducer extends InstanceZoneBaseProducer<RoyalSoulConfig>
      */
     private String reward;
 
-
-
-    @Autowired
-    CommonService commonService;
-
-
     
 
     /**
@@ -103,10 +97,7 @@ public class RoyalSoulProducer extends InstanceZoneBaseProducer<RoyalSoulConfig>
         }
 
         //图片匹配器
-        System.out.println(height);
-        System.out.println(width);
-        System.out.println(scale);
-        Matcher matcher = new Matcher(height, width, scale);
+        Matcher matcher = new Matcher(width, height);
 
         // 处理挂机时长
         if (job.getHangUpType().getType().equals(HangUpTypeEnum.TIMES.getCode())) {
@@ -188,7 +179,7 @@ public class RoyalSoulProducer extends InstanceZoneBaseProducer<RoyalSoulConfig>
         matcher.clickFirst(start, true, false);
         // 睡眠10s，不会有人能15s刷魂吧
 
-        Thread.sleep(15000);
+        Thread.sleep(10000);
         // 匹配领奖
         do {
             count = matcher.count(reward, false);

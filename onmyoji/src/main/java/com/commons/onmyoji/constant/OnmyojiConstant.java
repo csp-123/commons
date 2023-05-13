@@ -48,7 +48,7 @@ public class OnmyojiConstant {
     // 御魂 =================================================================================================================
 
     /**
-     * 开始图片
+     * 开始图片：在处理器实现类中会拼接_solo or _team
      */
     public static String ROYAL_SOUL_START_BUTTON = "start.png";
 
@@ -106,7 +106,7 @@ public class OnmyojiConstant {
     public static String TAN_SUO_FULL_DEMARCATION_BUTTON = "fullDemarcation.png";
 
 
-    public static String TAN_SUO_MOVE_POINT_BUTTON = "movePoint.png";
+    public static String TAN_SUO_MOVE_POINT_BUTTON = "auto.png";
 
 
     /**

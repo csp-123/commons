@@ -85,7 +85,7 @@ public class TanSuoProducer extends InstanceZoneBaseProducer<TanSuoConfig> {
     private String confirmEndTanSuo;
 
     /**
-     * 移动点
+     * 移动点：借助阴阳师自动挑战的寻敌功能，移动后取消自动挑战，不进行挑战就不会消耗小纸人体力
      */
     private String movePoint;
 
@@ -108,9 +108,7 @@ public class TanSuoProducer extends InstanceZoneBaseProducer<TanSuoConfig> {
         // 脚本执行次数
         Integer count = 0;
         threadLocal.set(count);
-        // todo 1. 目前仅支持御魂界面开始挂机 庭院相关处理后续提供一个公共方法
-        // todo 2. 组队逻辑待补全
-        // todo 3. 容错机制：好友邀请悬赏（完成） 宠物发现额外奖励、组队超市重新邀请
+
         // todo 4. 清理结界突破（9退4）
 
         // 返回至庭院
@@ -146,7 +144,7 @@ public class TanSuoProducer extends InstanceZoneBaseProducer<TanSuoConfig> {
         movePoint = imgDirectory + OnmyojiConstant.TAN_SUO_MOVE_POINT_BUTTON;
 
         // 图片匹配器
-        Matcher matcher = new Matcher(height, width, scale);
+        Matcher matcher = new Matcher(width, height);
 
         // 处理挂机时长
         if (job.getHangUpType().getType().equals(HangUpTypeEnum.TIMES.getCode())) {
@@ -217,34 +215,32 @@ public class TanSuoProducer extends InstanceZoneBaseProducer<TanSuoConfig> {
         } while (count != 1);
         // 单击开始探索
         matcher.clickFirst(startTanSuo, true, false);
-
-//        ImgMatcher.matchAndClick(startTanSuo, 1, true);
-        boolean moved = false;
+        Thread.sleep(2000);
         while (matcher.count(challengeBoss, false) == 0) {
             logger.info("====暂未发现boss==");
             if (matcher.count(challenge, true) != 0) {
                 logger.info("==小怪尚存==");
                 // 挑战小怪
-                matcher.clickFirst(challenge, true, true);
+                matcher.clickFirst(challenge, true, true, false);
                 while (matcher.count(reward, false) != 1);
                 matcher.clickFirst(reward, true, false);
                 while (matcher.count(end, false) != 1);
                 matcher.clickFirst(end, true, false);
                 Thread.sleep(1000);
-                moved = false;
-            } else if (!moved && matcher.count(challenge, true) == 0) {
-                logger.info("====没有移动过且场上无可挑战小怪===");
-                // 没有移动过且场上无可挑战小怪
-                moved = true;
-                // 移动
-                matcher.clickFirst(movePoint, true, false);
-                //移动后停顿2.5秒
-                Thread.sleep(2500);
-            } else if (moved && ImgMatcher.similarCount(challenge) == 0) {
-                logger.info("====移动过且场上无可挑战小怪====");
-                // 移动过且场上无可挑战小怪
-                moved = false;
+
+            } else {
+                logger.info("==移动==");
+                // 场上无可挑战小怪
+                // 移动  todo 目前是点击固定位置 803，507  后续看一下有没有更好的解决方案
+                matcher.click(movePoint, true, false);
+                matcher.click(803, 537, movePoint);
+                //移动后停顿0.8秒，鼠标移动会停顿200-400毫秒，保证总耗时一秒以内， 避免自动挑战成功
+                Thread.sleep(800);
+                matcher.click(803, 537, movePoint);
+                // 视角移动后停顿2s
+                Thread.sleep(2000);
             }
+            Thread.sleep(2000);
 
         }
         // 不挑战boss，可简化流程，不会出现多种情况，损失并不大。
