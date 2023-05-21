@@ -246,7 +246,7 @@ public class Matcher {
             return false;
         }
 
-        IntStream.range(1, num)
+        IntStream.range(0, num)
                 .forEach(cur-> {
                     MatchResult matchResult = results.get(cur);
                     mouseMove(matchResult.locationX, matchResult.locationY, random, targetImgWidth, targetImgHeight, false);

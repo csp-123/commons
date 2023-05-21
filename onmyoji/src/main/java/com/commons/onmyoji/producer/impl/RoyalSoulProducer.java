@@ -45,7 +45,7 @@ public class RoyalSoulProducer extends InstanceZoneBaseProducer<RoyalSoulConfig>
     @Override
     public void produce(OnmyojiJob<RoyalSoulConfig> job) {
         // 脚本执行次数
-        int count = 0;
+        int count = 1;
         threadLocal.set(count);
 
         // 配置： 层数、截图存放位置
@@ -111,9 +111,6 @@ public class RoyalSoulProducer extends InstanceZoneBaseProducer<RoyalSoulConfig>
     private void executeOnce(String start, String end, String reward, OnmyojiJob<RoyalSoulConfig> job, Matcher matcher) {
         //  计数器
         Integer count = threadLocal.get();
-        if (count == null) {
-            count = 1;
-        }
 
         logger.info(String.format("=============执行第%s次挂机脚本，处理器：[%s]，组队类型：[%s]=============", count, getProcuderName(), TeamTypeEnum.find(job.getTeamType()).getDesc()));
         if (job.getTeamType().equals(TeamTypeEnum.SOLO.getCode())) {
@@ -170,23 +167,23 @@ public class RoyalSoulProducer extends InstanceZoneBaseProducer<RoyalSoulConfig>
     private void executeOnceInTeamMod(String start, String end, String reward, OnmyojiJob<RoyalSoulConfig> job, Matcher matcher) {
 
         // 开始
-        boolean success;
-        do {
-            success = matcher.clickBlocking(start, true, 1, false);
-        } while (success);
-
+        boolean startSuccess = false;
+        while (!startSuccess) {
+            startSuccess = matcher.clickBlocking(start, true, 1, false);
+        }
         // 睡眠10s，不会有人能15s刷魂吧
         Thread.sleep(15000);
-
         // 领取奖励
-        do {
-            success = matcher.clickBlocking(reward, true, 2, false);
-        } while (success);
+        boolean rewardSuccess= false;
+        while (!rewardSuccess) {
+            rewardSuccess = matcher.clickBlocking(reward, true, 2, false);
+        }
 
         // 结束
-        do {
-            success = matcher.clickBlocking(end, true, 2, false);
-        } while (success);
+        boolean endSuccess = false;
+        while (!endSuccess) {
+            endSuccess = matcher.clickBlocking(end, true, 2, false);
+        }
 
     }
 

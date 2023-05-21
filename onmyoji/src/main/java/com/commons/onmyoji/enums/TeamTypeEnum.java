@@ -20,6 +20,9 @@ public enum TeamTypeEnum {
      */
     TEAM(2, "组队"),
 
+    /**
+     * 线上组队
+     */
     TEAM_ONLINE(3, "线上组队");
 
     /**
