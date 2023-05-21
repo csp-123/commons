@@ -18,7 +18,9 @@ public enum TeamTypeEnum {
     /**
      * 组队
      */
-    TEAM(2, "组队");
+    TEAM(2, "组队"),
+
+    TEAM_ONLINE(3, "线上组队");
 
     /**
      * 状态码

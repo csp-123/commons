@@ -20,6 +20,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.*;
 import java.util.List;
+import java.util.stream.IntStream;
 
 /**
  * Description:
@@ -211,6 +212,7 @@ public class Matcher {
      * @param targetImgPath 目标图路径
      * @param random 是否随机处理
      * @param isSimilar 是否近似匹配
+     * @param delay 是否延时
      */
     public void clickFirst(String targetImgPath, boolean random, boolean isSimilar, boolean delay) {
         match(targetImgPath, isSimilar);
@@ -222,6 +224,54 @@ public class Matcher {
         mouseMove(matchResult.locationX, matchResult.locationY, random, targetImgWidth, targetImgHeight, delay);
         leftClick(null, delay);
     }
+
+
+
+    /**
+     * 阻塞点击
+     * @param targetImgPath 目标图路径
+     * @param random 是否随机处理
+     * @param num 点击数量
+     * @param isSimilar 是否近似匹配
+     * @return  是否成功
+     */
+    public boolean clickBlocking(String targetImgPath, boolean random, Integer num, boolean isSimilar) {
+        match(targetImgPath, isSimilar);
+        // 点击
+        if (results.isEmpty()) {
+            return false;
+        }
+
+        if (results.size() < num) {
+            return false;
+        }
+
+        IntStream.range(1, num)
+                .forEach(cur-> {
+                    MatchResult matchResult = results.get(cur);
+                    mouseMove(matchResult.locationX, matchResult.locationY, random, targetImgWidth, targetImgHeight, false);
+                    leftClick(300, true);
+                });
+        return true;
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -406,34 +456,6 @@ public class Matcher {
 
     }
 
-
-    /**
-     * 判断屏幕截图上目标图映射范围内的全部点是否全部和小图的点一一对应。
-     *
-     * @param y - 与目标图左上角像素点想匹配的屏幕截图y坐标
-     * @param x - 与目标图左上角像素点想匹配的屏幕截图x坐标
-     * @return
-     */
-    private boolean isMatchAll(int y, int x) {
-        int biggerY = 0;
-        int biggerX = 0;
-        int xor = 0;
-        for (int smallerY = 0; smallerY < targetImgHeight; smallerY++) {
-            biggerY = y + smallerY;
-            for (int smallerX = 0; smallerX < targetImgWidth; smallerX++) {
-                biggerX = x + smallerX;
-                if (biggerY >= srcImgHeight || biggerX >= srcImgWidth) {
-                    return false;
-                }
-                xor = targetImgRGBData[smallerY][smallerX] ^ srcImgRGBData[biggerY][biggerX];
-                if (xor != 0) {
-                    return false;
-                }
-            }
-        }
-
-        return true;
-    }
 
     /**
      * 初始化

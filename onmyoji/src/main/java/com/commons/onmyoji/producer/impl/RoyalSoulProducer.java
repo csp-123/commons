@@ -31,22 +31,6 @@ public class RoyalSoulProducer extends InstanceZoneBaseProducer<RoyalSoulConfig>
 
     ThreadLocal<Integer> threadLocal = new ThreadLocal<>();
 
-    /**
-     * 开始图片路径
-     */
-    private String start;
-
-    /**
-     * 结束图片路径
-     */
-    private String end;
-
-    /**
-     * 获取奖励图片路径
-     */
-    private String reward;
-
-    
 
     /**
      * 从哪个界面开始，庭院？还是御魂界面？ 或者兼容？
@@ -63,13 +47,6 @@ public class RoyalSoulProducer extends InstanceZoneBaseProducer<RoyalSoulConfig>
         // 脚本执行次数
         int count = 0;
         threadLocal.set(count);
-        // todo 1. 目前仅支持御魂界面开始挂机 庭院相关处理后续提供一个公共方法
-        // todo 2. 组队逻辑待补全
-        // todo 3. 容错机制：好友邀请悬赏（完成） 宠物发现额外奖励、组队超市重新邀请
-
-        // 返回至庭院
-        //commonService.backToYard(job.getTeamType());
-        // 从庭院进入御魂
 
         // 配置： 层数、截图存放位置
         RoyalSoulConfig jobConfig = job.getConfig();
@@ -77,27 +54,30 @@ public class RoyalSoulProducer extends InstanceZoneBaseProducer<RoyalSoulConfig>
 
 
         // 开始图片
-        start = imgDirectory + OnmyojiConstant.ROYAL_SOUL_START_BUTTON;
+        String start = imgDirectory + OnmyojiConstant.ROYAL_SOUL_START_BUTTON;
         // 奖励图片
-        reward = imgDirectory + OnmyojiConstant.ROYAL_SOUL_REWARD_BUTTON;
+        String reward = imgDirectory + OnmyojiConstant.ROYAL_SOUL_REWARD_BUTTON;
         // 结束图片
-        end = imgDirectory + OnmyojiConstant.ROYAL_SOUL_END_BUTTON;
+        String end = imgDirectory + OnmyojiConstant.ROYAL_SOUL_END_BUTTON;
+
+
         // start拼接上solo or team
         if (job.getTeamType().equals(TeamTypeEnum.SOLO.getCode())) {
             String[] split = start.split("\\.");
-            start = Arrays.asList(split).stream()
+            start = Arrays.stream(split)
                     .reduce((s1, s2) -> s1 + "_solo." + s2)
                     .orElse(start);
         }
         if (job.getTeamType().equals(TeamTypeEnum.TEAM.getCode())) {
             String[] split = start.split("\\.");
-            start = Arrays.asList(split).stream()
+            start = Arrays.stream(split)
                     .reduce((s1, s2) -> s1 + "_team." + s2)
                     .orElse(start);
         }
 
         //图片匹配器
         Matcher matcher = new Matcher(width, height);
+
 
         // 处理挂机时长
         if (job.getHangUpType().getType().equals(HangUpTypeEnum.TIMES.getCode())) {
@@ -124,9 +104,9 @@ public class RoyalSoulProducer extends InstanceZoneBaseProducer<RoyalSoulConfig>
     /**
      * 执行脚本
      *
-     * @param start
-     * @param end
-     * @param job
+     * @param start 开始图片
+     * @param end 结束图片
+     * @param job 任务
      */
     private void executeOnce(String start, String end, String reward, OnmyojiJob<RoyalSoulConfig> job, Matcher matcher) {
         //  计数器
@@ -142,21 +122,40 @@ public class RoyalSoulProducer extends InstanceZoneBaseProducer<RoyalSoulConfig>
         if (job.getTeamType().equals(TeamTypeEnum.TEAM.getCode())) {
             executeOnceInTeamMod(start, end, reward, job, matcher);
         }
+        if (job.getTeamType().equals(TeamTypeEnum.TEAM_ONLINE.getCode())) {
+            executeOnceInTeamOnlineMod(start, end, reward, job, matcher);
+        }
         logger.info("=============执行结束=============");
         threadLocal.set(++count);
     }
 
+
+
     /**
      * 执行一次挂机脚本 - 单刷模式
      */
+    @SneakyThrows
     private void executeOnceInSoloMod(String start, String end, String reward, OnmyojiJob<RoyalSoulConfig> job, Matcher matcher) {
         // todo 尚未改造，单刷较少
-        // 点击开始
-        ImgMatcher.matchAndClick(start, 1, true);
-        // 点击获得奖励
-        ImgMatcher.matchAndClick(start, 1, true);
-        // 点击结束
-        ImgMatcher.matchAndClick(start, 1, true);
+
+        // 开始
+        boolean success;
+        do {
+            success = matcher.clickBlocking(start, true, 1, false);
+        } while (success);
+
+        // 睡眠10s，不会有人能15s刷魂吧
+        Thread.sleep(15000);
+
+        // 领取奖励
+        do {
+            success = matcher.clickBlocking(reward, true, 1, false);
+        } while (success);
+
+        // 结束
+        do {
+            success = matcher.clickBlocking(end, true, 1, false);
+        } while (success);
     }
 
     /**
@@ -169,29 +168,56 @@ public class RoyalSoulProducer extends InstanceZoneBaseProducer<RoyalSoulConfig>
      */
     @SneakyThrows
     private void executeOnceInTeamMod(String start, String end, String reward, OnmyojiJob<RoyalSoulConfig> job, Matcher matcher) {
-        // 匹配开始
-        int count;
-        do {
-           count = matcher.count(start, false);
-           Thread.sleep(1000);
-        } while (count != 1);
-        // 点击开始
-        matcher.clickFirst(start, true, false);
-        // 睡眠10s，不会有人能15s刷魂吧
 
-        Thread.sleep(10000);
-        // 匹配领奖
+        // 开始
+        boolean success;
         do {
-            count = matcher.count(reward, false);
-        } while (count != 2);
+            success = matcher.clickBlocking(start, true, 1, false);
+        } while (success);
+
+        // 睡眠10s，不会有人能15s刷魂吧
+        Thread.sleep(15000);
+
         // 领取奖励
-        matcher.click(reward, true, false);
-        // 匹配结束
         do {
-            count = matcher.count(end, false);
-        } while (count != 2);
-        // 点击结束
-        matcher.click(end, true, false);
+            success = matcher.clickBlocking(reward, true, 2, false);
+        } while (success);
+
+        // 结束
+        do {
+            success = matcher.clickBlocking(end, true, 2, false);
+        } while (success);
+
+    }
+
+
+    /**
+     * 执行一次挂机脚本 - 在线组队模式
+     *
+     * @param start 开始图片路径
+     * @param end   结束图片路径
+     * @param job   job配置
+     */
+    @SneakyThrows
+    private void executeOnceInTeamOnlineMod(String start, String end, String reward, OnmyojiJob<RoyalSoulConfig> job, Matcher matcher) {
+        // 开始
+        boolean success;
+        do {
+            success = matcher.clickBlocking(start, true, 1, false);
+        } while (success);
+
+        // 睡眠10s，不会有人能15s刷魂吧
+        Thread.sleep(15000);
+
+        // 领取奖励
+        do {
+            success = matcher.clickBlocking(reward, true, 1, false);
+        } while (success);
+
+        // 结束
+        do {
+            success = matcher.clickBlocking(end, true, 1, false);
+        } while (success);
     }
 
     @Override
