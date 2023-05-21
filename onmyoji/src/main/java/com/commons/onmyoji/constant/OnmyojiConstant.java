@@ -129,4 +129,14 @@ public class OnmyojiConstant {
      * 确认结束探索
      */
     public static String TAN_SUO_CONFIRM_END_TANSUO_BUTTON = "confirmEndTanSuo.png";
+
+
+    // 自定义场景 ==============================================================================================
+
+    public static String CUSTOMIZE_START_BUTTON = "start.png";
+    public static String CUSTOMIZE_REWARD_BUTTON = "reward.png";
+    public static String CUSTOMIZE_END_BUTTON = "end.png";
+
+
+
 }

@@ -1,0 +1,8 @@
+name: 自定义场景
+teamType: 2
+hangUpType:
+  type: 2
+  times: 500
+producerBean: Customize
+config:
+  imgPath: onmyoji\src\main\resources\img\\customize\

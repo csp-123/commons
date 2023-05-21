@@ -451,8 +451,9 @@ public class Matcher {
             }
 
         }
-        logger.info(String.format("匹配图片：%s，结果：%s", targetImgPath, JSON.toJSONString(results)));
-
+        if (!CollectionUtils.isEmpty(results)) {
+            logger.info(String.format("匹配图片：%s，结果：%s", targetImgPath, JSON.toJSONString(results)));
+        }
 
     }
 
