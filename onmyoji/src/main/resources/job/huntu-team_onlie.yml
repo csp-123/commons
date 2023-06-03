@@ -5,4 +5,4 @@ hangUpType:
   times: 500
 producerBean: RoyalSoul
 config:
-  imgPath: onmyoji\src\main\resources\img\\royalsoul\
+  imgPath: onmyoji\src\main\resources\img\royalsoul\

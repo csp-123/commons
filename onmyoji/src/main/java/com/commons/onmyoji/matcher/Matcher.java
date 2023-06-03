@@ -235,6 +235,7 @@ public class Matcher {
      * @param isSimilar 是否近似匹配
      * @return  是否成功
      */
+    @SneakyThrows
     public boolean clickBlocking(String targetImgPath, boolean random, Integer num, boolean isSimilar) {
         match(targetImgPath, isSimilar);
         // 点击
@@ -245,6 +246,8 @@ public class Matcher {
         if (results.size() < num) {
             return false;
         }
+
+        Thread.sleep(1000);
 
         IntStream.range(0, num)
                 .forEach(cur-> {

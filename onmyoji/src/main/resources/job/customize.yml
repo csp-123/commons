@@ -5,4 +5,4 @@ hangUpType:
   times: 500
 producerBean: Customize
 config:
-  imgPath: onmyoji\src\main\resources\img\\customize\
+  imgPath: onmyoji\src\main\resources\img\customize\
