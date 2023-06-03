@@ -51,7 +51,24 @@ public class CustomizeProducer extends InstanceZoneBaseProducer<CustomizeConfig>
         //图片匹配器
         Matcher matcher = new Matcher(width, height);
 
-        executeOnce(start, end, reward, job, matcher);
+        // 处理挂机时长
+        if (job.getHangUpType().getType().equals(HangUpTypeEnum.TIMES.getCode())) {
+            // 限次
+            for (int i = 1; i <= job.getHangUpType().getTimes(); i++) {
+                executeOnce(start, end, reward, job, matcher);            }
+        } else if (job.getHangUpType().getType().equals(HangUpTypeEnum.TIME.getCode())) {
+            // 限时
+            long endTime = System.currentTimeMillis() + 60 * 1000 * 1000;
+            while (System.currentTimeMillis() <= endTime) {
+                executeOnce(start, end, reward, job, matcher);            }
+        } else if (job.getHangUpType().getType().equals(HangUpTypeEnum.FOREVER.getCode())) {
+            // 不限
+            while (true) {
+                executeOnce(start, end, reward, job, matcher);            }
+        }
+
+
+
 
         threadLocal.remove();
     }
@@ -67,10 +84,10 @@ public class CustomizeProducer extends InstanceZoneBaseProducer<CustomizeConfig>
         }
 
         // 领取奖励
-        boolean rewardSuccess= false;
-        while (!rewardSuccess) {
-            rewardSuccess = matcher.clickBlocking(reward, true, 1, false);
-        }
+//        boolean rewardSuccess= false;
+//        while (!rewardSuccess) {
+//            rewardSuccess = matcher.clickBlocking(reward, true, 1, false);
+//        }
 
         // 结束
         boolean endSuccess = false;
