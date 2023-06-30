@@ -17,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.ui.context.Theme;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -207,42 +208,16 @@ public class TanSuoProducer extends InstanceZoneBaseProducer<TanSuoConfig> {
 //        }
 
 
-//         单击章节按钮
-//        ImgMatcher.matchAndClick(chapter, 1, true);
+
         int count = 0;
-        do {
-          count = matcher.count(startTanSuo, false);
-        } while (count != 1);
         // 单击开始探索
-        matcher.clickFirst(startTanSuo, true, false);
+        matcher.clickBlocking(startTanSuo, true, 1, false);
         Thread.sleep(2000);
-        while (matcher.count(challengeBoss, false) == 0) {
-            logger.info("====暂未发现boss==");
-            if (matcher.count(challenge, true) != 0) {
-                logger.info("==小怪尚存==");
-                // 挑战小怪
-                matcher.clickFirst(challenge, true, true, false);
-                while (matcher.count(reward, false) != 1);
-                matcher.clickFirst(reward, true, false);
-                while (matcher.count(end, false) != 1);
-                matcher.clickFirst(end, true, false);
-                Thread.sleep(1000);
-
-            } else {
-                logger.info("==移动==");
-                // 场上无可挑战小怪
-                // 移动  todo 目前是点击固定位置 803，507  后续看一下有没有更好的解决方案
-                matcher.click(movePoint, true, false);
-                matcher.click(803, 537, movePoint);
-                //移动后停顿0.8秒，鼠标移动会停顿200-400毫秒，保证总耗时一秒以内， 避免自动挑战成功
-                Thread.sleep(800);
-                matcher.click(803, 537, movePoint);
-                // 视角移动后停顿2s
-                Thread.sleep(2000);
-            }
-            Thread.sleep(2000);
-
-        }
+        List<String> matchList = new ArrayList<>();
+        matchList.add(challenge);
+        matchList.add(end);
+        matchList.add(reward);
+        boolean foundBoss  = matcher.tansuo(true, true, matchList, challengeBoss, );
         // 不挑战boss，可简化流程，不会出现多种情况，损失并不大。
 
         // 退出
