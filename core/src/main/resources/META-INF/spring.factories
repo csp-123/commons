@@ -1,5 +1,0 @@
-org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
-com.commons.core.config.CoreAutoConfiguration
-
-org.springframework.boot.env.EnvironmentPostProcessor=\
-com.trs.gov.core.config.EnvPropertiesConfig

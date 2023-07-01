@@ -26,19 +26,29 @@ import java.util.Scanner;
 @Getter
 public class MPGenerator {
 
+    private static final String MYSQL_PASSWORD = "root";
+
+    private static final String MYSQL_USERNAME = "root";
+
+    private static final String MYSQL_URL = "jdbc:mysql://120.48.35.213:3307/commons?useUnicode=true&characterEncoding=utf8&autoReconnect=true&failOverReadOnly=false&serverTimezone=Asia/Shanghai";
+
+    private static final String MYSQL_TABLE_PREFIX = "commons_";
+
+    private static final String PACKAGE_PARENT = "com.commons";
+
+    private static final String MODULE_NAME = "auth";
+
+    private static final String PACKAGE_ENTITY = "pojo";
+
+
 
     public static void main(String[] args) {
-        // 配置信息
-        String password = "root";
-        String userName = "root";
-        String url = "jdbc:mysql://120.48.35.213:3307/commons?useUnicode=true&characterEncoding=utf8&autoReconnect=true&failOverReadOnly=false&serverTimezone=Asia/Shanghai";
-
 
         System.out.println("请输入模块名：");
         String moduleName = new Scanner(System.in).next();
         System.out.println("请输入表名，多个英文逗号分隔 所有输入 all：");
         String tableName = new Scanner(System.in).next();
-        FastAutoGenerator.create(url, userName, password)
+        FastAutoGenerator.create(MYSQL_URL, MYSQL_USERNAME, MYSQL_PASSWORD)
 
                 // 全局配置
                 .globalConfig(builder -> {
@@ -49,16 +59,16 @@ public class MPGenerator {
 
                 // 包配置
                 .packageConfig(builder -> {
-                    builder.parent("com.commons") // 设置父包名
-                            .moduleName("auth") // 设置父包模块名
-                            .entity("pojo") // pojo 实体类包名,其它包名同理
+                    builder.parent(PACKAGE_PARENT) // 设置父包名
+                            .moduleName(MODULE_NAME) // 设置父包模块名
+                            .entity(PACKAGE_ENTITY) // pojo 实体类包名,其它包名同理
                             .pathInfo(Collections.singletonMap(OutputFile.xml, System.getProperty("user.dir") + "/" + moduleName +"/src/main/resources/mapper")); // 设置mapperXml生成路径
                 })
 
                 // 策略配置
                 .strategyConfig(builder -> builder
                         .addInclude(getTables(tableName))
-                        .addTablePrefix("commons_") // 设置过滤表前缀
+                        .addTablePrefix(MYSQL_TABLE_PREFIX) // 设置过滤表前缀
                         // entity 策略配置
                         .entityBuilder()
                         .enableLombok()

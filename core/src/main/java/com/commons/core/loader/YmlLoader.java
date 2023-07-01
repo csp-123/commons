@@ -1,6 +1,7 @@
 package com.commons.core.loader;
 
 import com.google.common.collect.Lists;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.config.YamlPropertiesFactoryBean;
@@ -15,10 +16,7 @@ import org.springframework.core.io.support.ResourcePatternResolver;
 import org.springframework.util.Assert;
 
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Title:
@@ -35,7 +33,7 @@ public class YmlLoader implements EnvironmentAware {
     private Environment environment;
 
     @Override
-    public void setEnvironment(Environment environment) {
+    public void setEnvironment(@NotNull Environment environment) {
         Assert.isInstanceOf(ConfigurableEnvironment.class, environment, "environment must be instance of ConfigurableEnvironment.");
         this.environment = environment;
     }
@@ -49,9 +47,8 @@ public class YmlLoader implements EnvironmentAware {
         Resource[] resourceArr = resourcePatternResolver.getResources(regex);
         Arrays.stream(resourceArr).forEach(resource -> {
             try {
-                if (resource.getInputStream() != null) {
-                    ymlPropertySourceMap.put(resource.getFilename(), resource);
-                }
+                resource.getInputStream();
+                ymlPropertySourceMap.put(resource.getFilename(), resource);
             } catch (IOException e) {
                 logger.error(e.getMessage(), e);
             }
@@ -61,7 +58,7 @@ public class YmlLoader implements EnvironmentAware {
             ymlPropertySourceMap.forEach((name, resource) -> {
                 YamlPropertiesFactoryBean yamlPropertiesFactoryBean = new YamlPropertiesFactoryBean();
                 yamlPropertiesFactoryBean.setResources(resource);
-                PropertiesPropertySource propertiesPropertySource = new PropertiesPropertySource(name, yamlPropertiesFactoryBean.getObject());
+                PropertiesPropertySource propertiesPropertySource = new PropertiesPropertySource(name, Objects.requireNonNull(yamlPropertiesFactoryBean.getObject()));
                 ConfigurableEnvironment configurableEnvironment = (ConfigurableEnvironment) environment;
                 MutablePropertySources propertySources = configurableEnvironment.getPropertySources();
                 propertySources.addLast(propertiesPropertySource);

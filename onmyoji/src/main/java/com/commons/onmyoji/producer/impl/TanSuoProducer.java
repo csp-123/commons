@@ -217,7 +217,7 @@ public class TanSuoProducer extends InstanceZoneBaseProducer<TanSuoConfig> {
         matchList.add(challenge);
         matchList.add(end);
         matchList.add(reward);
-        boolean foundBoss  = matcher.tansuo(true, true, matchList, challengeBoss, );
+//        boolean foundBoss  = matcher.tansuo(true, true, matchList, challengeBoss, );
         // 不挑战boss，可简化流程，不会出现多种情况，损失并不大。
 
         // 退出

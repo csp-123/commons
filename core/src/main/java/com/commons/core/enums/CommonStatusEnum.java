@@ -1,32 +1,47 @@
 package com.commons.core.enums;
 
+import lombok.Getter;
+
 /**
- * @description: 通用状态码
- * @author: cccsp
- * @date: 2022/9/19 16:08
+ * Description:
+ *      通用状态码
+ * Project: commons
+ * Author: cccsp
+ * Create Time:2022/9/19 16:08
  */
+@Getter
 public enum CommonStatusEnum {
 
     /**
      * 是
      */
-    IS(1),
+    TRUE(1, "是"),
 
     /**
      * 否
      */
-    NOT(0);
+    FALSE(0, "否");
 
     /**
      * 状态码
      */
     private final Integer statusCode;
 
-    CommonStatusEnum(Integer statusCode) {
+    /**
+     * 描述
+     */
+    private final String desc;
+
+    CommonStatusEnum(Integer statusCode, String desc) {
         this.statusCode = statusCode;
+        this.desc = desc;
     }
 
-    public Integer getStatus() {
-        return this.statusCode;
+    public static Integer getTrue() {
+        return TRUE.statusCode;
+    }
+
+    public static Integer getFalse() {
+        return FALSE.statusCode;
     }
 }
