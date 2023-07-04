@@ -58,7 +58,7 @@ public class CustomizeProducer extends InstanceZoneBaseProducer<CustomizeConfig>
                 executeOnce(start, end, reward, job, matcher);            }
         } else if (job.getHangUpType().getType().equals(HangUpTypeEnum.TIME.getCode())) {
             // 限时
-            long endTime = System.currentTimeMillis() + 60 * 1000 * 1000;
+            long endTime = System.currentTimeMillis() + 60L * 1000 * job.getHangUpType().getTime();
             while (System.currentTimeMillis() <= endTime) {
                 executeOnce(start, end, reward, job, matcher);            }
         } else if (job.getHangUpType().getType().equals(HangUpTypeEnum.FOREVER.getCode())) {
@@ -78,10 +78,7 @@ public class CustomizeProducer extends InstanceZoneBaseProducer<CustomizeConfig>
     private void executeOnce(String start, String end, String reward, OnmyojiJob<CustomizeConfig> job, Matcher matcher) {
 
         // 开始
-        boolean startSuccess = false;
-        while (!startSuccess) {
-            startSuccess = matcher.clickBlocking(start, true, 1, false);
-        }
+        matcher.click(start, true,  false);
 
         // 领取奖励
 //        boolean rewardSuccess= false;
@@ -90,10 +87,8 @@ public class CustomizeProducer extends InstanceZoneBaseProducer<CustomizeConfig>
 //        }
 
         // 结束
-        boolean endSuccess = false;
-        while (!endSuccess) {
-            endSuccess = matcher.clickBlocking(end, true, 1, false);
-        }
+
+        matcher.click(end, true, false);
 
     }
     @Override

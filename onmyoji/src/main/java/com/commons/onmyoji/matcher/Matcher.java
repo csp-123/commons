@@ -564,7 +564,6 @@ public class Matcher {
         BufferedImage bfImage = null;
 
         bfImage = robot.createScreenCapture(new Rectangle(0, 0, this.fullScreenWidth, this.fullScreenHeight));
-
         return bfImage;
     }
 

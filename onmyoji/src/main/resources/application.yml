@@ -10,7 +10,8 @@ screen:
   width: 2560
   # 屏幕高度
   height: 1600
-
+  #
+  scale: 1.5D
 
 
 

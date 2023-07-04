@@ -18,13 +18,13 @@ public abstract class InstanceZoneBaseProducer<CONFIG extends OnmyojiScriptConfi
      * 屏幕高度 默认1080
      */
     @Value("${screen.height}")
-    public int height = 1080;
+    public int height = 1600;
 
     /**
      * 屏幕高度 默认1920
      */
     @Value("${screen.width}")
-    public final int width = 1920;
+    public final int width = 2560;
 
 
 }
