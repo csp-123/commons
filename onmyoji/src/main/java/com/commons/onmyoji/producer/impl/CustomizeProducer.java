@@ -49,7 +49,7 @@ public class CustomizeProducer extends InstanceZoneBaseProducer<CustomizeConfig>
 
 
         //图片匹配器
-        Matcher matcher = new Matcher(width, height);
+        Matcher matcher = new Matcher();
 
         // 处理挂机时长
         if (job.getHangUpType().getType().equals(HangUpTypeEnum.TIMES.getCode())) {

@@ -76,7 +76,7 @@ public class RoyalSoulProducer extends InstanceZoneBaseProducer<RoyalSoulConfig>
         }
 
         //图片匹配器
-        Matcher matcher = new Matcher(width, height);
+        Matcher matcher = new Matcher();
 
 
         // 处理挂机时长
@@ -89,7 +89,7 @@ public class RoyalSoulProducer extends InstanceZoneBaseProducer<RoyalSoulConfig>
             // 限时
             long endTime = System.currentTimeMillis() + 60 * 1000 * 1000;
             while (System.currentTimeMillis() <= endTime) {
-                executeOnce(start, end, reward, job, matcher);
+                executeUntilEnd(start, end, reward, job, matcher);
             }
         } else if (job.getHangUpType().getType().equals(HangUpTypeEnum.FOREVER.getCode())) {
             // 不限
@@ -99,6 +99,21 @@ public class RoyalSoulProducer extends InstanceZoneBaseProducer<RoyalSoulConfig>
         }
 
         threadLocal.remove();
+    }
+
+    private void executeUntilEnd(String start, String end, String reward, OnmyojiJob<RoyalSoulConfig> job, Matcher matcher) {
+        // 开始
+        matcher.click(start, true,  false);
+
+        // 领取奖励
+        boolean rewardSuccess= false;
+        while (!rewardSuccess) {
+            rewardSuccess = matcher.clickBlocking(reward, true, 1, false);
+        }
+
+        // 结束
+
+        matcher.click(end, true, false);
     }
 
     /**

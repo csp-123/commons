@@ -3,6 +3,7 @@ package com.commons.onmyoji.matcher;
 import com.alibaba.fastjson.JSON;
 import com.commons.onmyoji.utils.ImageSimilarity;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.SneakyThrows;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -57,12 +58,12 @@ public class Matcher {
     /**
      * 全屏高
      */
-    private final int fullScreenHeight;
+    private int fullScreenHeight;
 
     /**
      * 全屏宽
      */
-    private final int fullScreenWidth;
+    private int fullScreenWidth;
 
     /**
      * 来源图片路径
@@ -120,19 +121,26 @@ public class Matcher {
     private List<Matcher.MatchResult> results = new ArrayList<>();
 
 
-    public Matcher(String targetImgPath, String srcImgPath, int screenHeight, int screenWidth) {
+    public Matcher(String targetImgPath, String srcImgPath) {
+        GraphicsDevice graphDevice = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
+        DisplayMode disMode = graphDevice.getDisplayMode();
+        int width = disMode.getWidth();
+        int height = disMode.getHeight();
+        this.fullScreenWidth = width;
+        this.fullScreenHeight = height;
         this.targetImgPath = targetImgPath;
         this.srcImgPath = srcImgPath;
-        this.fullScreenHeight = screenHeight;
-        this.fullScreenWidth = screenWidth;
-
         this.reload(targetImgPath);
     }
 
-    public Matcher(int screenWidth, int screenHeight) {
-        this.fullScreenHeight = screenHeight;
-        this.fullScreenWidth = screenWidth;
-
+    public Matcher() {
+        GraphicsDevice graphDevice = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
+        DisplayMode disMode = graphDevice.getDisplayMode();
+        int width = disMode.getWidth();
+        int height = disMode.getHeight();
+        this.fullScreenWidth = width;
+        this.fullScreenHeight = height;
+        this.reload(targetImgPath);
     }
 
 
@@ -561,8 +569,7 @@ public class Matcher {
      * @return 返回BufferedImage
      */
     private BufferedImage getFullScreenShot() {
-        BufferedImage bfImage = null;
-
+        BufferedImage bfImage;
         bfImage = robot.createScreenCapture(new Rectangle(0, 0, this.fullScreenWidth, this.fullScreenHeight));
         return bfImage;
     }

@@ -145,7 +145,7 @@ public class TanSuoProducer extends InstanceZoneBaseProducer<TanSuoConfig> {
         movePoint = imgDirectory + OnmyojiConstant.TAN_SUO_MOVE_POINT_BUTTON;
 
         // 图片匹配器
-        Matcher matcher = new Matcher(width, height);
+        Matcher matcher = new Matcher();
 
         // 处理挂机时长
         if (job.getHangUpType().getType().equals(HangUpTypeEnum.TIMES.getCode())) {

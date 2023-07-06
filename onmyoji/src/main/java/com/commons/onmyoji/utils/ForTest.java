@@ -28,7 +28,7 @@ public class ForTest {
 
         String path = "D:\\IdeaProjects\\onmyoji\\src\\main\\resources\\img\\royalsoul\\end.png";
 
-        Matcher matcher = new Matcher(1920, 1080);
+        Matcher matcher = new Matcher();
 
 //        matcher.count(path);
 
