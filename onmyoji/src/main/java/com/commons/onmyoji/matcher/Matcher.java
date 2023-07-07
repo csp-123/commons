@@ -625,4 +625,14 @@ public class Matcher {
         }
     }
 
+
+    public static void main(String[] args) {
+        String s = "/Users/chishupeng/IdeaProjects/commons/onmyoji/src/main/resources/img/tansuo/img.png";
+
+        Matcher m = new Matcher();
+
+        m.click(s, false, false);
+
+    }
+
 }

@@ -7,7 +7,7 @@ package com.commons.onmyoji.config;
  * Author: csp
  * Create Time:2023/2/21 22:58
  */
-public class TanSuoConfig extends OnmyojiScriptConfig{
+public class TanSuoConfig extends OnmyojiScriptConfig {
 
     /**
      * 副本章数

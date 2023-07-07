@@ -10,8 +10,7 @@ import lombok.Getter;
  * Create Time:2023/2/21 22:58
  */
 @Getter
-public class RoyalSoulConfig extends OnmyojiScriptConfig{
-
+public class RoyalSoulConfig extends OnmyojiScriptConfig {
 
 
 }

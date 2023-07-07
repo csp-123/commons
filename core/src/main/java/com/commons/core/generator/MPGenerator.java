@@ -7,7 +7,7 @@ import com.baomidou.mybatisplus.generator.config.OutputFile;
 import com.baomidou.mybatisplus.generator.config.rules.NamingStrategy;
 import com.baomidou.mybatisplus.generator.engine.FreemarkerTemplateEngine;
 import com.baomidou.mybatisplus.generator.fill.Column;
-import com.commons.core.pojo.BasePOJO;
+import com.commons.core.pojo.BaseEntity;
 import lombok.Getter;
 import org.apache.ibatis.annotations.Mapper;
 
@@ -80,7 +80,7 @@ public class MPGenerator {
                                 new Column("create_time", FieldFill.INSERT)
                         )   //添加表字段填充，"create_time"字段自动填充为插入时间，"modify_time"字段自动填充为插入修改时间
                         .enableTableFieldAnnotation()       // 开启生成实体时生成字段注解
-                        .superClass(BasePOJO.class)
+                        .superClass(BaseEntity.class)
                         .enableFileOverride()
 
 

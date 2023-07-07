@@ -10,20 +10,16 @@ import java.util.Map;
  * @date: 2023/3/11 23:56
  */
 public enum TeamTypeEnum {
+
     /**
      * 单刷
      */
-    SOLO(1, "单刷"),
+    ONLY_ONE(1, "单刷"),
 
     /**
-     * 组队
+     * 多开
      */
-    TEAM(2, "组队"),
-
-    /**
-     * 线上组队
-     */
-    TEAM_ONLINE(3, "线上组队");
+    MORE(2, "多开");
 
     /**
      * 状态码

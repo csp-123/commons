@@ -1,0 +1,10 @@
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://101.42.35.190:3306/tencentcloud?autoReconnect=true&useUnicode=true&characterEncoding=UTF8&allowPublicKeyRetrieval=true&useSSL=false&tcpKeepAlive=true&autoReconnect=true&serverTimezone=Asia/Shanghai
+    username: csp
+    password: jt4sZdaR7AdDYDXe
+  redis:
+    host: 101.42.35.190
+    port: 6379
+    password: aaa95284-0e0d-5add-9471-1ad1ded16b28
