@@ -1,13 +1,11 @@
 package com.commons.blog.convert;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.commons.blog.model.dto.ArticleDetailDTO;
-import com.commons.blog.model.dto.ArticleEditDTO;
+import com.commons.blog.model.dto.article.ArticleEditDTO;
 import com.commons.blog.model.entity.Article;
-import com.commons.blog.model.vo.ArticleDetailVO;
-import com.commons.blog.model.vo.ArticlePageVO;
+import com.commons.blog.model.vo.article.ArticleDetailVO;
+import com.commons.blog.model.vo.article.ArticlePageVO;
 import org.mapstruct.Mapper;
-import org.springframework.stereotype.Component;
 
 /**
  * 文章转换器
@@ -30,7 +28,7 @@ public abstract class ArticleConvert {
      * @param article article
      * @return ArticleDetailVO
      */
-    public abstract ArticleDetailVO entity2DetailVO(Object article);
+    public abstract ArticleDetailVO entity2DetailVO(Article article);
 
     /**
      * entity 2 pageVO

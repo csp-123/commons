@@ -8,3 +8,4 @@ spring:
     host: 101.42.35.190
     port: 6379
     password: aaa95284-0e0d-5add-9471-1ad1ded16b28
+

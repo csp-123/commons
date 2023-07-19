@@ -1,9 +1,8 @@
 package com.commons.blog.mapper;
 
-import com.commons.blog.model.entity.Article;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.commons.blog.model.entity.BaseSourceEntity;
 import org.apache.ibatis.annotations.Mapper;
-import org.checkerframework.checker.units.qual.A;
 
 /**
  * <p>
@@ -14,6 +13,6 @@ import org.checkerframework.checker.units.qual.A;
  * @since 2023-07-04
  */
 @Mapper
-public interface ArticleMapper extends BaseMapper<Article> {
+public interface BaseSourceEntityMapper extends BaseMapper<BaseSourceEntity> {
 
 }

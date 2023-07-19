@@ -1,27 +1,22 @@
 package com.commons.blog.service.impl;
 
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.conditions.query.LambdaQueryChainWrapper;
-import com.baomidou.mybatisplus.extension.conditions.query.QueryChainWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.commons.blog.convert.ArticleConvert;
 import com.commons.blog.enums.SourceTypeEnum;
-import com.commons.blog.model.dto.ArticleDetailDTO;
-import com.commons.blog.model.dto.ArticleEditDTO;
-import com.commons.blog.model.dto.ArticlePageDTO;
+import com.commons.blog.model.dto.article.ArticleDetailDTO;
+import com.commons.blog.model.dto.article.ArticleEditDTO;
+import com.commons.blog.model.dto.article.ArticlePageDTO;
 import com.commons.blog.model.entity.Article;
 import com.commons.blog.mapper.ArticleMapper;
-import com.commons.blog.model.vo.ArticleDetailVO;
-import com.commons.blog.model.vo.ArticlePageVO;
-import com.commons.blog.service.ArticleService;
+import com.commons.blog.model.vo.article.ArticleDetailVO;
+import com.commons.blog.model.vo.article.ArticlePageVO;
 import com.commons.blog.utils.ParamAssertUtil;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
 import javax.annotation.Resource;
-import java.util.List;
 
 /**
  * <p>
@@ -32,7 +27,7 @@ import java.util.List;
  * @since 2023-07-04
  */
 @Service
-public class ArticleServiceImpl extends BaseSourceServiceImpl<ArticleMapper, Article> implements ArticleService {
+public class ArticleService extends BaseSourceService<ArticleMapper, Article> implements com.commons.blog.service.ArticleService {
 
     @Resource
     private ArticleConvert articleConvert;
@@ -74,9 +69,9 @@ public class ArticleServiceImpl extends BaseSourceServiceImpl<ArticleMapper, Art
      */
     @Override
     public Page<ArticlePageVO> pageArticle(ArticlePageDTO articlePageDTO) {
-        LambdaQueryChainWrapper<Article> pageWrapper = new LambdaQueryChainWrapper<>(this.getBaseMapper());
+        LambdaQueryWrapper<Article> pageWrapper = new LambdaQueryWrapper<>();
         pageWrapper.like(StringUtils.hasText(articlePageDTO.getTitle()), Article::getTitle, articlePageDTO.getTitle());
-        Page<Article> page = getBaseMapper().selectPage(new Page<>(), pageWrapper);
+        Page<Article> page = baseMapper.selectPage(new Page<>(), pageWrapper);
         return articleConvert.entityPage2VOPage(page);
     }
 
@@ -87,9 +82,8 @@ public class ArticleServiceImpl extends BaseSourceServiceImpl<ArticleMapper, Art
      */
     @Override
     public ArticleDetailVO detailArticle(ArticleDetailDTO articleDetailDTO) {
-        LambdaQueryChainWrapper<Article> wrapper = lambdaQuery();
-        wrapper.eq(Article::getId, articleDetailDTO.getId());
-        return this.getObj(wrapper, article -> articleConvert.entity2DetailVO(article));
+        Article article = findById(articleDetailDTO.getId());
+        return articleConvert.entity2DetailVO(article);
     }
 
 

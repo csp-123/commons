@@ -1,6 +1,7 @@
 package com.commons.blog.context;
 
-import com.commons.blog.model.dto.UserDTO;
+import com.commons.blog.model.dto.user.LoginUserDTO;
+import com.commons.blog.model.dto.user.UserRegisterDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -19,13 +20,13 @@ public class UserContext {
 
     private static final String DEV = "dev";
 
-    private static final ThreadLocal<UserDTO> userContext = new ThreadLocal<>();
+    private static final ThreadLocal<LoginUserDTO> userContext = new ThreadLocal<>();
 
     /**
      * 用户信息 todo
      * @param dto
      */
-    public void set(UserDTO dto) {
+    public void set(LoginUserDTO dto) {
         userContext.set(dto);
     }
 
@@ -37,15 +38,15 @@ public class UserContext {
      * 获取登录用户
      * @return 用户信息
      */
-    public UserDTO getCurrentUser() {
-        UserDTO userDTO = userContext.get();
-        if (needMock() && Objects.isNull(userDTO)) {
-            userDTO = new UserDTO();
-            userDTO.setId(1L)
-                    .setName("mock用户")
-                    .setCode("mockUserCode");
+    public LoginUserDTO getCurrentUser() {
+        LoginUserDTO loginUserDTO = userContext.get();
+        if (needMock() && Objects.isNull(loginUserDTO)) {
+            loginUserDTO = new LoginUserDTO();
+            loginUserDTO.setId(1L)
+                    .setUsername("mock用户")
+                    .setUserCode("mockUserCode");
         }
-        return userDTO;
+        return loginUserDTO;
     }
 
     /**

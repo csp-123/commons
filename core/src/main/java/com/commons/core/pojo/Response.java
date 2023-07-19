@@ -32,9 +32,10 @@ public class Response<T> implements Serializable {
     private String code;
 
     /**
-     * 如果success = false,则通过error可以查看错误信息
+     * 描述
      */
-    private String error;
+    private String message;
+
 
     @Override
     public String toString() {
@@ -42,7 +43,6 @@ public class Response<T> implements Serializable {
                 .add("success", success)
                 .add("result", result)
                 .add("code", code)
-                .add("error", error)
                 .omitNullValues()
                 .toString();
     }
@@ -55,7 +55,6 @@ public class Response<T> implements Serializable {
         if (!Objects.equals(this.success, other.success)) return false;
         if (!Objects.equals(this.result, other.result)) return false;
         if (!Objects.equals(this.code, other.code)) return false;
-        if (!Objects.equals(this.error, other.error)) return false;
         return true;
     }
 
@@ -66,7 +65,6 @@ public class Response<T> implements Serializable {
         result = (result * PRIME) + (this.success ? 1 : 0);
         result = (result * PRIME) + (this.result == null ? 0 : this.result.hashCode());
         result = (result * PRIME) + (this.code == null ? 0 : this.code.hashCode());
-        result = (result * PRIME) + (this.error == null ? 0 : this.error.hashCode());
         return result;
     }
 
@@ -74,6 +72,8 @@ public class Response<T> implements Serializable {
     public static <T> Response<T> ok(T data) {
         Response<T> resp = new Response<>();
         resp.setResult(data);
+        resp.setCode("200");
+        resp.setSuccess(true);
         return resp;
     }
 
@@ -83,7 +83,8 @@ public class Response<T> implements Serializable {
 
     public static <T> Response<T> fail(String error) {
         Response<T> resp = new Response<>();
-        resp.setError(error);
+        resp.setSuccess(false);
+        resp.setMessage(error);
         return resp;
     }
 

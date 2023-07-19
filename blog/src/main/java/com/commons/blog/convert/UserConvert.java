@@ -1,5 +1,8 @@
 package com.commons.blog.convert;
 
+import com.commons.blog.model.dto.user.LoginUserDTO;
+import com.commons.blog.model.dto.user.UserRegisterDTO;
+import com.commons.blog.model.entity.User;
 import org.mapstruct.Mapper;
 
 /**
@@ -9,7 +12,13 @@ import org.mapstruct.Mapper;
  * @date 2023/7/4 12:38 AM
  */
 @Mapper(componentModel = "spring")
-public class UserConvert {
+public abstract class UserConvert {
 
 
+    /**
+     * 注册dto 2 user
+     * @param loginUserDTO
+     * @return
+     */
+    public abstract User registerDTO2User(LoginUserDTO loginUserDTO);
 }

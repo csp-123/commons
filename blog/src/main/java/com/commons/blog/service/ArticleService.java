@@ -1,12 +1,13 @@
 package com.commons.blog.service;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.commons.blog.model.dto.ArticleDetailDTO;
-import com.commons.blog.model.dto.ArticleEditDTO;
-import com.commons.blog.model.dto.ArticlePageDTO;
+import com.baomidou.mybatisplus.extension.service.IService;
+import com.commons.blog.model.dto.article.ArticleDetailDTO;
+import com.commons.blog.model.dto.article.ArticleEditDTO;
+import com.commons.blog.model.dto.article.ArticlePageDTO;
 import com.commons.blog.model.entity.Article;
-import com.commons.blog.model.vo.ArticleDetailVO;
-import com.commons.blog.model.vo.ArticlePageVO;
+import com.commons.blog.model.vo.article.ArticleDetailVO;
+import com.commons.blog.model.vo.article.ArticlePageVO;
 
 /**
  * <p>
@@ -16,7 +17,7 @@ import com.commons.blog.model.vo.ArticlePageVO;
  * @author baomidou
  * @since 2023-07-04
  */
-public interface ArticleService extends BaseSourceService<Article> {
+public interface ArticleService extends IService<Article> {
 
     /**
      * 文章保存

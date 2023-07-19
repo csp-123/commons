@@ -8,8 +8,7 @@ import com.baomidou.mybatisplus.generator.config.rules.NamingStrategy;
 import com.baomidou.mybatisplus.generator.engine.FreemarkerTemplateEngine;
 import com.baomidou.mybatisplus.generator.fill.Column;
 import com.commons.blog.model.entity.BaseSourceEntity;
-import com.commons.blog.service.BaseSourceService;
-import com.commons.blog.service.impl.BaseSourceServiceImpl;
+import com.commons.blog.service.impl.BaseSourceService;
 import lombok.Getter;
 import org.apache.ibatis.annotations.Mapper;
 
@@ -40,7 +39,7 @@ public class MPGenerator {
 
     private static final String MODULE_NAME = "blog";
 
-    private static final String PACKAGE_ENTITY = "entity";
+    private static final String PACKAGE_ENTITY = "model.entity";
 
 
     public static void main(String[] args) {
@@ -96,8 +95,8 @@ public class MPGenerator {
                                 .serviceBuilder()
                                 .formatServiceFileName("%sService") // 如:UserService
                                 .formatServiceImplFileName("%sServiceImpl") // 如:UserServiceImpl
-                                .superServiceClass(BaseSourceService.class)
-                                .superServiceImplClass(BaseSourceServiceImpl.class)
+//                                .superServiceClass(BaseSourceService.class)
+                                .superServiceImplClass(BaseSourceService.class)
 //                                .enableFileOverride()
 
                                 // controller 策略配置

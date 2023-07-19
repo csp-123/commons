@@ -26,7 +26,7 @@ public class BaseEntity<T> implements Serializable {
     /**
      * 主键id
      */
-    @TableId(value = "id", type = IdType.INPUT)
+    @TableId(value = "id", type = IdType.AUTO)
     private T id;
 
     /**
