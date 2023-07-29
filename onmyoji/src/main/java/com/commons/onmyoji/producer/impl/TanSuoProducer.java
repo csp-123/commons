@@ -17,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.ui.context.Theme;
 
+import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
 
