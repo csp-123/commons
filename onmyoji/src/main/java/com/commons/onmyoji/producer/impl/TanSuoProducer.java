@@ -90,7 +90,7 @@ public class TanSuoProducer extends InstanceZoneBaseProducer<TanSuoConfig> {
      */
     private String movePoint;
 
-    @Autowired
+    @Resource
     CommonService commonService;
 
 

@@ -22,7 +22,7 @@ public class RedisIdGenerator {
     /**
      * redis生成全局唯一id
      *
-     * @param key 业务key  比如订单 就给他一个order
+     * @param busKey 业务key
      */
     public Long redisIdGenerate(String busKey) {
 

@@ -3,7 +3,8 @@ package com.commons.blog.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.commons.blog.convert.ArticleConvert;
-import com.commons.blog.enums.SourceTypeEnum;
+import com.commons.blog.model.annotation.SourceTypeAnno;
+import com.commons.blog.model.enums.SourceTypeEnum;
 import com.commons.blog.model.dto.article.ArticleDetailDTO;
 import com.commons.blog.model.dto.article.ArticleEditDTO;
 import com.commons.blog.model.dto.article.ArticlePageDTO;
@@ -11,7 +12,7 @@ import com.commons.blog.model.entity.Article;
 import com.commons.blog.mapper.ArticleMapper;
 import com.commons.blog.model.vo.article.ArticleDetailVO;
 import com.commons.blog.model.vo.article.ArticlePageVO;
-import com.commons.blog.utils.ParamAssertUtil;
+import com.commons.core.util.ParamAssertUtil;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
@@ -27,6 +28,7 @@ import javax.annotation.Resource;
  * @since 2023-07-04
  */
 @Service
+@SourceTypeAnno(type = SourceTypeEnum.ARTICLE)
 public class ArticleService extends BaseSourceService<ArticleMapper, Article> implements com.commons.blog.service.ArticleService {
 
     @Resource

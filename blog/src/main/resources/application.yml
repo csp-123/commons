@@ -1,5 +1,8 @@
 server:
   port: 8080
+  servlet:
+    context-path: /blog
+
 
 
 spring:
@@ -13,3 +16,7 @@ mybatis-plus:
   configuration:
     # mybatis配置中设置将sql日志输出到控制台
     log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+
+#jwt
+jwt:
+  secret: cccsp_secret!

@@ -43,7 +43,7 @@
 //
 //        boolean success = convert(filePath + "\\" + input, filePath + "\\" + output);
 //
-//        System.out.println(success ? "ok is over" : "oh no failed");
+//        System.out.println(success ? "success is over" : "oh no failed");
 //    }
 //
 //    /**

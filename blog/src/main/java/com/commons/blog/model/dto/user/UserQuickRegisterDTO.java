@@ -15,7 +15,7 @@ import javax.validation.constraints.Size;
  */
 @Data
 @Accessors(chain = true)
-public class UserRegisterDTO {
+public class UserQuickRegisterDTO {
 
     /**
      * 用户id
@@ -27,17 +27,8 @@ public class UserRegisterDTO {
      * 用户名称
      */
     @Size(max = 20, message = "用户名超过最大长度{max}")
-    @NotBlank
     @ApiModelProperty("用户名")
     private String username;
-
-    /**
-     * 密码
-     */
-    @Size(max = 20, message = "密码超过最大长度{max}")
-    @NotBlank
-    @ApiModelProperty("密码")
-    private String password;
 
     /**
      * 手机号

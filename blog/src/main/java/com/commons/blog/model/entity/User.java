@@ -50,12 +50,6 @@ public class User extends BaseSourceEntity {
     private String password;
 
     /**
-     * 密码盐
-     */
-    @TableField("salt")
-    private String salt;
-
-    /**
      * 手机号
      */
     @TableField("phone")

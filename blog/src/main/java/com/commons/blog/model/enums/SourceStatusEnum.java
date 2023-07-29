@@ -1,4 +1,4 @@
-package com.commons.blog.enums;
+package com.commons.blog.model.enums;
 
 import com.mysql.cj.Query;
 import lombok.Data;

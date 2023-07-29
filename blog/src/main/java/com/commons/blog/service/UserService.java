@@ -1,8 +1,13 @@
 package com.commons.blog.service;
 
-import com.commons.blog.model.dto.user.LoginUserDTO;
+import com.commons.blog.model.dto.user.LoginDTO;
+import com.commons.blog.model.dto.user.LoginUserInfo;
+import com.commons.blog.model.dto.user.UserQuickRegisterDTO;
+import com.commons.blog.model.dto.user.UserRegisterDTO;
 import com.commons.blog.model.entity.User;
 import com.baomidou.mybatisplus.extension.service.IService;
+
+import javax.servlet.http.HttpServletRequest;
 
 /**
  * <p>
@@ -24,13 +29,43 @@ public interface UserService extends IService<User> {
     /**
      * 用户注册
      *
-     * @param loginUserDTO
+     * @param registerDTO
      */
-    void register(LoginUserDTO loginUserDTO);
+    void register(UserRegisterDTO registerDTO);
 
     /**
      * 手机号快速注册
-     * @param loginUserDTO
+     * @param quickRegisterDTO
      */
-    void quickRegister(LoginUserDTO loginUserDTO);
+    void quickRegister(UserQuickRegisterDTO quickRegisterDTO);
+
+    /**
+     * 登录
+     *
+     * @param loginDTO
+     * @param request
+     * @return
+     */
+    String login(LoginDTO loginDTO);
+
+    /**
+     * 登出
+     * @param request
+     */
+    void logout(HttpServletRequest request);
+
+    /**
+     * token换user信息
+     * @param token
+     * @return
+     */
+    LoginUserInfo getCurUser(String token);
+
+
+    /**
+     * 刷新用户token
+     * @param jwtToken
+     * @return
+     */
+    String refreshToken(String jwtToken);
 }

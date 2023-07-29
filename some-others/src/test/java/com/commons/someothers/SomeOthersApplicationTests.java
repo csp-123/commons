@@ -16,10 +16,10 @@ import java.util.*;
 @SpringBootTest
 class SomeOthersApplicationTests {
 
-    @Autowired
+    @Resource
     RedisTemplate redisTemplate;
 
-    @Autowired
+    @Resource
     RedissonClient redissonClient;
 
     @Test

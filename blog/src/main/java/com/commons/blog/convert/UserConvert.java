@@ -1,6 +1,6 @@
 package com.commons.blog.convert;
 
-import com.commons.blog.model.dto.user.LoginUserDTO;
+import com.commons.blog.model.dto.user.LoginUserInfo;
 import com.commons.blog.model.dto.user.UserRegisterDTO;
 import com.commons.blog.model.entity.User;
 import org.mapstruct.Mapper;
@@ -17,8 +17,15 @@ public abstract class UserConvert {
 
     /**
      * 注册dto 2 user
-     * @param loginUserDTO
+     * @param registerDTO
      * @return
      */
-    public abstract User registerDTO2User(LoginUserDTO loginUserDTO);
+    public abstract User registerDTO2User(UserRegisterDTO registerDTO);
+
+    /**
+     * user 2 loginUserInfo
+     * @param user
+     * @return
+     */
+    public abstract LoginUserInfo user2LoginUserInfo(User user);
 }

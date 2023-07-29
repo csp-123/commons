@@ -5,6 +5,9 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Mapper;
 import org.checkerframework.checker.units.qual.A;
 
+import java.time.LocalDate;
+import java.util.List;
+
 /**
  * <p>
  * 文章 Mapper 接口
@@ -15,5 +18,7 @@ import org.checkerframework.checker.units.qual.A;
  */
 @Mapper
 public interface ArticleMapper extends BaseMapper<Article> {
+
+    public List<Article> listForTest(LocalDate start, LocalDate end);
 
 }

@@ -1,14 +1,14 @@
 package com.commons.blog.controller.manage;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.commons.blog.constant.BlogRequestConstant;
+import com.commons.blog.model.constant.BlogRequestConstant;
 import com.commons.blog.model.dto.article.ArticleDetailDTO;
 import com.commons.blog.model.dto.article.ArticleEditDTO;
 import com.commons.blog.model.dto.article.ArticlePageDTO;
 import com.commons.blog.model.vo.article.ArticleDetailVO;
 import com.commons.blog.model.vo.article.ArticlePageVO;
 import com.commons.blog.service.ArticleService;
-import com.commons.core.pojo.Response;
+import com.commons.core.pojo.Result;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -42,9 +42,9 @@ public class ArticleManageController {
      */
     @PostMapping("/create")
     @ApiOperation("创建")
-    public Response<Long> createArticle(@RequestBody ArticleEditDTO articleEditDTO) {
+    public Result<Long> createArticle(@RequestBody ArticleEditDTO articleEditDTO) {
         Long id = articleService.saveArticle(articleEditDTO);
-        return Response.ok(id);
+        return Result.success(id);
     }
 
 
@@ -55,9 +55,9 @@ public class ArticleManageController {
      */
     @PostMapping("/update")
     @ApiOperation("编辑")
-    public Response<Long> updateArticle(@RequestBody ArticleEditDTO articleEditDTO) {
+    public Result<Long> updateArticle(@RequestBody ArticleEditDTO articleEditDTO) {
         Long id = articleService.updateArticle(articleEditDTO);
-        return Response.ok(id);
+        return Result.success(id);
     }
 
 
@@ -68,17 +68,17 @@ public class ArticleManageController {
      */
     @PostMapping("/page")
     @ApiOperation("分页")
-    public Response<Page<ArticlePageVO>> page(@RequestBody ArticlePageDTO articlePageDTO) {
+    public Result<Page<ArticlePageVO>> page(@RequestBody ArticlePageDTO articlePageDTO) {
         Page<ArticlePageVO> page = articleService.pageArticle(articlePageDTO);
-        return Response.ok(page);
+        return Result.success(page);
     }
 
 
     @PostMapping("/detail")
     @ApiOperation("详情")
-    public Response<ArticleDetailVO> detail(@RequestBody ArticleDetailDTO articleDetailDTO) {
+    public Result<ArticleDetailVO> detail(@RequestBody ArticleDetailDTO articleDetailDTO) {
         ArticleDetailVO detailVO = articleService.detailArticle(articleDetailDTO);
-        return Response.ok(detailVO);
+        return Result.success(detailVO);
     }
 
 }

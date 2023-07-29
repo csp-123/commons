@@ -1,4 +1,4 @@
-package com.commons.blog.utils;
+package com.commons.core.util;
 
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
@@ -32,13 +32,18 @@ public class ParamAssertUtil {
      * 校验相等
      * @param obj1 参数1
      * @param obj2 参数2
-     * @param msg 提示信息
+     * @param msg 不相等提示信息
      */
     public static void assertEqual(Object obj1, Object obj2, String msg) {
         Assert.isTrue(Objects.equals(obj1, obj2), msg);
     }
 
 
+    /**
+     * 校验空对象、字符串、集合
+     * @param obj
+     * @return
+     */
     private static boolean isEmpty(Object obj) {
         if (obj == null) {
             return true;
@@ -52,7 +57,17 @@ public class ParamAssertUtil {
     }
 
 
+    /**
+     * 非空校验
+     * @param obj
+     * @return
+     */
     private static boolean isNotEmpty(Object obj) {
         return !isEmpty(obj);
+    }
+
+
+    public static void main(String[] args) {
+        assertEqual(null, "null", "sada");
     }
 }

@@ -3,6 +3,7 @@ package com.commons.blog;
 import com.commons.blog.config.SpringFoxSwaggerConfig;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
 import org.springframework.context.annotation.Import;
 
 @SpringBootApplication

@@ -1,15 +1,10 @@
 package com.commons.blog.model.dto.user;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
-
-
-import java.util.Collection;
-import java.util.List;
 
 /**
  * 登录用户
@@ -21,7 +16,7 @@ import java.util.List;
 @Setter
 @Accessors(chain = true)
 @ApiModel("登录用户")
-public class LoginUserDTO {
+public class LoginUserInfo {
 
     /**
      * 用户id
@@ -35,11 +30,6 @@ public class LoginUserDTO {
     @ApiModelProperty("用户名")
     private String username;
 
-    /**
-     * 密码
-     */
-    @ApiModelProperty("密码")
-    private String password;
 
     /**
      * userCode

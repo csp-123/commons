@@ -1,10 +1,8 @@
 package com.commons.blog.model.vo;
 
-import com.commons.blog.enums.SourceTypeEnum;
+import com.commons.blog.model.enums.SourceTypeEnum;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
-
-import java.io.Serializable;
 
 /**
  * VO基类

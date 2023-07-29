@@ -1,6 +1,8 @@
 package com.commons.blog.model.entity;
 
 import com.baomidou.mybatisplus.annotation.TableField;
+import com.commons.blog.model.enums.SourceStatusEnum;
+import com.commons.blog.model.enums.SourceTypeEnum;
 import com.commons.core.pojo.BaseEntity;
 import lombok.Data;
 import lombok.experimental.Accessors;
@@ -23,14 +25,14 @@ public class BaseSourceEntity extends BaseEntity<Long> {
 
     /**
      * 资源类型
-     * todo 枚举
+     * @see SourceTypeEnum
      */
     @TableField(value = "source_type")
     private String sourceType;
 
     /**
      * 资源状态
-     * todo 枚举
+     * @see SourceStatusEnum
      */
     @TableField(value = "source_status")
     private String sourceStatus;

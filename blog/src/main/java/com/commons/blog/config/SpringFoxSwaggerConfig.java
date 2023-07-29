@@ -2,8 +2,6 @@ package com.commons.blog.config;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.web.context.WebServerInitializedEvent;
-import org.springframework.boot.web.servlet.context.ServletWebServerInitializedEvent;
-import org.springframework.context.ApplicationContextInitializer;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -71,7 +69,7 @@ public class SpringFoxSwaggerConfig implements ApplicationListener<WebServerInit
             int port = event.getWebServer().getPort();
             //获取应用名
             String applicationName = event.getApplicationContext().getApplicationName();
-            log.info("项目启动启动成功！接口文档地址: http://"+hostAddress+":"+event.getWebServer().getPort()+applicationName+"/swagger-ui/index.html");
+            log.info("项目启动启动成功！接口文档地址: http://"+hostAddress+":"+port+applicationName+"/swagger-ui/index.html");
         } catch (UnknownHostException e) {
             e.printStackTrace();
         }

@@ -1,20 +1,22 @@
 package com.commons.blog.controller.web;
 
-import com.commons.blog.constant.BlogRequestConstant;
-import com.commons.blog.model.dto.user.LoginUserDTO;
+import com.commons.blog.model.constant.BlogRequestConstant;
+import com.commons.blog.model.dto.user.LoginDTO;
+import com.commons.blog.model.dto.user.UserQuickRegisterDTO;
 import com.commons.blog.model.dto.user.UserRegisterDTO;
 import com.commons.blog.service.UserService;
-import com.commons.core.pojo.Response;
+import com.commons.core.pojo.Result;
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.shiro.SecurityUtils;
-import org.apache.shiro.authc.IncorrectCredentialsException;
-import org.apache.shiro.authc.UnknownAccountException;
-import org.apache.shiro.authc.UsernamePasswordToken;
-import org.apache.shiro.subject.Subject;
+
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import static com.commons.blog.model.constant.BlogRequestConstant.AUTHORIZATION_FIELD;
 
 /**
  * <p>
@@ -27,50 +29,48 @@ import javax.annotation.Resource;
 @RestController
 @Slf4j
 @RequestMapping(BlogRequestConstant.REQUEST_WEB_PREFIX + "/user")
-@Api(tags = "用户")
+@Api(tags = "用户-WEB")
 public class UserWebController {
 
     @Resource
     private UserService userService;
 
+   
+
     @PostMapping("/login")
-    public Response login(@RequestBody LoginUserDTO loginUserDTO) {
-        String loginResult = "登录失败";
-        //获取主题对象
-        Subject subject = SecurityUtils.getSubject();
+    @ApiOperation("登录")
+    public Result login(@RequestBody LoginDTO loginDTO, HttpServletResponse response) {
         try {
-            subject.login(new UsernamePasswordToken(loginUserDTO.getUsername(), loginUserDTO.getPassword()));
-            log.info("用户{}登录成功", loginUserDTO.getUsername());
-            return Response.ok();
-        } catch (UnknownAccountException e) {
-            loginResult = "用户名错误";
-            log.error(loginResult);
-        } catch (IncorrectCredentialsException e) {
-            loginResult = "密码错误";
-            log.error(loginResult);
+            String token = userService.login(loginDTO);
+
+            response.addHeader(AUTHORIZATION_FIELD, token);
+            return Result.success(token);
+        } catch (Exception e) {
+            return Result.fail(e.getMessage());
         }
-        return Response.fail(loginResult);
     }
 
 
     @GetMapping("logout")
-    public Response logout() {
-        Subject subject = SecurityUtils.getSubject();
-        subject.logout();
-        return Response.ok();
+    @ApiOperation("登出")
+    public Result logout(HttpServletRequest request) {
+        userService.logout(request);
+        return Result.success();
     }
 
     @PostMapping("/register")
-    public Response register(@RequestBody LoginUserDTO loginUserDTO) {
-        userService.register(loginUserDTO);
-        return Response.ok();
+    @ApiOperation("注册")
+    public Result register(@RequestBody UserRegisterDTO registerDTO) {
+        userService.register(registerDTO);
+        return Result.success();
     }
 
 
     @PostMapping("/quickRegister")
-    public Response quickRegister(@RequestBody LoginUserDTO loginUserDTO) {
-        userService.quickRegister(loginUserDTO);
-        return Response.ok();
+    @ApiOperation("快速注册")
+    public Result quickRegister(@RequestBody UserQuickRegisterDTO quickRegisterDTO) {
+        userService.quickRegister(quickRegisterDTO);
+        return Result.success();
     }
 
 

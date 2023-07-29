@@ -4,11 +4,13 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.commons.blog.context.UserContext;
-import com.commons.blog.enums.SourceStatusEnum;
+import com.commons.blog.model.annotation.SourceTypeAnno;
+import com.commons.blog.model.dto.user.LoginUserInfo;
+import com.commons.blog.model.enums.SourceStatusEnum;
 import com.commons.blog.generator.RedisIdGenerator;
-import com.commons.blog.model.dto.user.LoginUserDTO;
-import com.commons.blog.model.dto.user.UserRegisterDTO;
+import com.commons.blog.model.dto.user.LoginDTO;
 import com.commons.blog.model.entity.BaseSourceEntity;
+import com.commons.blog.model.enums.SourceTypeEnum;
 import com.commons.core.enums.CommonStatusEnum;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
@@ -32,14 +34,18 @@ public abstract class BaseSourceService<M extends BaseMapper<T>, T extends BaseS
 
 //    @Override
     public T saveReturn(T t) {
-        LoginUserDTO loginUserDTO = userContext.getCurrentUser();
+
+        SourceTypeEnum sourceTypeEnum = this.getClass().getAnnotation(SourceTypeAnno.class).type();
+
+        LoginUserInfo userInfo = userContext.getCurrentUser();
         t
                 .setSourceId(redisIdGenerator.redisIdGenerate(t.getSourceType()))
                 .setSourceStatus(SourceStatusEnum.INITIAL.getStatus())
+                .setSourceType(sourceTypeEnum.getStatus())
                 .setCreateTime(new Date())
-                .setCreateUserId(loginUserDTO.getId())
-                .setCreateUserCode(loginUserDTO.getUserCode())
-                .setCreateUserName(loginUserDTO.getUsername())
+                .setCreateUserId(userInfo.getId())
+                .setCreateUserCode(userInfo.getUserCode())
+                .setCreateUserName(userInfo.getUsername())
                 .setIsDeleted(CommonStatusEnum.getFalse())
                 .setVersion(1L);
         save(t);

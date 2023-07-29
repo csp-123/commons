@@ -1,6 +1,7 @@
 package com.commons.blog.controller.manage;
 
-import com.commons.blog.constant.BlogRequestConstant;
+import com.commons.blog.model.constant.BlogRequestConstant;
+import io.swagger.annotations.Api;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @RequestMapping(BlogRequestConstant.REQUEST_MANAGE_PREFIX + "/user")
+@Api(tags = "用户-MANAGE")
 public class UserManageController {
 
 }

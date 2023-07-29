@@ -16,6 +16,7 @@ import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.RedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
+import javax.annotation.Resource;
 import java.io.IOException;
 
 /**
@@ -28,7 +29,7 @@ import java.io.IOException;
 @Configuration
 public class RedisConfig {
 
-    @Autowired
+    @Resource
     RedisProperties redisProperties;
 
     @Bean

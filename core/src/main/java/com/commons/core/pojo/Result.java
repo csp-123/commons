@@ -2,7 +2,6 @@ package com.commons.core.pojo;
 
 import com.google.common.base.MoreObjects;
 import lombok.Data;
-import lombok.Getter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -11,10 +10,10 @@ import java.util.Objects;
 import java.util.function.Supplier;
 
 @Data
-public class Response<T> implements Serializable {
+public class Result<T> implements Serializable {
     private static final long serialVersionUID = 1L;
 
-    private static final Logger logger = LoggerFactory.getLogger(Response.class);
+    private static final Logger logger = LoggerFactory.getLogger(Result.class);
 
     /**
      * 调用是否成功
@@ -50,8 +49,8 @@ public class Response<T> implements Serializable {
     @Override
     public boolean equals(Object o) {
         if (o == this) return true;
-        if (!(o instanceof Response)) return false;
-        Response other = (Response) o;
+        if (!(o instanceof Result)) return false;
+        Result other = (Result) o;
         if (!Objects.equals(this.success, other.success)) return false;
         if (!Objects.equals(this.result, other.result)) return false;
         if (!Objects.equals(this.code, other.code)) return false;
@@ -69,50 +68,50 @@ public class Response<T> implements Serializable {
     }
 
 
-    public static <T> Response<T> ok(T data) {
-        Response<T> resp = new Response<>();
+    public static <T> Result<T> success(T data) {
+        Result<T> resp = new Result<>();
         resp.setResult(data);
         resp.setCode("200");
         resp.setSuccess(true);
         return resp;
     }
 
-    public static <T> Response<T> ok() {
-        return Response.ok(null);
+    public static <T> Result<T> success() {
+        return Result.success(null);
     }
 
-    public static <T> Response<T> fail(String error) {
-        Response<T> resp = new Response<>();
+    public static <T> Result<T> fail(String error) {
+        Result<T> resp = new Result<>();
         resp.setSuccess(false);
         resp.setMessage(error);
         return resp;
     }
 
     /**
-     * usage: Response&lt;String&gt; resp = Response.get(() -> someDAO.getSomeStringResult(), "error.code")
+     * usage: Result&lt;String&gt; resp = Result.get(() -> someDAO.getSomeStringResult(), "error.code")
      * <br>
      * 这个封装有个不太好的地方，无法打印出自定义错误日志……
      *
      * @param supplier  lambda
      * @param errorCode error code
      * @param <T>       anything
-     * @return Response
+     * @return Result
      */
-    public static <T> Response<T> get(Supplier<T> supplier, String errorCode) {
+    public static <T> Result<T> get(Supplier<T> supplier, String errorCode) {
         try {
             T result = supplier.get();
-            return Response.ok(result);
+            return Result.success(result);
         } catch (Exception e) {
             logger.error("error when get response call", e);
-            return Response.fail(errorCode);
+            return Result.fail(errorCode);
         }
     }
 
-    public static <T> Response<T> fail(String code, String error) {
-        return new Response<>();
+    public static <T> Result<T> fail(String code, String error) {
+        return new Result<>();
     }
 
-    public Response<T> code(String code) {
+    public Result<T> code(String code) {
         this.code = code;
         return this;
     }

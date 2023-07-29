@@ -1,11 +1,6 @@
-package com.commons.blog.enums;
+package com.commons.blog.model.enums;
 
-import lombok.Data;
 import lombok.Getter;
-import lombok.Setter;
-
-import javax.sql.rowset.serial.SerialException;
-import java.util.HashMap;
 
 /**
  * 资源类型
@@ -17,6 +12,8 @@ import java.util.HashMap;
 public enum SourceTypeEnum {
 
     ARTICLE("文章", "ARTICLE"),
+
+    USER("用户", "USER"),
 
     TAG("标签", "TAG"),
 
