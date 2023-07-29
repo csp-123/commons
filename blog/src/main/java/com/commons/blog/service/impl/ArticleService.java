@@ -1,9 +1,11 @@
 package com.commons.blog.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.OrderItem;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.commons.blog.convert.ArticleConvert;
 import com.commons.blog.model.annotation.SourceTypeAnno;
+import com.commons.blog.model.dto.OrderCondition;
 import com.commons.blog.model.enums.SourceTypeEnum;
 import com.commons.blog.model.dto.article.ArticleDetailDTO;
 import com.commons.blog.model.dto.article.ArticleEditDTO;
@@ -18,6 +20,9 @@ import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
 import javax.annotation.Resource;
+import java.util.Comparator;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * <p>
@@ -36,6 +41,7 @@ public class ArticleService extends BaseSourceService<ArticleMapper, Article> im
 
     /**
      * 文章保存
+     *
      * @param articleEditDTO 文章
      * @return id
      */
@@ -50,6 +56,7 @@ public class ArticleService extends BaseSourceService<ArticleMapper, Article> im
 
     /**
      * 文章更新
+     *
      * @param articleEditDTO 文章
      * @return id
      */
@@ -66,19 +73,28 @@ public class ArticleService extends BaseSourceService<ArticleMapper, Article> im
 
     /**
      * 分页查询
+     *
      * @param articlePageDTO 分页查询参数
      * @return 分页vo
      */
     @Override
     public Page<ArticlePageVO> pageArticle(ArticlePageDTO articlePageDTO) {
+        // todo
         LambdaQueryWrapper<Article> pageWrapper = new LambdaQueryWrapper<>();
         pageWrapper.like(StringUtils.hasText(articlePageDTO.getTitle()), Article::getTitle, articlePageDTO.getTitle());
-        Page<Article> page = baseMapper.selectPage(new Page<>(), pageWrapper);
+        Page<Article> articlePage = new Page<>();
+        List<OrderItem> orderItems = articlePageDTO.getOrderBy()
+                .stream()
+                .sorted((o1, o2) -> o2.getPriority().compareTo(o1.getPriority()))
+                .collect(Collectors.toList());
+        articlePage.addOrder(orderItems);
+        Page<Article> page = baseMapper.selectPage(articlePage, pageWrapper);
         return articleConvert.entityPage2VOPage(page);
     }
 
     /**
      * 详情
+     *
      * @param articleDetailDTO 详情查询参数
      * @return 详情vo
      */

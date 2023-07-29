@@ -1,5 +1,6 @@
 package com.commons.blog.model.dto;
 
+import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
@@ -10,6 +11,7 @@ import lombok.Data;
  * @date 2023/7/7 6:34 PM
  */
 @Data
+@ApiModel("分页")
 public class BasePageDTO {
 
     /**

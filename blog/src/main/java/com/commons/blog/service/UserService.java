@@ -1,9 +1,6 @@
 package com.commons.blog.service;
 
-import com.commons.blog.model.dto.user.LoginDTO;
-import com.commons.blog.model.dto.user.LoginUserInfo;
-import com.commons.blog.model.dto.user.UserQuickRegisterDTO;
-import com.commons.blog.model.dto.user.UserRegisterDTO;
+import com.commons.blog.model.dto.user.*;
 import com.commons.blog.model.entity.User;
 import com.baomidou.mybatisplus.extension.service.IService;
 
@@ -56,10 +53,10 @@ public interface UserService extends IService<User> {
 
     /**
      * token换user信息
-     * @param token
+     *
      * @return
      */
-    LoginUserInfo getCurUser(String token);
+    LoginUserInfo getCurUser();
 
 
     /**
@@ -68,4 +65,10 @@ public interface UserService extends IService<User> {
      * @return
      */
     String refreshToken(String jwtToken);
+
+    /**
+     * 编辑个人信息
+     * @param userEditDTO
+     */
+    void edit(UserEditDTO userEditDTO);
 }

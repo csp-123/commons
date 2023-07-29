@@ -6,6 +6,9 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Size;
+
 /**
  * 登录用户
  *
@@ -28,12 +31,16 @@ public class LoginDTO {
      * 用户名
      */
     @ApiModelProperty("用户名")
+    @Size(max = 20, message = "用户名超过最大长度{max}")
+    @NotBlank
     private String username;
 
     /**
      * 密码
      */
     @ApiModelProperty("密码")
+    @Size(max = 20, message = "密码超过最大长度{max}")
+    @NotBlank
     private String password;
 
     /**

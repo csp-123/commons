@@ -1,9 +1,7 @@
 package com.commons.blog.controller.web;
 
 import com.commons.blog.model.constant.BlogRequestConstant;
-import com.commons.blog.model.dto.user.LoginDTO;
-import com.commons.blog.model.dto.user.UserQuickRegisterDTO;
-import com.commons.blog.model.dto.user.UserRegisterDTO;
+import com.commons.blog.model.dto.user.*;
 import com.commons.blog.service.UserService;
 import com.commons.core.pojo.Result;
 import io.swagger.annotations.Api;
@@ -42,7 +40,6 @@ public class UserWebController {
     public Result login(@RequestBody LoginDTO loginDTO, HttpServletResponse response) {
         try {
             String token = userService.login(loginDTO);
-
             response.addHeader(AUTHORIZATION_FIELD, token);
             return Result.success(token);
         } catch (Exception e) {
@@ -72,6 +69,50 @@ public class UserWebController {
         userService.quickRegister(quickRegisterDTO);
         return Result.success();
     }
+
+
+    @PostMapping("/edit")
+    @ApiOperation("编辑个人信息")
+    public Result edit(@RequestBody UserEditDTO userEditDTO) {
+        userService.edit(userEditDTO);
+        return Result.success();
+    }
+
+    /**
+     * todo
+     * @param userEditDTO
+     * @return
+     */
+    @PostMapping("/modifyBinding")
+    @ApiOperation("换绑手机")
+    public Result modifyBinding(@RequestBody UserEditDTO userEditDTO) {
+        userService.edit(userEditDTO);
+        return Result.success();
+    }
+
+    /**
+     * todo
+     * @param userEditDTO
+     * @return
+     */
+    @PostMapping("/assertUser")
+    @ApiOperation("发送验证码验证身份")
+    public Result assertUser(@RequestBody UserEditDTO userEditDTO) {
+        userService.edit(userEditDTO);
+        return Result.success();
+    }
+
+    /**
+     * 获取当前用户信息
+     * @return
+     */
+    @GetMapping("/getCurUser")
+    @ApiOperation("获取当前登录用户")
+    public Result getCurUser() {
+        LoginUserInfo curUser = userService.getCurUser();
+        return Result.success(curUser);
+    }
+
 
 
 }

@@ -7,15 +7,13 @@ import com.commons.blog.convert.UserConvert;
 import com.commons.blog.holder.RequestHolder;
 import com.commons.blog.model.annotation.SourceTypeAnno;
 import com.commons.blog.model.constant.BlogRequestConstant;
-import com.commons.blog.model.dto.user.LoginDTO;
-import com.commons.blog.model.dto.user.LoginUserInfo;
-import com.commons.blog.model.dto.user.UserQuickRegisterDTO;
+import com.commons.blog.model.dto.user.*;
 import com.commons.blog.model.enums.SourceTypeEnum;
-import com.commons.blog.model.dto.user.UserRegisterDTO;
 import com.commons.blog.model.entity.User;
 import com.commons.blog.mapper.UserMapper;
 import com.commons.blog.model.exception.BlogException;
 import com.commons.blog.service.UserService;
+import com.commons.blog.shiro.token.JwtToken;
 import com.commons.blog.utils.JwtUtil;
 import com.commons.blog.utils.RedisUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -28,7 +26,6 @@ import org.springframework.util.StringUtils;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
@@ -109,6 +106,8 @@ public class UserServiceImpl extends BaseSourceService<UserMapper, User> impleme
             log.info("用户{}登录成功", loginDTO.getUsername());
             // 登录成功后 用户上下文赋值
             redisUtil.set(BlogRequestConstant.USER_TOKEN_PREFIX + jwtToken, JSON.toJSONString(userConvert.user2LoginUserInfo(user)), 1L, TimeUnit.HOURS);
+            Subject subject = SecurityUtils.getSubject();
+            subject.login(new JwtToken(jwtToken));
             return jwtToken;
         } else {
             throw new BlogException("用户名或密码错误");
@@ -125,10 +124,10 @@ public class UserServiceImpl extends BaseSourceService<UserMapper, User> impleme
     }
 
     @Override
-    public LoginUserInfo getCurUser(String token) {
+    public LoginUserInfo getCurUser() {
+        String token = RequestHolder.getRequest().getHeader(AUTHORIZATION_FIELD);
         String loginUserInfoString = redisUtil.get(token);
-        LoginUserInfo loginUserInfo = JSON.parseObject(loginUserInfoString, LoginUserInfo.class);
-        return loginUserInfo;
+        return JSON.parseObject(loginUserInfoString, LoginUserInfo.class);
     }
 
     @Override
@@ -141,6 +140,12 @@ public class UserServiceImpl extends BaseSourceService<UserMapper, User> impleme
         LoginUserInfo userInfo = userConvert.user2LoginUserInfo(user);
         redisUtil.set(BlogRequestConstant.USER_TOKEN_PREFIX + newJwtToken, JSON.toJSONString(userInfo), 1L, TimeUnit.HOURS);
         return newJwtToken;
+    }
+
+    @Override
+    public void edit(UserEditDTO userEditDTO) {
+        User user = userConvert.editDTO2User(userEditDTO);
+        updateById(user);
     }
 
 
