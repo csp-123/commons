@@ -116,7 +116,11 @@ public class MPGenerator {
     }
 
 
-    // 处理 all 情况
+    /**
+     * 处理 all 情况
+     * @param tables
+     * @return
+     */
     protected static List<String> getTables(String tables) {
         return "all".equals(tables) ? Collections.emptyList() : Arrays.asList(tables.split(","));
     }

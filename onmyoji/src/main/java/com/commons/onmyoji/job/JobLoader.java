@@ -54,7 +54,7 @@ public class JobLoader {
     @SneakyThrows
     public Map<String, OnmyojiJob> loadAllJobs() {
         logger.info("==============开始加载配置=============");
-        if (jobs == null){
+        if (jobs == null) {
             List<PropertiesPropertySource> sources = ymlLoader.loadAllYml("classpath:job/*.yml");
             jobs = sources.stream().map(this::parseJob).collect(Collectors.toMap(r -> r.getId(), r -> r));
         }
@@ -72,7 +72,7 @@ public class JobLoader {
         job.setTeamType((Integer) source.getProperty("teamType"));
         job.setTeamMembers((Integer) source.getProperty("teamMembers"));
         job.setHangUpType(buildHangUpType(source));
-        logger.info("开始加载任务文件："  + job.getId());
+        logger.info("开始加载任务文件：" + job.getId());
         logger.info("任务名称：" + job.getName());
         InstanceZoneProducer producer = producerMap.get(source.getProperty("producerBean"));
         Assert.notNull(producer, "未找到producerBean：" + source.getProperty("producerBean"));
@@ -103,8 +103,7 @@ public class JobLoader {
         Type[] parameterTypes = declaredMethod.getGenericParameterTypes();
         ParameterizedType parameterizedType = (ParameterizedType) parameterTypes[0];
         Type[] actualTypeArguments = parameterizedType.getActualTypeArguments();
-        OnmyojiScriptConfig config = (OnmyojiScriptConfig) ((Class)actualTypeArguments[0]).newInstance();
-
+        OnmyojiScriptConfig config = (OnmyojiScriptConfig) ((Class) actualTypeArguments[0]).newInstance();
 
 
         source.getSource().entrySet().stream()
@@ -165,7 +164,7 @@ public class JobLoader {
                     }
                 }
 
-                if (i == arr.length - 1){
+                if (i == arr.length - 1) {
                     list.set(index, value);
                 } else {
                     if (list.get(index) != null) {
@@ -181,7 +180,7 @@ public class JobLoader {
                     setValueToField(parent, field, transType(field.getType(), value));
                 } else {
                     Object o = field.get(parent);
-                    if (o == null){
+                    if (o == null) {
                         sub = genValue(field.getType());
                         setValueToField(parent, field, sub);
                     } else {
@@ -194,42 +193,43 @@ public class JobLoader {
 
 
     }
-    private Field getField(Class clz, String fieldName){
-        List<Field> fieldList = getAllFields(clz,null);
+
+    private Field getField(Class clz, String fieldName) {
+        List<Field> fieldList = getAllFields(clz, null);
         for (Field field : fieldList) {
-            if(field.getName().equals(fieldName)){
+            if (field.getName().equals(fieldName)) {
                 return field;
             }
         }
         return null;
     }
 
-    private List<Field> getAllFields(Class<?> clz, List<Field> fieldList){
-        if(clz==null || clz.getName().equals(Object.class.getName())){
+    private List<Field> getAllFields(Class<?> clz, List<Field> fieldList) {
+        if (clz == null || clz.getName().equals(Object.class.getName())) {
             return fieldList;
         }
-        if(fieldList==null){
+        if (fieldList == null) {
             fieldList = new ArrayList<Field>();
         }
         Field[] fields = clz.getDeclaredFields();
-        if(fields!=null && fields.length>0){
+        if (fields != null && fields.length > 0) {
             for (Field field : fields) {
                 //添加非静态的字段
                 //todo 跳过子类复写的字段
-                if(!Modifier.isStatic(field.getModifiers())){
+                if (!Modifier.isStatic(field.getModifiers())) {
                     fieldList.add(field);
                 }
             }
         }
-        return getAllFields(clz.getSuperclass(),fieldList);
+        return getAllFields(clz.getSuperclass(), fieldList);
     }
 
 
-    private  Object genValue(Class<? extends Object> clazz) throws IllegalAccessException, InstantiationException {
+    private Object genValue(Class<? extends Object> clazz) throws IllegalAccessException, InstantiationException {
         Object res;
         if (List.class.isAssignableFrom(clazz)) {
             res = Lists.newArrayList();
-        }else if (MultiValueMap.class.isAssignableFrom(clazz)) {
+        } else if (MultiValueMap.class.isAssignableFrom(clazz)) {
             res = new LinkedMultiValueMap<>();
         } else {
             res = clazz.newInstance();
