@@ -4,6 +4,9 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * 分页基类
  *
@@ -25,5 +28,11 @@ public class BasePageDTO {
      */
     @ApiModelProperty("分页大小")
     private Integer pageSize = 20;
+
+    /**
+     * 排序器
+     */
+    @ApiModelProperty("排序器")
+    private List<OrderCondition> orderBy = new ArrayList<>();
 
 }

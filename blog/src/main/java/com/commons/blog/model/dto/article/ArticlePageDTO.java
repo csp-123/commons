@@ -45,11 +45,7 @@ public class ArticlePageDTO extends BasePageDTO {
     @ApiModelProperty("分类id")
     private Long classificationId;
 
-    /**
-     * 排序器
-     */
-    @ApiModelProperty("排序器")
-    private List<OrderCondition> orderBy;
+
 
 
 }
