@@ -1,9 +1,8 @@
 package com.commons.onmyoji.matcher;
 
 import com.alibaba.fastjson.JSON;
-import com.commons.onmyoji.utils.ImageSimilarity;
+import com.commons.onmyoji.utils.ImageSimilarityUtil;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.SneakyThrows;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,10 +12,8 @@ import org.springframework.util.StringUtils;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
-import java.awt.color.ColorSpace;
 import java.awt.event.InputEvent;
 import java.awt.image.BufferedImage;
-import java.awt.image.ColorConvertOp;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
@@ -412,7 +409,7 @@ public class Matcher {
                     if (srcImgRGBData[y][x] == targetImgRGBData[0][0]) {
                         BufferedImage image = robot.createScreenCapture(new Rectangle(x, y, targetImgWidth, targetImgHeight));
                         // 相似度
-                        double similarity = ImageSimilarity.calSimilarity(image, targetImg);
+                        double similarity = ImageSimilarityUtil.calSimilarity(image, targetImg);
                         logger.error("相似度为" + similarity);
                         if (similarity > SIMILAR_THRESHOLD) {
                             //y

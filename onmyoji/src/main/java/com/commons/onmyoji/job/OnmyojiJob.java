@@ -2,13 +2,9 @@ package com.commons.onmyoji.job;
 
 import com.commons.onmyoji.config.OnmyojiScriptConfig;
 import com.commons.onmyoji.producer.InstanceZoneProducer;
-import com.commons.onmyoji.thread.OnmyojiDeamonThread;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
-import lombok.ToString;
-
-import java.util.Objects;
 
 /**
  * Title:
@@ -56,7 +52,7 @@ public class OnmyojiJob <JOB_CONFIG extends OnmyojiScriptConfig> {
     private JOB_CONFIG config;
 
     public void start() {
-//        OnmyojiDeamonThread thread = new OnmyojiDeamonThread();
+//        OnmyojiDeamonTask thread = new OnmyojiDeamonTask();
 //        thread.start();
         producer.produce(this);
 //        thread.interrupt();

@@ -18,7 +18,7 @@ import javax.imageio.ImageIO;
  * 图片相似性
  */
 
-public class ImageSimilarity {
+public class ImageSimilarityUtil {
 
     public static int size = 32;
 

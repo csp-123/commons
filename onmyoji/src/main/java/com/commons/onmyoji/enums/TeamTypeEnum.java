@@ -14,12 +14,12 @@ public enum TeamTypeEnum {
     /**
      * 单刷
      */
-    ONLY_ONE(1, "单刷"),
+    SOLO(1, "单刷"),
 
     /**
-     * 多开
+     * 组队
      */
-    MORE(2, "多开");
+    TEAM(2, "组队");
 
     /**
      * 状态码

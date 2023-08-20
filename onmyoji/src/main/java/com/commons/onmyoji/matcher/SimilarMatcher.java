@@ -1,6 +1,6 @@
 package com.commons.onmyoji.matcher;
 
-import com.commons.onmyoji.utils.ImageSimilarity;
+import com.commons.onmyoji.utils.ImageSimilarityUtil;
 import lombok.Getter;
 import lombok.SneakyThrows;
 import org.slf4j.Logger;
@@ -128,7 +128,7 @@ public class SimilarMatcher {
 
                     BufferedImage screenCaptureBfImage = robot.createScreenCapture(new Rectangle(x, y, width, height));
                     // 相似度
-                    double similarity = ImageSimilarity.calSimilarity(screenCaptureBfImage, bufferedImage);
+                    double similarity = ImageSimilarityUtil.calSimilarity(screenCaptureBfImage, bufferedImage);
                     if (similarity > SIMILAR_THRESHOLD) {
                         found = true;
                         //y

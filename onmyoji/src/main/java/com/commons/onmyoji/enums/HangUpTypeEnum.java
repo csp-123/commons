@@ -19,7 +19,7 @@ public enum HangUpTypeEnum {
     /**
      * 刷到死
      */
-    FOREVER(3, "一直刷");
+    FOREVER(3, "只要不断电");
     private Integer code;
 
     private String desc;

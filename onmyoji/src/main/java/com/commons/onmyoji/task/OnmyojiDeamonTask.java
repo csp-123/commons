@@ -1,8 +1,6 @@
-package com.commons.onmyoji.thread;
+package com.commons.onmyoji.task;
 
-import com.commons.onmyoji.config.RoyalSoulConfig;
 import com.commons.onmyoji.constant.OnmyojiConstant;
-import com.commons.onmyoji.matcher.ImgMatcher;
 import com.commons.onmyoji.matcher.ImgMatcher2;
 
 /**
@@ -10,7 +8,7 @@ import com.commons.onmyoji.matcher.ImgMatcher2;
  * @author: cccsp
  * @date: 2023/3/15 13:43
  */
-public class OnmyojiDeamonThread extends Thread {
+public class OnmyojiDeamonTask extends Thread {
 
 
 

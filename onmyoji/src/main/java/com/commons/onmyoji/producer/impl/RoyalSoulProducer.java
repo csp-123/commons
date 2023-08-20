@@ -62,13 +62,13 @@ public class RoyalSoulProducer extends InstanceZoneBaseProducer<RoyalSoulConfig>
 
 
         // start拼接上solo or team
-        if (job.getTeamType().equals(TeamTypeEnum.ONLY_ONE.getCode())) {
+        if (job.getTeamType().equals(TeamTypeEnum.SOLO.getCode())) {
             String[] split = start.split("\\.");
             start = Arrays.stream(split)
                     .reduce((s1, s2) -> s1 + "_solo." + s2)
                     .orElse(start);
         }
-        if (job.getTeamType().equals(TeamTypeEnum.MORE.getCode())) {
+        if (job.getTeamType().equals(TeamTypeEnum.TEAM.getCode())) {
             String[] split = start.split("\\.");
             start = Arrays.stream(split)
                     .reduce((s1, s2) -> s1 + "_team." + s2)
@@ -128,13 +128,13 @@ public class RoyalSoulProducer extends InstanceZoneBaseProducer<RoyalSoulConfig>
         Integer count = threadLocal.get();
 
         logger.info(String.format("=============执行第%s次挂机脚本，处理器：[%s]，组队类型：[%s]=============", count, getProcuderName(), TeamTypeEnum.find(job.getTeamType()).getDesc()));
-        if (job.getTeamType().equals(TeamTypeEnum.ONLY_ONE.getCode())) {
+        if (job.getTeamType().equals(TeamTypeEnum.SOLO.getCode())) {
             executeOnceInSoloMod(start, end, reward, job, matcher);
         }
-        if (job.getTeamType().equals(TeamTypeEnum.MORE.getCode())) {
+        if (job.getTeamType().equals(TeamTypeEnum.TEAM.getCode())) {
             executeOnceInTeamMod(start, end, reward, job, matcher);
         }
-        if (job.getTeamType().equals(TeamTypeEnum.ONLY_ONE.getCode())) {
+        if (job.getTeamType().equals(TeamTypeEnum.SOLO.getCode())) {
             executeOnceInTeamOnlineMod(start, end, reward, job, matcher);
         }
         logger.info("=============执行结束=============");
