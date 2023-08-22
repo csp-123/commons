@@ -1,6 +1,8 @@
 package com.commons.onmyoji.matcher;
 
+import com.alibaba.fastjson.JSON;
 import com.commons.onmyoji.entity.ScreenSnapshot;
+import com.commons.onmyoji.entity.ScreenSnapshotItem;
 import com.commons.onmyoji.utils.ImageSimilarityUtil;
 import lombok.Getter;
 import lombok.Setter;
@@ -66,20 +68,22 @@ public class SimilarMatcher2 {
     private final List<String> targetImgPathList;
 
     /**
-     * 匹配结果
+     * 匹配结果 keu-imgPath, value-Map:key-windowName,value-result
      */
-    private Map<String, List<MatchResult>> results = new HashMap<>();
+    private Map<String, Map<String, MatchResult>> results = new HashMap<>();
 
     /**
      * 匹配结果
      */
     private Map<String, Integer> count = new HashMap<>();
 
+    private List<ScreenSnapshot> snapshots = new ArrayList<>();
+
     public SimilarMatcher2(List<String> targetImgPathList) {
         this.targetImgPathList = targetImgPathList;
         this.load(targetImgPathList);
         this.count = targetImgPathList.stream()
-                .collect(Collectors.toMap( o -> o, v -> 0));
+                .collect(Collectors.toMap(o -> o, v -> 0));
     }
 
     /**
@@ -99,6 +103,7 @@ public class SimilarMatcher2 {
 
     @SneakyThrows
     public void matchOne(String targetImgPath, boolean solo) {
+
         int[][] RGBData = RGBDataMap.get(targetImgPath);
         BufferedImage bufferedImage = bfImageMap.get(targetImgPath);
         int width = bufferedImage.getWidth();
@@ -107,102 +112,79 @@ public class SimilarMatcher2 {
         // 灰度匹配，相似度超过阈值即认定为匹配成功
         // 单刷模式下 找到一个点位即返回
         ScreenSnapshot snapshot = ScreenSnapshot.getInstance();
-        outer:
-        for (int x = 0; x < snapshot.getWindowWidth(); x++) {
-            for (int y = 0; y < snapshot.getWindowHeight(); y++) {
-                Color pixelColor = robot.getPixelColor(x + snapshot.getX(), y + snapshot.getY());
-                if (pixelColor.getRGB() != RGBData[0][0]) {
-                    continue;
-                }
-                BufferedImage screenCaptureBfImage = robot.createScreenCapture(new Rectangle(x, y, width, height));
-                if (ImageSimilarityUtil.calSimilarity(screenCaptureBfImage, bufferedImage) >= SIMILAR_THRESHOLD) {
-                    List<MatchResult> matchResults = results.get(targetImgPath);
-                    if (CollectionUtils.isEmpty(matchResults)) {
-                        matchResults = new ArrayList<>();
-                        matchResults.add(new MatchResult(x, y, width, height));
-                        results.put(targetImgPath, matchResults);
-                    } else {
-                        matchResults.add(new MatchResult(x, y, width, height));
+        if (snapshot.getSnapshotItemMap().isEmpty()) {
+            return;
+        }
+        for (Map.Entry<String, ScreenSnapshotItem> snapshotItemEntry : snapshot.getSnapshotItemMap().entrySet()) {
+            ScreenSnapshotItem snapshotItem = snapshotItemEntry.getValue();
+
+            int[][] rgbData = snapshotItem.getRGBData();
+            for (int y = 0; y < rgbData.length; y++) {
+                for (int x = 0; x < rgbData[0].length; x++) {
+                    if (rgbData[y][x] != RGBData[0][0]) {
+                        continue;
                     }
-                    if (solo) {
-                        break outer;
+                    int realX = x + snapshotItem.getX();
+                    int realY = y + snapshotItem.getY();
+                    BufferedImage screenCaptureBfImage = robot.createScreenCapture(new Rectangle(realX, realY, width, height));
+                    double similarity = ImageSimilarityUtil.calSimilarity(screenCaptureBfImage, bufferedImage);
+                    if (similarity >= SIMILAR_THRESHOLD) {
+                        Map<String, MatchResult> matchResultMap = results.get(targetImgPath);
+                        if (matchResultMap == null) {
+                            matchResultMap = new HashMap<>();
+                        }
+                        logger.info("result:{}", JSON.toJSONString(matchResultMap));
+                        MatchResult result = new MatchResult(realX, realY, width, height);
+                        matchResultMap.put(snapshotItemEntry.getKey(), result);
+                        results.put(targetImgPath, matchResultMap);
+                        if (solo) {
+                            return;
+                        }
                     }
                 }
             }
         }
-    }
 
-    public void matchAll(boolean solo) {
-        executorService.submit(() -> {
-            for (String targetImgPath : getTargetImgPathList()) {
-                matchOne(targetImgPath, solo);
-            }
-        });
     }
 
     public void matchAll(boolean solo, Long endTime) {
         while (System.currentTimeMillis() <= endTime) {
-            executorService.submit(() -> {
-                for (String targetImgPath : getTargetImgPathList()) {
-                    matchOne(targetImgPath, solo);
-                }
-            });
+            for (String targetImgPath : getTargetImgPathList()) {
+                matchOne(targetImgPath, solo);
+            }
         }
     }
 
     public void clickAll(boolean solo, Long endTime) {
+        Map<String, Map<String, MatchResult>> map = getResults();
         while (System.currentTimeMillis() <= endTime) {
-            Map<String, List<MatchResult>> map = getResults();
-            map.keySet().forEach(imgPath -> clickOne(imgPath, solo));
+            if (map.isEmpty()) {
+                continue;
+            }
+            map.keySet()
+                    .forEach(imgPath -> clickOne(imgPath, solo));
         }
-    }
-    public void clickAll(boolean solo) {
-        Map<String, List<MatchResult>> map = getResults();
-        map.keySet().forEach(imgPath -> clickOne(imgPath, solo));
     }
 
     @SneakyThrows
     public boolean clickOne(String targetImgPath, boolean solo) {
-        List<MatchResult> resultList = results.get(targetImgPath);
-        if (CollectionUtils.isEmpty(resultList)) {
+        logger.info("执行一次点击");
+        Map<String, MatchResult> matchResultMap = results.get(targetImgPath);
+        if (CollectionUtils.isEmpty(matchResultMap)) {
             return false;
         }
         Integer imgClickCount = count.get(targetImgPath);
         count.put(targetImgPath, imgClickCount == null ? 0 : ++imgClickCount);
-        if (solo) {
-            MatchResult matchResult = resultList.get(0);
-            int randomX = buildRandomLocation2(matchResult.getLocationX(), matchResult.getImgWidth());
-            int randomY = buildRandomLocation2(matchResult.getLocationY(), matchResult.getImgHeight());
-            click(randomX, randomY);
-            resultList.remove(matchResult);
-            return true;
-        }
 
-        resultList.forEach(matchResult -> {
+        matchResultMap.values().forEach(matchResult -> {
             int randomX = buildRandomLocation2(matchResult.getLocationX(), matchResult.getImgWidth());
             int randomY = buildRandomLocation2(matchResult.getLocationY(), matchResult.getImgHeight());
             click(randomX, randomY);
-            resultList.remove(matchResult);
+            matchResultMap.clear();
         });
         return true;
     }
 
-    public void test() {
-        try {
-            String line;
-//            Process p = Runtime.getRuntime().exec("ps -e");
-            Process p = Runtime.getRuntime().exec
-                    (System.getenv("windir") + "\\system32\\" + "tasklist.exe");
-            BufferedReader input =
-                    new BufferedReader(new InputStreamReader(p.getInputStream()));
-            while ((line = input.readLine()) != null) {
-                System.out.println(line); //<-- Parse data here.
-            }
-            input.close();
-        } catch (Exception err) {
-            err.printStackTrace();
-        }
-    }
 
     /**
      * 以中心点为构建随机位置

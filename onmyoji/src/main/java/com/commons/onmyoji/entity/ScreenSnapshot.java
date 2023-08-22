@@ -1,11 +1,16 @@
 package com.commons.onmyoji.entity;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * 屏幕快照
@@ -22,26 +27,9 @@ public class ScreenSnapshot {
     private static final ScreenSnapshot snapshot = new ScreenSnapshot();
 
     /**
-     * 窗口程序x坐标
+     * 窗口快照map  key-窗口名称 value-快照
      */
-    private int x;
-
-    /**
-     * 窗口程序y坐标
-     */
-    private int y;
-
-    /**
-     * 窗口宽
-     */
-    private int windowWidth;
-
-    /**
-     * 窗口高
-     */
-    private int windowHeight;
-
-
+    private Map<String, ScreenSnapshotItem> snapshotItemMap = new HashMap<>();
 
     /**
      * 私有化构造函数，不允许外部通过构造函数实例化
@@ -56,7 +44,5 @@ public class ScreenSnapshot {
     public static ScreenSnapshot getInstance() {
         return snapshot;
     }
-
-
 
 }

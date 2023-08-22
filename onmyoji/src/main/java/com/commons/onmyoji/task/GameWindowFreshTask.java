@@ -1,25 +1,108 @@
 package com.commons.onmyoji.task;
 
 import com.commons.onmyoji.entity.ScreenSnapshot;
+import com.commons.onmyoji.entity.ScreenSnapshotItem;
+import com.sun.jna.Pointer;
+import com.sun.jna.platform.win32.User32;
+import com.sun.jna.platform.win32.WinDef;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.SneakyThrows;
 import lombok.extern.apachecommons.CommonsLog;
 import org.springframework.stereotype.Component;
+import org.springframework.util.Assert;
 
-import java.util.TimerTask;
+import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.util.*;
+import java.util.List;
 
 /**
  * 游戏窗口刷新：实时监测游戏窗口位置、窗口大小
  * @author chishupeng
  * @date 2023/8/18 2:45 PM
  */
-@Component
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class GameWindowFreshTask extends TimerTask {
+
+    /**
+     * 窗口名列表
+     */
+    private List<String> windowsNameList = new ArrayList<>();
+
+
+    @SneakyThrows
     @Override
     public void run() {
-        // todo 记录游戏窗口位置、大小
+
+        Assert.notEmpty(windowsNameList, "未指定窗口名称");
+
+        Robot robot = new Robot();
         ScreenSnapshot instance = ScreenSnapshot.getInstance();
-        instance.setX(0)
-                .setY(0)
-                .setWindowWidth(2560)
-                .setWindowHeight(1440);
+        // 单窗口
+        if (windowsNameList.size() == 1) {
+            reloadScreenSnapShot(robot, windowsNameList.get(0), instance);
+        }
+
+        if (windowsNameList.size() > 1) {
+            for (String windowName : windowsNameList) {
+                reloadScreenSnapShot(robot, windowName, instance);
+            }
+        }
+
+
+    }
+
+    private void reloadScreenSnapShot(Robot robot, String windowName, ScreenSnapshot snapshot) {
+        WinDef.RECT rect = getRect(windowName);
+        ScreenSnapshotItem snapshotItem = new ScreenSnapshotItem();
+        snapshotItem.setX(rect.left);
+        snapshotItem.setY(rect.top);
+        snapshotItem.setWindowName(windowName);
+        snapshotItem.setWindowWidth(rect.right-rect.left);
+        snapshotItem.setWindowHeight(rect.bottom- rect.top);
+        snapshotItem.setX(rect.left);
+        BufferedImage screenCapture = robot.createScreenCapture(new Rectangle(snapshotItem.getX(), snapshotItem.getY(), snapshotItem.getWindowWidth(), snapshotItem.getWindowHeight()));
+        snapshotItem.setBufferedImage(screenCapture);
+        snapshotItem.setRGBData(getImageRGB(screenCapture));
+        Map<String, ScreenSnapshotItem> snapshotItemMap = snapshot.getSnapshotItemMap();
+        if (snapshotItemMap == null) {
+            snapshotItemMap = new HashMap<>();
+        }
+        snapshotItemMap.put(windowName, snapshotItem);
+        snapshot.setSnapshotItemMap(snapshotItemMap);
+    }
+
+    private static WinDef.RECT getRect(String windowName) {
+        // 记录游戏窗口位置、大小
+        User32 user32 = User32.INSTANCE;
+        WinDef.HWND hwnd = user32.FindWindow(null, windowName);
+        Assert.notNull(hwnd, "找不到窗口");
+        // 获取窗口大小
+        WinDef.RECT rect = new WinDef.RECT();
+        user32.GetWindowRect(hwnd, rect);
+        return rect;
+    }
+
+    /**
+     * 根据BufferedImage获取图片RGB数组
+     *
+     * @param bfImage
+     * @return
+     */
+    private int[][] getImageRGB(BufferedImage bfImage) {
+        int width = bfImage.getWidth();
+        int height = bfImage.getHeight();
+        int[][] result = new int[height][width];
+        for (int h = 0; h < height; h++) {
+            for (int w = 0; w < width; w++) {
+                //使用getRGB(w, h)获取该点的颜色值是ARGB，而在实际应用中使用的是RGB，所以需要将ARGB转化成RGB，即bufImg.getRGB(w, h) & 0xFFFFFF。
+                result[h][w] = bfImage.getRGB(w, h) & 0xFFFFFF;
+            }
+        }
+        return result;
     }
 }

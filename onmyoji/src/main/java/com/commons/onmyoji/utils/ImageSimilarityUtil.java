@@ -1,5 +1,7 @@
 package com.commons.onmyoji.utils;
 
+import lombok.SneakyThrows;
+
 import java.awt.Graphics2D;
 
 import java.awt.color.ColorSpace;
@@ -92,6 +94,7 @@ public class ImageSimilarityUtil {
     }
 
 
+    @SneakyThrows
     public static double calSimilarity(BufferedImage image1, BufferedImage image2) throws IOException {
 
         return calSimilarity(getHammingDistance(image1, image2));

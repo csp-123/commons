@@ -14,6 +14,7 @@ import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.core.io.support.ResourcePatternResolver;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
+import org.yaml.snakeyaml.Yaml;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -29,7 +30,7 @@ import java.util.Map;
  * Create Time:2023/2/20 16:29
  */
 @Component
-public class YmlLoader implements EnvironmentAware {
+public class YmlLoader<T> implements EnvironmentAware {
 
     private static Logger logger = LoggerFactory.getLogger(YmlLoader.class);
 
@@ -70,6 +71,25 @@ public class YmlLoader implements EnvironmentAware {
                 result.add(propertiesPropertySource);
             });
         }
+        return result;
+    }
+
+
+    public List<T> loadAs(String regex, Class<T> type) throws IOException {
+        List<T> result = Lists.newArrayList();
+        ResourcePatternResolver resourcePatternResolver = new PathMatchingResourcePatternResolver();
+        Resource[] resourceArr = resourcePatternResolver.getResources(regex);
+        Arrays.stream(resourceArr).forEach(resource -> {
+            try {
+                resource.getInputStream();
+                Yaml yaml = new Yaml();
+                T t = yaml.loadAs(resource.getInputStream(), type);
+                result.add(t);
+            } catch (IOException e) {
+                logger.error(e.getMessage(), e);
+            }
+        });
+
         return result;
     }
 

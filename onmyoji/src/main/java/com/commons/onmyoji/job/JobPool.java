@@ -1,5 +1,6 @@
 package com.commons.onmyoji.job;
 
+import com.commons.onmyoji.config.OnmyojiScriptConfig;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;

@@ -7,6 +7,7 @@ import com.commons.onmyoji.enums.TeamTypeEnum;
 import com.commons.onmyoji.job.OnmyojiJob;
 import com.commons.onmyoji.matcher.ImgMatcher;
 import com.commons.onmyoji.matcher.Matcher;
+import com.commons.onmyoji.matcher.SimilarMatcher2;
 import com.commons.onmyoji.producer.InstanceZoneBaseProducer;
 import com.commons.onmyoji.service.CommonService;
 import lombok.SneakyThrows;
@@ -15,7 +16,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.Arrays;
+import java.util.*;
 
 /**
  * Title: 御魂脚本处理器
@@ -28,8 +29,6 @@ import java.util.Arrays;
 public class RoyalSoulProducer extends InstanceZoneBaseProducer<RoyalSoulConfig> {
 
     private static final Logger logger = LoggerFactory.getLogger(RoyalSoulProducer.class);
-
-    ThreadLocal<Integer> threadLocal = new ThreadLocal<>();
 
 
     /**
@@ -44,10 +43,6 @@ public class RoyalSoulProducer extends InstanceZoneBaseProducer<RoyalSoulConfig>
      */
     @Override
     public void produce(OnmyojiJob<RoyalSoulConfig> job) {
-        // 脚本执行次数
-        int count = 1;
-        threadLocal.set(count);
-
         // 配置： 层数、截图存放位置
         RoyalSoulConfig jobConfig = job.getConfig();
         String imgDirectory = System.getProperty("user.dir") + "\\" + jobConfig.imgPath + "\\";
@@ -75,162 +70,31 @@ public class RoyalSoulProducer extends InstanceZoneBaseProducer<RoyalSoulConfig>
                     .orElse(start);
         }
 
+        List<String> targetImgList = new ArrayList<>();
+        targetImgList.add(start);
+        targetImgList.add(end);
+        targetImgList.add(reward);
         //图片匹配器
-        Matcher matcher = new Matcher();
+        SimilarMatcher2 matcher = new SimilarMatcher2(targetImgList);
 
 
         // 处理挂机时长
         if (job.getHangUpType().getType().equals(HangUpTypeEnum.TIMES.getCode())) {
-            // 限次
-            for (int i = 1; i <= job.getHangUpType().getTimes(); i++) {
-                executeOnce(start, end, reward, job, matcher);
-            }
+            // 限次 todo
         } else if (job.getHangUpType().getType().equals(HangUpTypeEnum.TIME.getCode())) {
-            // 限时
-            long endTime = System.currentTimeMillis() + 60 * 1000 * 1000;
-            while (System.currentTimeMillis() <= endTime) {
-                executeUntilEnd(start, end, reward, job, matcher);
-            }
+            //  限时
+            Integer minute = job.getHangUpType().getTime();
+            long endTime = System.currentTimeMillis() + 60L * 1000 * minute;
+            boolean solo = job.getTeamType().equals(TeamTypeEnum.SOLO.getCode());
+            matcher.matchAll(solo, endTime);
+//            matcher.clickAll(solo, endTime);
         } else if (job.getHangUpType().getType().equals(HangUpTypeEnum.FOREVER.getCode())) {
-            // 不限
-            while (true) {
-                executeOnce(start, end, reward, job, matcher);
-            }
+            // 不限 todo
         }
-
-        threadLocal.remove();
-    }
-
-    private void executeUntilEnd(String start, String end, String reward, OnmyojiJob<RoyalSoulConfig> job, Matcher matcher) {
-        // 开始
-        matcher.click(start, true,  false);
-
-        // 领取奖励
-        boolean rewardSuccess= false;
-        while (!rewardSuccess) {
-            rewardSuccess = matcher.clickBlocking(reward, true, 1, false);
-        }
-
-        // 结束
-
-        matcher.click(end, true, false);
-    }
-
-    /**
-     * 执行脚本
-     *
-     * @param start 开始图片
-     * @param end 结束图片
-     * @param job 任务
-     */
-    private void executeOnce(String start, String end, String reward, OnmyojiJob<RoyalSoulConfig> job, Matcher matcher) {
-        //  计数器
-        Integer count = threadLocal.get();
-
-        logger.info(String.format("=============执行第%s次挂机脚本，处理器：[%s]，组队类型：[%s]=============", count, getProcuderName(), TeamTypeEnum.find(job.getTeamType()).getDesc()));
-        if (job.getTeamType().equals(TeamTypeEnum.SOLO.getCode())) {
-            executeOnceInSoloMod(start, end, reward, job, matcher);
-        }
-        if (job.getTeamType().equals(TeamTypeEnum.TEAM.getCode())) {
-            executeOnceInTeamMod(start, end, reward, job, matcher);
-        }
-        if (job.getTeamType().equals(TeamTypeEnum.SOLO.getCode())) {
-            executeOnceInTeamOnlineMod(start, end, reward, job, matcher);
-        }
-        logger.info("=============执行结束=============");
-        threadLocal.set(++count);
     }
 
 
 
-    /**
-     * 执行一次挂机脚本 - 单刷模式
-     */
-    @SneakyThrows
-    private void executeOnceInSoloMod(String start, String end, String reward, OnmyojiJob<RoyalSoulConfig> job, Matcher matcher) {
-        // todo 尚未改造，单刷较少
-
-        // 开始
-        boolean success;
-        do {
-            success = matcher.clickBlocking(start, true, 1, false);
-        } while (success);
-
-        // 睡眠10s，不会有人能15s刷魂吧
-        Thread.sleep(15000);
-
-        // 领取奖励
-        do {
-            success = matcher.clickBlocking(reward, true, 1, false);
-        } while (success);
-
-        // 结束
-        do {
-            success = matcher.clickBlocking(end, true, 1, false);
-        } while (success);
-    }
-
-    /**
-     * 执行一次挂机脚本 - 组队模式
-     * 组队模式下，需要对屏幕内的所有命中位置进行点击，适配多开的情况
-     *
-     * @param start 开始图片路径
-     * @param end   结束图片路径
-     * @param job   job配置
-     */
-    @SneakyThrows
-    private void executeOnceInTeamMod(String start, String end, String reward, OnmyojiJob<RoyalSoulConfig> job, Matcher matcher) {
-
-        // 开始
-        boolean startSuccess = false;
-        while (!startSuccess) {
-            startSuccess = matcher.clickBlocking(start, true, 1, false);
-        }
-        // 睡眠10s，不会有人能15s刷魂吧
-        Thread.sleep(15000);
-        // 领取奖励
-        boolean rewardSuccess= false;
-        while (!rewardSuccess) {
-            rewardSuccess = matcher.clickBlocking(reward, true, 2, false);
-        }
-
-        // 结束
-        boolean endSuccess = false;
-        while (!endSuccess) {
-            endSuccess = matcher.clickBlocking(end, true, 2, false);
-        }
-
-    }
-
-
-    /**
-     * 执行一次挂机脚本 - 在线组队模式
-     *
-     * @param start 开始图片路径
-     * @param end   结束图片路径
-     * @param job   job配置
-     */
-    @SneakyThrows
-    private void executeOnceInTeamOnlineMod(String start, String end, String reward, OnmyojiJob<RoyalSoulConfig> job, Matcher matcher) {
-        // 开始
-        boolean success;
-        do {
-            success = matcher.clickBlocking(start, true, 1, false);
-        } while (success);
-
-        // 睡眠10s，不会有人能15s刷魂吧
-        Thread.sleep(15000);
-
-        // 领取奖励
-        do {
-            success = matcher.clickBlocking(reward, true, 1, false);
-        } while (success);
-
-        // 结束
-        do {
-            success = matcher.clickBlocking(end, true, 1, false);
-        } while (success);
-    }
 
     @Override
     public String getProcuderName() {

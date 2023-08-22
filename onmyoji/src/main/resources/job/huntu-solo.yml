@@ -1,12 +1,11 @@
-name: 魂土
-teamType: 2
+name: 魂土-单人
+teamType: 1
 hangUpType:
-  type: 2
-  times: 500
+  type: 1
+  time: 30
 producerBean: RoyalSoul
 config:
   imgPath: onmyoji\src\main\resources\img\royalsoul\
   windowNameList:
     - "今时月"
-    - "念山行"
 
