@@ -1,18 +1,14 @@
-package com.commons.onmyoji.task;
+package com.commons.onmyoji.components;
 
-import com.commons.onmyoji.entity.ScreenSnapshot;
-import com.commons.onmyoji.entity.ScreenSnapshotItem;
-import com.sun.jna.Pointer;
+import com.commons.onmyoji.entity.GameWindowSnapshot;
+import com.commons.onmyoji.entity.GameWindowSnapshotItem;
 import com.sun.jna.platform.win32.User32;
 import com.sun.jna.platform.win32.WinDef;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.SneakyThrows;
-import lombok.extern.apachecommons.CommonsLog;
+import lombok.*;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 
+import javax.annotation.Resource;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.*;
@@ -23,16 +19,18 @@ import java.util.List;
  * @author chishupeng
  * @date 2023/8/18 2:45 PM
  */
+@EqualsAndHashCode(callSuper = true)
 @Data
-@AllArgsConstructor
-@NoArgsConstructor
+@Component
 public class GameWindowFreshTask extends TimerTask {
 
     /**
      * 窗口名列表
      */
-    private List<String> windowsNameList = new ArrayList<>();
+    private List<String> windowsNameList;
 
+    @Resource
+    private Robot robot;
 
     @SneakyThrows
     @Override
@@ -40,8 +38,7 @@ public class GameWindowFreshTask extends TimerTask {
 
         Assert.notEmpty(windowsNameList, "未指定窗口名称");
 
-        Robot robot = new Robot();
-        ScreenSnapshot instance = ScreenSnapshot.getInstance();
+        GameWindowSnapshot instance = GameWindowSnapshot.getInstance();
         // 单窗口
         if (windowsNameList.size() == 1) {
             reloadScreenSnapShot(robot, windowsNameList.get(0), instance);
@@ -56,9 +53,9 @@ public class GameWindowFreshTask extends TimerTask {
 
     }
 
-    private void reloadScreenSnapShot(Robot robot, String windowName, ScreenSnapshot snapshot) {
+    private void reloadScreenSnapShot(Robot robot, String windowName, GameWindowSnapshot snapshot) {
         WinDef.RECT rect = getRect(windowName);
-        ScreenSnapshotItem snapshotItem = new ScreenSnapshotItem();
+        GameWindowSnapshotItem snapshotItem = new GameWindowSnapshotItem();
         snapshotItem.setX(rect.left);
         snapshotItem.setY(rect.top);
         snapshotItem.setWindowName(windowName);
@@ -68,12 +65,7 @@ public class GameWindowFreshTask extends TimerTask {
         BufferedImage screenCapture = robot.createScreenCapture(new Rectangle(snapshotItem.getX(), snapshotItem.getY(), snapshotItem.getWindowWidth(), snapshotItem.getWindowHeight()));
         snapshotItem.setBufferedImage(screenCapture);
         snapshotItem.setRGBData(getImageRGB(screenCapture));
-        Map<String, ScreenSnapshotItem> snapshotItemMap = snapshot.getSnapshotItemMap();
-        if (snapshotItemMap == null) {
-            snapshotItemMap = new HashMap<>();
-        }
-        snapshotItemMap.put(windowName, snapshotItem);
-        snapshot.setSnapshotItemMap(snapshotItemMap);
+        snapshot.getSnapshotItemList().add(snapshotItem);
     }
 
     private static WinDef.RECT getRect(String windowName) {

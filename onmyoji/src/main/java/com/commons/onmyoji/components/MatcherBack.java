@@ -1,4 +1,4 @@
-package com.commons.onmyoji.matcher;
+package com.commons.onmyoji.components;
 
 import com.alibaba.fastjson.JSON;
 import com.commons.onmyoji.utils.ImageSimilarityUtil;
@@ -27,9 +27,9 @@ import java.util.stream.IntStream;
  * Date: 2023/3/12 1:07
  */
 @Getter
-public class Matcher {
+public class MatcherBack {
 
-    private static final Logger logger = LoggerFactory.getLogger(Matcher.class);
+    private static final Logger logger = LoggerFactory.getLogger(MatcherBack.class);
 
 
     private static final Robot robot = getRobot();
@@ -115,10 +115,10 @@ public class Matcher {
     /**
      * 匹配结果
      */
-    private List<Matcher.MatchResult> results = new ArrayList<>();
+    private List<MatcherBack.MatchResult> results = new ArrayList<>();
 
 
-    public Matcher(String targetImgPath, String srcImgPath) {
+    public MatcherBack(String targetImgPath, String srcImgPath) {
         GraphicsDevice graphDevice = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
         DisplayMode disMode = graphDevice.getDisplayMode();
         int width = disMode.getWidth();
@@ -130,7 +130,7 @@ public class Matcher {
         this.reload(targetImgPath);
     }
 
-    public Matcher() {
+    public MatcherBack() {
         GraphicsDevice graphDevice = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
         DisplayMode disMode = graphDevice.getDisplayMode();
         int width = disMode.getWidth();
@@ -418,7 +418,7 @@ public class Matcher {
                             //x
                             int maxX = x + targetImgWidth;
                             int locationX = ((x + maxX) / 2);
-                            results.add(new Matcher.MatchResult(locationX, locationY));
+                            results.add(new MatcherBack.MatchResult(locationX, locationY));
                             x += targetImgWidth;
                             y += targetImgHeight;
                         }
@@ -451,7 +451,7 @@ public class Matcher {
                             //x
                             int maxX = x + targetImgWidth;
                             int locationX = ((x + maxX) / 2);
-                            results.add(new Matcher.MatchResult(locationX, locationY));
+                            results.add(new MatcherBack.MatchResult(locationX, locationY));
 
                         }
                     }
@@ -626,7 +626,7 @@ public class Matcher {
     public static void main(String[] args) {
         String s = "/Users/chishupeng/IdeaProjects/commons/onmyoji/src/main/resources/img/tansuo/start_solo.png";
 
-        Matcher m = new Matcher();
+        MatcherBack m = new MatcherBack();
 
         m.click(s, false, false);
 

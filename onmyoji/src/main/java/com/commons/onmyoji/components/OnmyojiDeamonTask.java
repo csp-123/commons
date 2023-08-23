@@ -1,7 +1,6 @@
-package com.commons.onmyoji.task;
+package com.commons.onmyoji.components;
 
 import com.commons.onmyoji.constant.OnmyojiConstant;
-import com.commons.onmyoji.matcher.ImgMatcher2;
 
 /**
  * @description: 守护线程 - 处理异常事件
@@ -9,8 +8,6 @@ import com.commons.onmyoji.matcher.ImgMatcher2;
  * @date: 2023/3/15 13:43
  */
 public class OnmyojiDeamonTask extends Thread {
-
-
 
     @Override
     public void run() {

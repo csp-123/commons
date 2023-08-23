@@ -1,20 +1,9 @@
 package com.commons.onmyoji.utils;
 
-import ch.qos.logback.core.util.SystemInfo;
-import com.alibaba.fastjson.JSON;
-import com.commons.onmyoji.entity.ScreenSnapshot;
-import com.commons.onmyoji.matcher.SimilarMatcher2;
 import com.sun.jna.Pointer;
 import com.sun.jna.platform.win32.User32;
 import com.sun.jna.platform.win32.WinDef;
 import lombok.SneakyThrows;
-import com.sun.jna.Native;
-
-
-
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.util.Collections;
 
 /**
  * @description: 测试
@@ -27,14 +16,14 @@ public class ForTest {
     @SneakyThrows
     public static void main(String[] args) {
 
-//        ScreenSnapshot instance = ScreenSnapshot.getInstance();
+//        GameWindowSnapshot instance = GameWindowSnapshot.getInstance();
 //        instance.setX(1280)
 //                .setY(40)
 //                .setWindowWidth(1280)
 //                .setWindowHeight(720);
 //        String s = "D:\\learn\\IdeaProjects\\commons\\onmyoji\\src\\main\\java\\com\\commons\\onmyoji\\utils\\start_solo.png";
 //
-//        SimilarMatcher2 matcher = new SimilarMatcher2(Collections.singletonList(s));
+//        Matcher matcher = new Matcher(Collections.singletonList(s));
 //
 //        matcher.matchOne(s, true);
 //

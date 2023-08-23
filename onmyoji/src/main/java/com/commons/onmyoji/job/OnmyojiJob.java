@@ -2,7 +2,7 @@ package com.commons.onmyoji.job;
 
 import com.commons.onmyoji.config.OnmyojiScriptConfig;
 import com.commons.onmyoji.producer.InstanceZoneProducer;
-import com.commons.onmyoji.task.GameWindowFreshTask;
+import com.commons.onmyoji.components.GameWindowFreshTask;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
@@ -56,13 +56,6 @@ public class OnmyojiJob <JOB_CONFIG extends OnmyojiScriptConfig> {
     private JOB_CONFIG config;
 
     public void start() {
-
-        /**
-         * 屏幕刷新器： 每秒刷新一次
-         */
-        GameWindowFreshTask gameWindowFreshTask = new GameWindowFreshTask(this.getConfig().getWindowNameList());
-        Timer timer = new Timer();
-        timer.scheduleAtFixedRate(gameWindowFreshTask, new Date(), 1000);
 
         producer.produce(this);
 

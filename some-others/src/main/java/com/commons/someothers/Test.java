@@ -58,6 +58,7 @@ public class Test {
             orderList.add(generateSqlForOrder(userCode1,orgCode,orgPath));
             useList.add(generateSqlForUse(userCode1,orgCode,orgPath));
             expList.add(generateSqlForExpReq(userCode1,orgCode,orgPath));
+            expList.add(generateSqlForExpReqApply(userCode1,orgCode,orgPath));
         }
 
         System.out.println("-- plan");
@@ -76,19 +77,19 @@ public class Test {
 
 
     public static String generateSqlForPlan(String userCode, String orgCode, String orgPath) {
-        return String.format(" update purchase_plan set department_code_path = '%s' where applicant_code = '%s' and department_code = '%s';", orgPath, userCode, orgCode);
+        return String.format(" update purchase_plan set department_code_path = '%s' where applicant_code = '%s' and department_code = '%s' and (department_code_path is null or department_code_path = '');", orgPath, userCode, orgCode);
     }
 
     public static String generateSqlForReq(String userCode, String orgCode, String orgPath) {
-        return String.format(" update purchase_request set department_code_path = '%s' where applicant_code = '%s' and department_code = '%s';", orgPath, userCode, orgCode);
+        return String.format(" update purchase_request set department_code_path = '%s' where applicant_code = '%s' and department_code = '%s' and (department_code_path is null or department_code_path = '');", orgPath, userCode, orgCode);
     }
 
     public static String generateSqlForOrder(String userCode, String orgCode, String orgPath) {
-        return String.format(" update purchase_order set department_code_path = '%s' where applicant_code = '%s' and department_code = '%s';", orgPath, userCode, orgCode);
+        return String.format(" update purchase_order set department_code_path = '%s' where applicant_code = '%s' and department_code = '%s' and (department_code_path is null or department_code_path = '');", orgPath, userCode, orgCode);
     }
 
     public static String generateSqlForUse(String userCode, String orgCode, String orgPath) {
-        return String.format(" update use_order set department_code_path = '%s' where use_user_code = '%s' and use_department_code = '%s';", orgPath, userCode, orgCode);
+        return String.format(" update use_order set department_code_path = '%s' where use_user_code = '%s' and use_department_code = '%s' and (department_code_path is null or department_code_path = '');", orgPath, userCode, orgCode);
     }
 
     /**
@@ -99,7 +100,10 @@ public class Test {
      * @return
      */
     public static String generateSqlForExpReq(String userCode, String orgCode, String orgPath) {
+        return String.format(" update purchase_order_exception_request set department_code_path = '%s' where applicant_code = '%s' and department_code = '%s' and (department_code_path is null or department_code_path = '');", orgPath, userCode, orgCode);
+    }
 
-        return String.format(" update purchase_order_exception_request set department_code_path = '%s' where use_user_code = '%s' and use_department_code = '%s';", orgPath, userCode, orgCode);
+    public static String generateSqlForExpReqApply(String userCode, String orgCode, String orgPath) {
+        return String.format(" update purchase_order_exception_request set apply_user_department_code = '%s',apply_user_department_code_path = '%s' where apply_user_code = '%s' and (apply_user_department_code_path is null or apply_user_department_code_path = '');", orgCode, orgPath, userCode);
     }
 }

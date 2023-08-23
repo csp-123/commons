@@ -1,19 +1,15 @@
 package com.commons.onmyoji.producer.impl;
 
 import com.commons.onmyoji.config.CustomizeConfig;
-import com.commons.onmyoji.config.RoyalSoulConfig;
 import com.commons.onmyoji.constant.OnmyojiConstant;
 import com.commons.onmyoji.enums.HangUpTypeEnum;
-import com.commons.onmyoji.enums.TeamTypeEnum;
 import com.commons.onmyoji.job.OnmyojiJob;
-import com.commons.onmyoji.matcher.Matcher;
+import com.commons.onmyoji.components.MatcherBack;
 import com.commons.onmyoji.producer.InstanceZoneBaseProducer;
 import lombok.SneakyThrows;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
-
-import java.util.Arrays;
 
 /**
  * Title: 自定义场景处理器
@@ -49,22 +45,22 @@ public class CustomizeProducer extends InstanceZoneBaseProducer<CustomizeConfig>
 
 
         //图片匹配器
-        Matcher matcher = new Matcher();
+        MatcherBack matcherBack = new MatcherBack();
 
         // 处理挂机时长
         if (job.getHangUpType().getType().equals(HangUpTypeEnum.TIMES.getCode())) {
             // 限次
             for (int i = 1; i <= job.getHangUpType().getTimes(); i++) {
-                executeOnce(start, end, reward, job, matcher);            }
+                executeOnce(start, end, reward, job, matcherBack);            }
         } else if (job.getHangUpType().getType().equals(HangUpTypeEnum.TIME.getCode())) {
             // 限时
             long endTime = System.currentTimeMillis() + 60L * 1000 * job.getHangUpType().getTime();
             while (System.currentTimeMillis() <= endTime) {
-                executeOnce(start, end, reward, job, matcher);            }
+                executeOnce(start, end, reward, job, matcherBack);            }
         } else if (job.getHangUpType().getType().equals(HangUpTypeEnum.FOREVER.getCode())) {
             // 不限
             while (true) {
-                executeOnce(start, end, reward, job, matcher);            }
+                executeOnce(start, end, reward, job, matcherBack);            }
         }
 
 
@@ -75,20 +71,20 @@ public class CustomizeProducer extends InstanceZoneBaseProducer<CustomizeConfig>
 
 
     @SneakyThrows
-    private void executeOnce(String start, String end, String reward, OnmyojiJob<CustomizeConfig> job, Matcher matcher) {
+    private void executeOnce(String start, String end, String reward, OnmyojiJob<CustomizeConfig> job, MatcherBack matcherBack) {
 
         // 开始
-        matcher.click(start, true,  false);
+        matcherBack.click(start, true,  false);
 
         // 领取奖励
 //        boolean rewardSuccess= false;
 //        while (!rewardSuccess) {
-//            rewardSuccess = matcher.clickBlocking(reward, true, 1, false);
+//            rewardSuccess = matcherBack.clickBlocking(reward, true, 1, false);
 //        }
 
         // 结束
 
-        matcher.click(end, true, false);
+        matcherBack.click(end, true, false);
 
     }
     @Override

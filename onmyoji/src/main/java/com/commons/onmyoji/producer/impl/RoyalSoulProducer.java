@@ -4,19 +4,17 @@ import com.commons.onmyoji.config.RoyalSoulConfig;
 import com.commons.onmyoji.constant.OnmyojiConstant;
 import com.commons.onmyoji.enums.HangUpTypeEnum;
 import com.commons.onmyoji.enums.TeamTypeEnum;
+import com.commons.onmyoji.job.HangUpType;
 import com.commons.onmyoji.job.OnmyojiJob;
-import com.commons.onmyoji.matcher.ImgMatcher;
-import com.commons.onmyoji.matcher.Matcher;
-import com.commons.onmyoji.matcher.SimilarMatcher2;
+import com.commons.onmyoji.components.Matcher;
 import com.commons.onmyoji.producer.InstanceZoneBaseProducer;
-import com.commons.onmyoji.service.CommonService;
-import lombok.SneakyThrows;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.Resource;
 import java.util.*;
+import java.util.concurrent.*;
 
 /**
  * Title: 御魂脚本处理器
@@ -30,6 +28,10 @@ public class RoyalSoulProducer extends InstanceZoneBaseProducer<RoyalSoulConfig>
 
     private static final Logger logger = LoggerFactory.getLogger(RoyalSoulProducer.class);
 
+    private static final ScheduledExecutorService scheduledExecutor = Executors.newScheduledThreadPool(2);
+
+    @Resource
+    Matcher matcher;
 
     /**
      * 从哪个界面开始，庭院？还是御魂界面？ 或者兼容？
@@ -47,7 +49,6 @@ public class RoyalSoulProducer extends InstanceZoneBaseProducer<RoyalSoulConfig>
         RoyalSoulConfig jobConfig = job.getConfig();
         String imgDirectory = System.getProperty("user.dir") + "\\" + jobConfig.imgPath + "\\";
 
-
         // 开始图片
         String start = imgDirectory + OnmyojiConstant.ROYAL_SOUL_START_BUTTON;
         // 奖励图片
@@ -55,9 +56,9 @@ public class RoyalSoulProducer extends InstanceZoneBaseProducer<RoyalSoulConfig>
         // 结束图片
         String end = imgDirectory + OnmyojiConstant.ROYAL_SOUL_END_BUTTON;
 
-
         // start拼接上solo or team
-        if (job.getTeamType().equals(TeamTypeEnum.SOLO.getCode())) {
+        boolean solo = TeamTypeEnum.SOLO.getCode().equals(job.getTeamType());
+        if (solo) {
             String[] split = start.split("\\.");
             start = Arrays.stream(split)
                     .reduce((s1, s2) -> s1 + "_solo." + s2)
@@ -74,22 +75,29 @@ public class RoyalSoulProducer extends InstanceZoneBaseProducer<RoyalSoulConfig>
         targetImgList.add(start);
         targetImgList.add(end);
         targetImgList.add(reward);
-        //图片匹配器
-        SimilarMatcher2 matcher = new SimilarMatcher2(targetImgList);
+        //图片匹配器初始化
+        matcher.init(targetImgList);
 
-
-        // 处理挂机时长
-        if (job.getHangUpType().getType().equals(HangUpTypeEnum.TIMES.getCode())) {
-            // 限次 todo
-        } else if (job.getHangUpType().getType().equals(HangUpTypeEnum.TIME.getCode())) {
-            //  限时
-            Integer minute = job.getHangUpType().getTime();
-            long endTime = System.currentTimeMillis() + 60L * 1000 * minute;
-            boolean solo = job.getTeamType().equals(TeamTypeEnum.SOLO.getCode());
-            matcher.matchAll(solo, endTime);
-//            matcher.clickAll(solo, endTime);
-        } else if (job.getHangUpType().getType().equals(HangUpTypeEnum.FOREVER.getCode())) {
-            // 不限 todo
+        // 限次 todo
+        HangUpType hangUpType = job.getHangUpType();
+        if (hangUpType.getType().equals(HangUpTypeEnum.TIMES.getCode())) {
+        }
+        //  限时
+        if (hangUpType.getType().equals(HangUpTypeEnum.TIME.getCode())) {
+            long endTime = hangUpType.getTime() * 60 * 1000L;
+            TimerTask timerTask = new TimerTask() {
+                @Override
+                public void run() {
+                    matcher.matchAllImg(solo);
+                }
+            };
+            scheduledExecutor.scheduleWithFixedDelay(timerTask, 0, 1, TimeUnit.SECONDS);
+            // 未到结束时间时空转
+            while (System.currentTimeMillis() <= endTime) {}
+            scheduledExecutor.shutdown();
+        }
+        // 不限 todo
+        if (hangUpType.getType().equals(HangUpTypeEnum.FOREVER.getCode())) {
         }
     }
 

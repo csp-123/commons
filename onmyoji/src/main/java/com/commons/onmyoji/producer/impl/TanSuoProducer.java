@@ -1,21 +1,18 @@
 package com.commons.onmyoji.producer.impl;
 
-import com.commons.onmyoji.config.RoyalSoulConfig;
 import com.commons.onmyoji.config.TanSuoConfig;
 import com.commons.onmyoji.constant.OnmyojiConstant;
 import com.commons.onmyoji.enums.HangUpTypeEnum;
 import com.commons.onmyoji.enums.TeamTypeEnum;
 import com.commons.onmyoji.job.OnmyojiJob;
-import com.commons.onmyoji.matcher.ImgMatcher;
-import com.commons.onmyoji.matcher.Matcher;
+import com.commons.onmyoji.components.ImgMatcher;
+import com.commons.onmyoji.components.MatcherBack;
 import com.commons.onmyoji.producer.InstanceZoneBaseProducer;
 import com.commons.onmyoji.service.CommonService;
 import lombok.SneakyThrows;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.ui.context.Theme;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
@@ -146,24 +143,24 @@ public class TanSuoProducer extends InstanceZoneBaseProducer<TanSuoConfig> {
         movePoint = imgDirectory + OnmyojiConstant.TAN_SUO_MOVE_POINT_BUTTON;
 
         // 图片匹配器
-        Matcher matcher = new Matcher();
+        MatcherBack matcherBack = new MatcherBack();
 
         // 处理挂机时长
         if (job.getHangUpType().getType().equals(HangUpTypeEnum.TIMES.getCode())) {
             // 限次
             for (int i = 1; i <= job.getHangUpType().getTimes(); i++) {
-                executeOnce(job, matcher);
+                executeOnce(job, matcherBack);
             }
         } else if (job.getHangUpType().getType().equals(HangUpTypeEnum.TIME.getCode())) {
             // 限时
             long endTime = System.currentTimeMillis() + 60 * 1000 * 1000;
             while (System.currentTimeMillis() <= endTime) {
-                executeOnce(job, matcher);
+                executeOnce(job, matcherBack);
             }
         } else if (job.getHangUpType().getType().equals(HangUpTypeEnum.FOREVER.getCode())) {
             // 不限
             while (true) {
-                executeOnce(job, matcher);
+                executeOnce(job, matcherBack);
             }
         }
 
@@ -176,17 +173,17 @@ public class TanSuoProducer extends InstanceZoneBaseProducer<TanSuoConfig> {
      *
      * @param job
      */
-    private void executeOnce(OnmyojiJob<TanSuoConfig> job, Matcher matcher) {
+    private void executeOnce(OnmyojiJob<TanSuoConfig> job, MatcherBack matcherBack) {
         Integer count = threadLocal.get();
         if (count == null) {
             count = 1;
         }
         logger.info(String.format("=============执行第%s次挂机脚本，处理器：[%s]，组队类型：[%s]=============", count, getProcuderName(), TeamTypeEnum.find(job.getTeamType()).getDesc()));
         if (job.getTeamType().equals(TeamTypeEnum.SOLO.getCode())) {
-            executeOnceInSoloMod(job, matcher);
+            executeOnceInSoloMod(job, matcherBack);
         }
         if (job.getTeamType().equals(TeamTypeEnum.TEAM.getCode())) {
-            executeOnceInTeamMod(job, matcher);
+            executeOnceInTeamMod(job, matcherBack);
         }
         logger.info("=============执行结束=============");
         threadLocal.set(++count);
@@ -196,7 +193,7 @@ public class TanSuoProducer extends InstanceZoneBaseProducer<TanSuoConfig> {
      * 执行一次挂机脚本 - 单刷模式
      */
     @SneakyThrows
-    private void executeOnceInSoloMod(OnmyojiJob<TanSuoConfig> job, Matcher matcher) {
+    private void executeOnceInSoloMod(OnmyojiJob<TanSuoConfig> job, MatcherBack matcherBack) {
         // todo 结界清理
 //        if (isfullDemarcation()) {
 //            closeTanSuo();
@@ -212,20 +209,20 @@ public class TanSuoProducer extends InstanceZoneBaseProducer<TanSuoConfig> {
 
         int count = 0;
         // 单击开始探索
-        matcher.clickBlocking(startTanSuo, true, 1, false);
+        matcherBack.clickBlocking(startTanSuo, true, 1, false);
         Thread.sleep(2000);
         List<String> matchList = new ArrayList<>();
         matchList.add(challenge);
         matchList.add(end);
         matchList.add(reward);
-//        boolean foundBoss  = matcher.tansuo(true, true, matchList, challengeBoss, );
+//        boolean foundBoss  = matcherBack.tansuo(true, true, matchList, challengeBoss, );
         // 不挑战boss，可简化流程，不会出现多种情况，损失并不大。
 
         // 退出
-        matcher.clickFirst(endTanSuo, true, false);
+        matcherBack.clickFirst(endTanSuo, true, false);
         Thread.sleep(1000);
-        while (matcher.count(confirmEndTanSuo, false) != 1);
-        matcher.clickFirst(confirmEndTanSuo, true, false);
+        while (matcherBack.count(confirmEndTanSuo, false) != 1);
+        matcherBack.clickFirst(confirmEndTanSuo, true, false);
         Thread.sleep(1000);
 
     }
@@ -269,7 +266,7 @@ public class TanSuoProducer extends InstanceZoneBaseProducer<TanSuoConfig> {
      *
      * @param job job配置
      */
-    private void executeOnceInTeamMod(OnmyojiJob<TanSuoConfig> job, Matcher matcher) {
+    private void executeOnceInTeamMod(OnmyojiJob<TanSuoConfig> job, MatcherBack matcherBack) {
         // todo
     }
 

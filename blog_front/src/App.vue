@@ -1,10 +1,9 @@
 <script setup>
 import { ref, computed } from 'vue'
 import TestData from "@/components/TestData.vue";
-import index from "@/components/index.vue";
+import Count from "@/components/Count.vue";
 const routes = {
-  '/test': TestData,
-  '/index': index
+  '/test': TestData
 }
 const currentPath = ref(window.location.hash)
 
@@ -23,11 +22,9 @@ const currentView = computed(() => {
   <header>
     <img alt="Vue logo" class="logo" src="./assets/logo.svg" width="125" height="125" />
   </header>
-
   <main>
-    <a href="#/test">About</a>
-    <p></p>
-    <a href="#/index">index</a>
+    <a href="src/static/test.html">link</a>
+    <count/>
     <component :is="currentView" />
   </main>
 

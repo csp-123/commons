@@ -1,25 +1,17 @@
 package com.commons.onmyoji.utils;
 
 import lombok.SneakyThrows;
-
 import java.awt.Graphics2D;
-
 import java.awt.color.ColorSpace;
-
 import java.awt.image.BufferedImage;
-
 import java.awt.image.ColorConvertOp;
-
 import java.io.File;
-
 import java.io.IOException;
-
 import javax.imageio.ImageIO;
 
 /**
- * 图片相似性
+ * 图片相似性工具类
  */
-
 public class ImageSimilarityUtil {
 
     public static int size = 32;
@@ -479,6 +471,44 @@ public class ImageSimilarityUtil {
 
         return F;
 
+    }
+
+
+    /**
+     * 根据BufferedImage获取图片RGB数组
+     *
+     * @param bfImage
+     * @return
+     */
+    public static int[][] getImageRGB(BufferedImage bfImage) {
+        int width = bfImage.getWidth();
+        int height = bfImage.getHeight();
+        int[][] result = new int[height][width];
+        for (int h = 0; h < height; h++) {
+            for (int w = 0; w < width; w++) {
+                //使用getRGB(w, h)获取该点的颜色值是ARGB，而在实际应用中使用的是RGB，所以需要将ARGB转化成RGB，即bufImg.getRGB(w, h) & 0xFFFFFF。
+                result[h][w] = bfImage.getRGB(w, h) & 0xFFFFFF;
+            }
+        }
+        return result;
+    }
+
+
+    /**
+     * 从本地文件读取目标图片
+     *
+     * @param keyImagePath - 图片绝对路径
+     * @return 本地图片的BufferedImage对象
+     */
+    public static BufferedImage getBfImageFromPath(String keyImagePath) {
+        BufferedImage bfImage = null;
+        try {
+            bfImage = ImageIO.read(new File(keyImagePath));
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return bfImage;
     }
 
 }
