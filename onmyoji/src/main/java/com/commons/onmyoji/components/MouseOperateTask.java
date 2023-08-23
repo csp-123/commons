@@ -1,5 +1,6 @@
 package com.commons.onmyoji.components;
 
+import com.alibaba.fastjson.JSON;
 import com.commons.onmyoji.entity.MatchResult;
 import com.commons.onmyoji.entity.MatchResultItem;
 import org.slf4j.Logger;
@@ -27,8 +28,11 @@ public class MouseOperateTask extends TimerTask {
 
     @Override
     public void run() {
+        logger.info("点击器");
+
         MatchResult matchResult = MatchResult.getInstance();
         Map<String, Set<MatchResultItem>> resultItemMap = matchResult.getResultItemMap();
+        logger.info(JSON.toJSONString(resultItemMap));
         Map<String, Integer> clickCountMap = matchResult.getClickCountMap();
         if (resultItemMap.isEmpty()) {
             return;
@@ -54,7 +58,7 @@ public class MouseOperateTask extends TimerTask {
             count++;
             clickCountMap.put(entry.getKey(), count);
             matchResult.setClickCountMap(clickCountMap);
-
+            logger.info("点击完成");
         }
     }
 

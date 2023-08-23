@@ -59,6 +59,7 @@ public class Matcher {
 
 
     public void init(List<String> targetImgPathList) {
+        logger.info("匹配器初始化完成");
         List<String> imgPathList = this.getTargetImgPathList();
         imgPathList.addAll(targetImgPathList);
         this.load(targetImgPathList);
@@ -87,10 +88,10 @@ public class Matcher {
      * @param solo
      */
     public void matchOneImg(String targetImgPath, boolean solo) {
-
+        logger.info("匹配图片：{}", targetImgPath);
         // 获取快照信息
         GameWindowSnapshot snapshot = GameWindowSnapshot.getInstance();
-        List<GameWindowSnapshotItem> snapshotItemList = snapshot.getSnapshotItemList();
+        Set<GameWindowSnapshotItem> snapshotItemList = snapshot.getSnapshotItemList();
         if (snapshotItemList.isEmpty()) {
             return;
         }
@@ -107,8 +108,8 @@ public class Matcher {
      * 单刷模式下 找到一个点位即返回
      *
      * @param targetImgPath 目标图片
-     * @param solo 是否单刷
-     * @param snapshotItem 窗口
+     * @param solo          是否单刷
+     * @param snapshotItem  窗口
      * @return true or false 是否匹配到结果
      */
     @SneakyThrows
@@ -131,15 +132,19 @@ public class Matcher {
                 int realY = y + snapshotItem.getY();
                 BufferedImage screenCaptureBfImage = robot.createScreenCapture(new Rectangle(realX, realY, width, height));
                 double similarity = ImageSimilarityUtil.calSimilarity(screenCaptureBfImage, bufferedImage);
+                logger.info("found one ! x:{},y:{},similarity:{}", x, y, similarity);
                 if (similarity >= onmyojiConfig.getThreshold()) {
                     found = true;
                     MatchResult matchResult = MatchResult.getInstance();
-                    Set<MatchResultItem> matchResultItems = matchResult.getResultItemMap().get(targetImgPath);
+                    Map<String, Set<MatchResultItem>> resultItemMap = matchResult.getResultItemMap();
+                    Set<MatchResultItem> matchResultItems = resultItemMap.get(targetImgPath);
                     if (CollectionUtils.isEmpty(matchResultItems)) {
                         matchResultItems = new HashSet<>();
                     }
                     MatchResultItem resultItem = new MatchResultItem(snapshotItem.getWindowName(), realX, realY, width, height);
                     matchResultItems.add(resultItem);
+                    resultItemMap.put(targetImgPath, matchResultItems);
+                    matchResult.setResultItemMap(resultItemMap);
                     if (solo) {
                         return found;
                     }
@@ -156,6 +161,7 @@ public class Matcher {
      */
     @SneakyThrows
     public Boolean matchAllImg(boolean solo) {
+
         List<CompletableFuture<Void>> completableFutureList = new ArrayList<>();
         for (String targetImgPath : getTargetImgPathList()) {
             CompletableFuture<Void> completableFuture =

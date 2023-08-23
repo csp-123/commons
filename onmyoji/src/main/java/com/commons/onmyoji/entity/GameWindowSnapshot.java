@@ -5,7 +5,9 @@ import lombok.Setter;
 import lombok.experimental.Accessors;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * 游戏窗口快照
@@ -23,7 +25,7 @@ public class GameWindowSnapshot {
     /**
      * 考虑多窗口情况，定义子类的集合
      */
-    private List<GameWindowSnapshotItem> snapshotItemList = new ArrayList<>();
+    private Set<GameWindowSnapshotItem> snapshotItemList = new HashSet<>();
 
     /**
      * 私有化构造函数，不允许外部通过构造函数实例化
@@ -38,5 +40,7 @@ public class GameWindowSnapshot {
     public static GameWindowSnapshot getInstance() {
         return snapshot;
     }
+
+
 
 }

@@ -45,6 +45,7 @@ public class RoyalSoulProducer extends InstanceZoneBaseProducer<RoyalSoulConfig>
      */
     @Override
     public void produce(OnmyojiJob<RoyalSoulConfig> job) {
+
         // 配置： 层数、截图存放位置
         RoyalSoulConfig jobConfig = job.getConfig();
         String imgDirectory = System.getProperty("user.dir") + "\\" + jobConfig.imgPath + "\\";
@@ -84,7 +85,8 @@ public class RoyalSoulProducer extends InstanceZoneBaseProducer<RoyalSoulConfig>
         }
         //  限时
         if (hangUpType.getType().equals(HangUpTypeEnum.TIME.getCode())) {
-            long endTime = hangUpType.getTime() * 60 * 1000L;
+            long endTime =System.currentTimeMillis() + hangUpType.getTime() * 60 * 1000L;
+            logger.info("准备执行");
             TimerTask timerTask = new TimerTask() {
                 @Override
                 public void run() {
