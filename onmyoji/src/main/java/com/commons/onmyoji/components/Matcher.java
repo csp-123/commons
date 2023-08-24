@@ -6,6 +6,7 @@ import com.commons.onmyoji.entity.GameWindowSnapshotItem;
 import com.commons.onmyoji.entity.MatchResult;
 import com.commons.onmyoji.entity.MatchResultItem;
 import com.commons.onmyoji.utils.ImageSimilarityUtil;
+import com.google.common.base.Throwables;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.SneakyThrows;
@@ -33,8 +34,6 @@ import java.util.concurrent.*;
 public class Matcher {
 
     private static final Logger logger = LoggerFactory.getLogger(Matcher.class);
-
-    private ExecutorService executorService = new ThreadPoolExecutor(3, 10, 2, TimeUnit.MINUTES, new ArrayBlockingQueue<>(20));
 
     @Resource
     private Robot robot;
@@ -112,7 +111,6 @@ public class Matcher {
      * @param snapshotItem  窗口
      * @return true or false 是否匹配到结果
      */
-    @SneakyThrows
     private boolean match(String targetImgPath, boolean solo, GameWindowSnapshotItem snapshotItem) {
         int[][] RGBData = RGBDataMap.get(targetImgPath);
         BufferedImage bufferedImage = bfImageMap.get(targetImgPath);
@@ -159,20 +157,24 @@ public class Matcher {
      *
      * @param solo
      */
-    @SneakyThrows
     public Boolean matchAllImg(boolean solo) {
-
-        List<CompletableFuture<Void>> completableFutureList = new ArrayList<>();
-        for (String targetImgPath : getTargetImgPathList()) {
-            CompletableFuture<Void> completableFuture =
-                    CompletableFuture.runAsync(() -> matchOneImg(targetImgPath, solo), executorService);
-            completableFutureList.add(completableFuture);
-            completableFuture.get();
+        try {
+            List<CompletableFuture<Void>> completableFutureList = new ArrayList<>();
+            for (String targetImgPath : getTargetImgPathList()) {
+                // 不能传线程池，否则后来的任务会把前面的覆盖，解决方案是每个任务新建一个线程池
+                CompletableFuture<Void> completableFuture =
+                        CompletableFuture.runAsync(() -> matchOneImg(targetImgPath, solo));
+                completableFutureList.add(completableFuture);
+                completableFuture.get();
+            }
+            CompletableFuture<Void> all = CompletableFuture.allOf(completableFutureList.toArray(new CompletableFuture[getTargetImgPathList().size()]));
+            // 匹配所有图片 等待时间1秒，过长匹配结果无意义
+            all.get(1, TimeUnit.SECONDS);
+            return all.isDone();
+        } catch (Exception e) {
+            logger.error("匹配失败：{}", Throwables.getStackTraceAsString(e));
         }
-        CompletableFuture<Void> all = CompletableFuture.allOf(completableFutureList.toArray(new CompletableFuture[getTargetImgPathList().size()]));
-        // 匹配所有图片 等待时间1秒，过长匹配结果无意义
-        all.get(1, TimeUnit.SECONDS);
-        return all.isDone();
+        return false;
     }
 
 }

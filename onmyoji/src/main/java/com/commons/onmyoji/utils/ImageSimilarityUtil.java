@@ -87,7 +87,7 @@ public class ImageSimilarityUtil {
 
 
     @SneakyThrows
-    public static double calSimilarity(BufferedImage image1, BufferedImage image2) throws IOException {
+    public static double calSimilarity(BufferedImage image1, BufferedImage image2) {
 
         return calSimilarity(getHammingDistance(image1, image2));
 
