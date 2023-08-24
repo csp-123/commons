@@ -1,9 +1,15 @@
 package com.commons.onmyoji.utils;
 
+import com.commons.onmyoji.entity.MatchResult;
+import com.commons.onmyoji.entity.MatchResultItem;
 import com.sun.jna.Pointer;
 import com.sun.jna.platform.win32.User32;
 import com.sun.jna.platform.win32.WinDef;
 import lombok.SneakyThrows;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * @description: 测试
@@ -48,28 +54,33 @@ public class ForTest {
 //
         // 获取窗口句柄
 
-        User32 instance = User32.INSTANCE;
-        WinDef.HWND hwnd = instance.FindWindow(null, "今时月");
-        if (hwnd != null) {
-            // 获取窗口大小
-            WinDef.RECT rect = new WinDef.RECT();
-            instance.GetWindowRect(hwnd, rect);
-            int width = rect.right - rect.left;
-            int height = rect.bottom - rect.top;
-            System.out.println("窗口大小: " + width + "x" + height);
+//        User32 instance = User32.INSTANCE;
+//        WinDef.HWND hwnd = instance.FindWindow(null, "今时月");
+//        if (hwnd != null) {
+//            // 获取窗口大小
+//            WinDef.RECT rect = new WinDef.RECT();
+//            instance.GetWindowRect(hwnd, rect);
+//            int width = rect.right - rect.left;
+//            int height = rect.bottom - rect.top;
+//            System.out.println("窗口大小: " + width + "x" + height);
+//
+//            Pointer pointer = hwnd.getPointer();
+//
+//            // 获取鼠标坐标
+//            WinDef.POINT point = new WinDef.POINT();
+//            instance.GetCursorPos(point);
+//
+//
+//            System.out.println("鼠标坐标: (" + point.x + ", " + point.y + ")");
+//            System.out.println("窗口坐标: (" + rect.top + ", " + rect.bottom + ")");
+//            System.out.println("窗口坐标: (" + rect.left + ", " + rect.right + ")");
+//        } else {
+//            System.out.println("找不到窗口");
+//        }
 
-            Pointer pointer = hwnd.getPointer();
+        MatchResult matchResult = MatchResult.getInstance();
+        Map<String, Set<MatchResultItem>> resultItemMap = matchResult.getResultItemMap();
 
-            // 获取鼠标坐标
-            WinDef.POINT point = new WinDef.POINT();
-            instance.GetCursorPos(point);
-
-
-            System.out.println("鼠标坐标: (" + point.x + ", " + point.y + ")");
-            System.out.println("窗口坐标: (" + rect.top + ", " + rect.bottom + ")");
-            System.out.println("窗口坐标: (" + rect.left + ", " + rect.right + ")");
-        } else {
-            System.out.println("找不到窗口");
-        }
+//        System.out.println(matchResultItem.getWindowName());
     }
 }

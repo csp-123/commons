@@ -28,16 +28,18 @@ public class MouseOperateTask extends TimerTask {
 
     @Override
     public void run() {
-        logger.info("点击器");
-
         MatchResult matchResult = MatchResult.getInstance();
         Map<String, Set<MatchResultItem>> resultItemMap = matchResult.getResultItemMap();
-        logger.info(JSON.toJSONString(resultItemMap));
+        logger.info("扫描匹配结果:{}", resultItemMap);
         Map<String, Integer> clickCountMap = matchResult.getClickCountMap();
         if (resultItemMap.isEmpty()) {
             return;
         }
+        // 按各图片遍历匹配结果
         for (Map.Entry<String, Set<MatchResultItem>> entry : resultItemMap.entrySet()) {
+            // 图片路径
+            String targetImgPath = entry.getKey();
+            // 所有窗口的匹配结果
             Set<MatchResultItem> resultItems = entry.getValue();
             if (CollectionUtils.isEmpty(resultItems)) {
                 continue;
@@ -48,17 +50,14 @@ public class MouseOperateTask extends TimerTask {
                 clickImg(iterator.next(), true);
                 iterator.remove();
             }
-            resultItemMap.put(entry.getKey(), resultItems);
-            matchResult.setResultItemMap(resultItemMap);
+            resultItemMap.put(targetImgPath, resultItems);
             // 点击数++
-            Integer count = clickCountMap.get(entry.getKey());
+            Integer count = clickCountMap.get(targetImgPath);
             if (count == null) {
                 count = 0;
             }
             count++;
-            clickCountMap.put(entry.getKey(), count);
-            matchResult.setClickCountMap(clickCountMap);
-            logger.info("点击完成");
+            clickCountMap.put(targetImgPath, count);
         }
     }
 

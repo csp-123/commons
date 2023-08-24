@@ -61,4 +61,9 @@ public class MatchResultItem {
         }
         return Objects.equals(this.getWindowName(),((MatchResultItem) obj).getWindowName());
     }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(windowName);
+    }
 }

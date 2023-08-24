@@ -41,15 +41,9 @@ public class GameWindowFreshTask extends TimerTask {
         Assert.notEmpty(windowsNameList, "未指定窗口名称");
 
         GameWindowSnapshot instance = GameWindowSnapshot.getInstance();
-        // 单窗口
-        if (windowsNameList.size() == 1) {
-            reloadScreenSnapShot(robot, windowsNameList.get(0), instance);
-        }
 
-        if (windowsNameList.size() > 1) {
-            for (String windowName : windowsNameList) {
-                reloadScreenSnapShot(robot, windowName, instance);
-            }
+        for (String windowName : windowsNameList) {
+            reloadScreenSnapShot(robot, windowName, instance);
         }
         log.info("游戏窗口刷新完成，监测到当前游戏窗口数：{}，窗口信息：{}", windowsNameList.size(), instance.getSnapshotItemList().stream().map(GameWindowSnapshotItem::toString).reduce((item1,item2) -> item1 + "|" + item2).orElse(""));
 
