@@ -86,7 +86,6 @@ public class RoyalSoulProducer extends InstanceZoneBaseProducer<RoyalSoulConfig>
         //  限时
         if (hangUpType.getType().equals(HangUpTypeEnum.TIME.getCode())) {
             long endTime =System.currentTimeMillis() + hangUpType.getTime() * 60 * 1000L;
-            logger.info("准备执行");
             TimerTask timerTask = new TimerTask() {
                 @Override
                 public void run() {

@@ -1,7 +1,7 @@
 package com.commons.onmyoji.service;
 
 /**
- * @description: 通用服务
+ * @description: 通用服务 - 已废弃
  * @author: cccsp
  * @date: 2023/2/23 23:16
  */
