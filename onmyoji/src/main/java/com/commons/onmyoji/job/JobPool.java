@@ -36,10 +36,6 @@ public class JobPool {
     @Resource
     private MouseOperateTask mouseOperateTask;
 
-    private static final ScheduledExecutorService windowFreshScheduledExecutor = Executors.newScheduledThreadPool(2);
-    private static final ScheduledExecutorService mouseScheduledExecutor = Executors.newScheduledThreadPool(2);
-
-
     public JobPool(JobLoader jobLoader) {
         this.jobLoader = jobLoader;
     }
@@ -51,11 +47,13 @@ public class JobPool {
 
     public void runJob(String id){
         OnmyojiJob job = jobMap.get(id);
+        Timer gameWindowFreshTimer = new Timer();
+        Timer mouseTimer = new Timer();
         //持续运行【屏幕刷新器】
         gameWindowFreshTask.setWindowsNameList(job.getConfig().getWindowNameList());
-        windowFreshScheduledExecutor.scheduleAtFixedRate(gameWindowFreshTask, 0, 0, TimeUnit.MILLISECONDS);
+        gameWindowFreshTimer.schedule(gameWindowFreshTask, new Date(), 500);
         //持续运行【匹配结果点击器】
-        mouseScheduledExecutor.scheduleAtFixedRate(mouseOperateTask, 0, 0, TimeUnit.MILLISECONDS);
+        mouseTimer.schedule(mouseOperateTask, new Date(), 500);
         job.start();
     }
 }

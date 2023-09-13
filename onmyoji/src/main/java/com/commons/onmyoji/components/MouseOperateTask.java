@@ -3,6 +3,7 @@ package com.commons.onmyoji.components;
 import com.alibaba.fastjson.JSON;
 import com.commons.onmyoji.entity.MatchResult;
 import com.commons.onmyoji.entity.MatchResultItem;
+import com.commons.onmyoji.utils.ImageSimilarityUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,6 +32,7 @@ public class MouseOperateTask extends TimerTask {
         MatchResult matchResult = MatchResult.getInstance();
         Map<String, Set<MatchResultItem>> resultItemMap = matchResult.getResultItemMap();
         if (resultItemMap.isEmpty()) {
+            log.info("无匹配结果");
             return;
         }
         Map<String, Integer> clickCountMap = matchResult.getClickCountMap();
@@ -38,8 +40,10 @@ public class MouseOperateTask extends TimerTask {
         for (Map.Entry<String, Set<MatchResultItem>> entry : resultItemMap.entrySet()) {
             // 图片路径
             String targetImgPath = entry.getKey();
-            // 所有窗口的匹配结果
+            String name = ImageSimilarityUtil.getNameFromPath(targetImgPath);
             Set<MatchResultItem> resultItems = entry.getValue();
+            log.info("图片{}匹配结果：{}", name, resultItems.size());
+            // 所有窗口的匹配结果
             if (CollectionUtils.isEmpty(resultItems)) {
                 continue;
             }

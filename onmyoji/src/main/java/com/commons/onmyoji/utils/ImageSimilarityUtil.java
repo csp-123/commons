@@ -1,12 +1,15 @@
 package com.commons.onmyoji.utils;
 
 import lombok.SneakyThrows;
+import org.springframework.util.Assert;
+
 import java.awt.Graphics2D;
 import java.awt.color.ColorSpace;
 import java.awt.image.BufferedImage;
 import java.awt.image.ColorConvertOp;
 import java.io.File;
 import java.io.IOException;
+import java.util.UnknownFormatConversionException;
 import javax.imageio.ImageIO;
 
 /**
@@ -48,6 +51,24 @@ public class ImageSimilarityUtil {
         return calSimilarity(getHammingDistance(hash1, hash2));
 
     }
+
+    /**
+     * 从图片路径中提取图片名称
+     * @param path
+     * @return
+     */
+    public static String getNameFromPath(String path) {
+        Assert.hasText(path, "图片路径为空");
+        try {
+            String[] dotSplits = path.split("\\.");
+            String pre = dotSplits[dotSplits.length-2];
+            String[] split = pre.split("/");
+            return split[split.length-1];
+        } catch (Exception e) {
+            throw new UnknownFormatConversionException(e.getMessage());
+        }
+    }
+
 
     /**
      * 通过汉明距离计算相似度

@@ -28,8 +28,6 @@ public class RoyalSoulProducer extends InstanceZoneBaseProducer<RoyalSoulConfig>
 
     private static final Logger logger = LoggerFactory.getLogger(RoyalSoulProducer.class);
 
-    private static final ScheduledExecutorService scheduledExecutor = Executors.newScheduledThreadPool(2);
-
     @Resource
     Matcher matcher;
 
@@ -93,10 +91,11 @@ public class RoyalSoulProducer extends InstanceZoneBaseProducer<RoyalSoulConfig>
                     logger.info("匹配结果：{}", success);
                 }
             };
-            scheduledExecutor.scheduleAtFixedRate(timerTask, 0, 0, TimeUnit.SECONDS);
+            Timer timer = new Timer();
+            timer.schedule(timerTask, new Date(), 500);
             // 未到结束时间时空转
             while (System.currentTimeMillis() <= endTime) {}
-            scheduledExecutor.shutdown();
+            timer.cancel();
         }
         // 不限 todo
         if (hangUpType.getType().equals(HangUpTypeEnum.FOREVER.getCode())) {

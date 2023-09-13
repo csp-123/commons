@@ -7,5 +7,5 @@ producerBean: RoyalSoul
 config:
   imgPath: onmyoji\src\main\resources\img\royalsoul\
   windowNameList:
-    - "念山行"
+    - "今时月"
 
