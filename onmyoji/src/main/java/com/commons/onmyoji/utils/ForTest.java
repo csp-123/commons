@@ -5,8 +5,11 @@ import com.commons.onmyoji.entity.MatchResultItem;
 import com.sun.jna.Pointer;
 import com.sun.jna.platform.win32.User32;
 import com.sun.jna.platform.win32.WinDef;
+import javafx.scene.layout.BackgroundImage;
 import lombok.SneakyThrows;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -78,8 +81,12 @@ public class ForTest {
 //            System.out.println("找不到窗口");
 //        }
 
-        MatchResult matchResult = MatchResult.getInstance();
-        Map<String, Set<MatchResultItem>> resultItemMap = matchResult.getResultItemMap();
+        BigDecimal a = BigDecimal.valueOf(1);
+        BigDecimal b = BigDecimal.valueOf(8);
+
+        System.out.println(b.divide(a, 2, RoundingMode.CEILING));
+        System.out.println(a.divide(b, 2, RoundingMode.CEILING));
+        System.out.println(a.divide(b, RoundingMode.CEILING));
 
 //        System.out.println(matchResultItem.getWindowName());
     }

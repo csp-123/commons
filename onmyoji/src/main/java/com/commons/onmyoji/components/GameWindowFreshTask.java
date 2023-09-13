@@ -15,6 +15,9 @@ import java.awt.image.BufferedImage;
 import java.util.*;
 import java.util.List;
 
+
+
+
 /**
  * 游戏窗口刷新：实时监测游戏窗口位置、窗口大小
  *
@@ -22,8 +25,9 @@ import java.util.List;
  * @date 2023/8/18 2:45 PM
  */
 @Data
-@Component
 @Slf4j
+@Component
+@EqualsAndHashCode(callSuper = true)
 public class GameWindowFreshTask extends TimerTask {
 
     /**
@@ -37,16 +41,12 @@ public class GameWindowFreshTask extends TimerTask {
 
     @Override
     public void run() {
-
         Assert.notEmpty(windowsNameList, "未指定窗口名称");
-
         GameWindowSnapshot instance = GameWindowSnapshot.getInstance();
-
         for (String windowName : windowsNameList) {
             reloadScreenSnapShot(robot, windowName, instance);
         }
-        log.info("游戏窗口刷新完成，监测到当前游戏窗口数：{}，窗口信息：{}", windowsNameList.size(), instance.getSnapshotItemList().stream().map(GameWindowSnapshotItem::toString).reduce((item1,item2) -> item1 + "|" + item2).orElse(""));
-
+        log.info("游戏窗口刷新完成，监测到当前游戏窗口数：{}", windowsNameList.size());
     }
 
     private void reloadScreenSnapShot(Robot robot, String windowName, GameWindowSnapshot snapshot) {
@@ -68,7 +68,7 @@ public class GameWindowFreshTask extends TimerTask {
         // 记录游戏窗口位置、大小
         User32 user32 = User32.INSTANCE;
         WinDef.HWND hwnd = user32.FindWindow(null, windowName);
-        Assert.notNull(hwnd, "找不到窗口");
+        Assert.notNull(hwnd, String.format("找不到窗口：%s", windowName));
         // 获取窗口大小
         WinDef.RECT rect = new WinDef.RECT();
         user32.GetWindowRect(hwnd, rect);

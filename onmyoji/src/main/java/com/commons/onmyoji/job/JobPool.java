@@ -51,11 +51,11 @@ public class JobPool {
 
     public void runJob(String id){
         OnmyojiJob job = jobMap.get(id);
-        // 屏幕每秒刷新一次
+        //持续运行【屏幕刷新器】
         gameWindowFreshTask.setWindowsNameList(job.getConfig().getWindowNameList());
-        windowFreshScheduledExecutor.scheduleAtFixedRate(gameWindowFreshTask, 0, 2, TimeUnit.SECONDS);
-        // 间隔1秒检查一次匹配结果，有则点击，无则跳过
-        mouseScheduledExecutor.scheduleWithFixedDelay(mouseOperateTask, 0, 1, TimeUnit.SECONDS);
+        windowFreshScheduledExecutor.scheduleAtFixedRate(gameWindowFreshTask, 0, 0, TimeUnit.MILLISECONDS);
+        //持续运行【匹配结果点击器】
+        mouseScheduledExecutor.scheduleAtFixedRate(mouseOperateTask, 0, 0, TimeUnit.MILLISECONDS);
         job.start();
     }
 }

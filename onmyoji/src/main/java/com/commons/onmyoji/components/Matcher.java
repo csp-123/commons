@@ -9,18 +9,19 @@ import com.commons.onmyoji.utils.ImageSimilarityUtil;
 import com.google.common.base.Throwables;
 import lombok.Getter;
 import lombok.Setter;
-import lombok.SneakyThrows;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 
 import javax.annotation.Resource;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.List;
 import java.util.*;
-import java.util.concurrent.*;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Description:
@@ -30,10 +31,10 @@ import java.util.concurrent.*;
  */
 @Getter
 @Setter
+@Slf4j
 @Component
 public class Matcher {
 
-    private static final Logger logger = LoggerFactory.getLogger(Matcher.class);
 
     @Resource
     private Robot robot;
@@ -58,7 +59,7 @@ public class Matcher {
 
 
     public void init(List<String> targetImgPathList) {
-        logger.info("匹配器初始化完成");
+        log.info("匹配器初始化完成");
         List<String> imgPathList = this.getTargetImgPathList();
         imgPathList.addAll(targetImgPathList);
         this.load(targetImgPathList);
@@ -87,7 +88,6 @@ public class Matcher {
      * @param solo
      */
     public void matchOneImg(String targetImgPath, boolean solo) {
-        logger.info("匹配图片：{}", targetImgPath);
         // 获取快照信息
         GameWindowSnapshot snapshot = GameWindowSnapshot.getInstance();
         Set<GameWindowSnapshotItem> snapshotItemList = snapshot.getSnapshotItemList();
@@ -97,8 +97,26 @@ public class Matcher {
         // 遍历窗口快照列表
         snapshotItemList.forEach(snapshotItem -> {
             boolean matched = match(targetImgPath, solo, snapshotItem);
-            logger.info("窗口[{}]匹配结果：[{}]", snapshotItem.getWindowName(), matched);
+            log.info("窗口[{}]匹配图片[{}]结果：[{}]", snapshotItem.getWindowName(), getNameFromPath(targetImgPath), matched);
         });
+    }
+
+    /**
+     * 从图片路径中提取图片名称
+     * @param path
+     * @return
+     */
+    private String getNameFromPath(String path) {
+        Assert.hasText(path, "图片路径为空");
+        try {
+            String[] dotSplits = path.split("\\.");
+            String pre = dotSplits[dotSplits.length-2];
+            String[] split = pre.split("/");
+            return split[split.length-1];
+        } catch (Exception e) {
+            log.error("图片名称提取失败");
+            throw new UnknownFormatConversionException(e.getMessage());
+        }
     }
 
     /**
@@ -130,7 +148,7 @@ public class Matcher {
                 int realY = y + snapshotItem.getY();
                 BufferedImage screenCaptureBfImage = robot.createScreenCapture(new Rectangle(realX, realY, width, height));
                 double similarity = ImageSimilarityUtil.calSimilarity(screenCaptureBfImage, bufferedImage);
-                logger.info("found one ! x:{},y:{},similarity:{}", x, y, similarity);
+                log.info("found one ! x:{},y:{},similarity:{}", x, y, similarity);
                 if (similarity >= onmyojiConfig.getThreshold()) {
                     found = true;
                     MatchResult matchResult = MatchResult.getInstance();
@@ -172,7 +190,7 @@ public class Matcher {
             all.get(1, TimeUnit.SECONDS);
             return all.isDone();
         } catch (Exception e) {
-            logger.error("匹配失败：{}", Throwables.getStackTraceAsString(e));
+            log.error("匹配异常：{}", Throwables.getStackTraceAsString(e));
         }
         return false;
     }

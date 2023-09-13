@@ -14,6 +14,7 @@ import java.util.*;
 @Setter
 @Getter
 public class MatchResult {
+
     private static final MatchResult result = new MatchResult();
 
     /**

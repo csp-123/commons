@@ -3,6 +3,7 @@ package com.commons.onmyoji.components;
 import com.alibaba.fastjson.JSON;
 import com.commons.onmyoji.entity.MatchResult;
 import com.commons.onmyoji.entity.MatchResultItem;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -19,9 +20,8 @@ import java.util.*;
  * @date 2023/8/23 3:49 PM
  */
 @Component
+@Slf4j
 public class MouseOperateTask extends TimerTask {
-
-    private static final Logger logger = LoggerFactory.getLogger(MouseOperateTask.class);
 
     @Resource
     private Robot robot;
@@ -30,11 +30,10 @@ public class MouseOperateTask extends TimerTask {
     public void run() {
         MatchResult matchResult = MatchResult.getInstance();
         Map<String, Set<MatchResultItem>> resultItemMap = matchResult.getResultItemMap();
-        logger.info("扫描匹配结果:{}", resultItemMap);
-        Map<String, Integer> clickCountMap = matchResult.getClickCountMap();
         if (resultItemMap.isEmpty()) {
             return;
         }
+        Map<String, Integer> clickCountMap = matchResult.getClickCountMap();
         // 按各图片遍历匹配结果
         for (Map.Entry<String, Set<MatchResultItem>> entry : resultItemMap.entrySet()) {
             // 图片路径
@@ -90,7 +89,7 @@ public class MouseOperateTask extends TimerTask {
         leftDown();
         int delayTime = setAutoDelay(time == 0 ? 100 : time, random);
         leftUp();
-        logger.info(String.format("单机鼠标左键成功！是否随机延时：[%s]", random) + (random ? String.format("，随机延时：[%s]", delayTime) : ""));
+        log.info(String.format("单机鼠标左键成功！是否随机延时：[%s]", random) + (random ? String.format("，随机延时：[%s]", delayTime) : ""));
     }
 
     /**

@@ -89,10 +89,11 @@ public class RoyalSoulProducer extends InstanceZoneBaseProducer<RoyalSoulConfig>
             TimerTask timerTask = new TimerTask() {
                 @Override
                 public void run() {
-                    matcher.matchAllImg(solo);
+                    Boolean success = matcher.matchAllImg(solo);
+                    logger.info("匹配结果：{}", success);
                 }
             };
-            scheduledExecutor.scheduleWithFixedDelay(timerTask, 0, 1, TimeUnit.SECONDS);
+            scheduledExecutor.scheduleAtFixedRate(timerTask, 0, 0, TimeUnit.SECONDS);
             // 未到结束时间时空转
             while (System.currentTimeMillis() <= endTime) {}
             scheduledExecutor.shutdown();
