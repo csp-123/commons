@@ -178,7 +178,7 @@ public class TanSuoProducer extends InstanceZoneBaseProducer<TanSuoConfig> {
         if (count == null) {
             count = 1;
         }
-        logger.info(String.format("=============执行第%s次挂机脚本，处理器：[%s]，组队类型：[%s]=============", count, getProcuderName(), TeamTypeEnum.find(job.getTeamType()).getDesc()));
+        logger.info(String.format("=============执行第%s次挂机脚本，处理器：[%s]，组队类型：[%s]=============", count, getProducerName(), TeamTypeEnum.find(job.getTeamType()).getDesc()));
         if (job.getTeamType().equals(TeamTypeEnum.SOLO.getCode())) {
             executeOnceInSoloMod(job, matcherBack);
         }
@@ -271,7 +271,7 @@ public class TanSuoProducer extends InstanceZoneBaseProducer<TanSuoConfig> {
     }
 
     @Override
-    public String getProcuderName() {
+    public String getProducerName() {
         return "探索";
     }
 }

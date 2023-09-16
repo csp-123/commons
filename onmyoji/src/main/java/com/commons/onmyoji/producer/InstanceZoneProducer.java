@@ -14,5 +14,5 @@ public interface InstanceZoneProducer <CONFIG extends OnmyojiScriptConfig> {
 
     void produce(OnmyojiJob<CONFIG> job);
 
-    String getProcuderName();
+    String getProducerName();
 }

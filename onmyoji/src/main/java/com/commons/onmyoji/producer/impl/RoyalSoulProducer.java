@@ -56,14 +56,12 @@ public class RoyalSoulProducer extends InstanceZoneBaseProducer<RoyalSoulConfig>
         String end = imgDirectory + OnmyojiConstant.ROYAL_SOUL_END_BUTTON;
 
         // start拼接上solo or team
-        boolean solo = TeamTypeEnum.SOLO.getCode().equals(job.getTeamType());
-        if (solo) {
+        if (job.isSolo()) {
             String[] split = start.split("\\.");
             start = Arrays.stream(split)
                     .reduce((s1, s2) -> s1 + "_solo." + s2)
                     .orElse(start);
-        }
-        if (job.getTeamType().equals(TeamTypeEnum.TEAM.getCode())) {
+        } else {
             String[] split = start.split("\\.");
             start = Arrays.stream(split)
                     .reduce((s1, s2) -> s1 + "_team." + s2)
@@ -87,7 +85,7 @@ public class RoyalSoulProducer extends InstanceZoneBaseProducer<RoyalSoulConfig>
             TimerTask timerTask = new TimerTask() {
                 @Override
                 public void run() {
-                    Boolean success = matcher.matchAllImg(solo);
+                    Boolean success = matcher.matchAllImg(job.isSolo());
                     logger.info("匹配结果：{}", success);
                 }
             };
@@ -106,7 +104,7 @@ public class RoyalSoulProducer extends InstanceZoneBaseProducer<RoyalSoulConfig>
 
 
     @Override
-    public String getProcuderName() {
+    public String getProducerName() {
         return "御魂";
     }
 }

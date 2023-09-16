@@ -88,7 +88,7 @@ public class CustomizeProducer extends InstanceZoneBaseProducer<CustomizeConfig>
 
     }
     @Override
-    public String getProcuderName() {
+    public String getProducerName() {
         return "自定义场景";
     }
 }

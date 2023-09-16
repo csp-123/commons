@@ -30,14 +30,9 @@ public class OnmyojiJob <JOB_CONFIG extends OnmyojiScriptConfig> {
     private String name;
 
     /**
-     * 组队类型 1.单刷 2. 组队
+     * 是否单刷
      */
-    private Integer teamType;
-
-    /**
-     * 队伍人数，默认为2
-     */
-    private Integer teamMembers = 2;
+    private boolean solo;
 
     /**
      * 挂机类型
@@ -46,7 +41,7 @@ public class OnmyojiJob <JOB_CONFIG extends OnmyojiScriptConfig> {
 
 
     /**
-     * 挂机处理器
+     * 副本挂机处理器
      */
     private InstanceZoneProducer producer;
 
@@ -55,10 +50,11 @@ public class OnmyojiJob <JOB_CONFIG extends OnmyojiScriptConfig> {
      */
     private JOB_CONFIG config;
 
+    /**
+     * 启动
+     */
     public void start() {
-
         producer.produce(this);
-
     }
 
 }
