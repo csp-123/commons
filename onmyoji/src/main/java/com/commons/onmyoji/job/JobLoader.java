@@ -7,6 +7,7 @@ import com.commons.onmyoji.producer.InstanceZoneProducer;
 import com.google.common.collect.Lists;
 import javassist.Modifier;
 import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.env.PropertiesPropertySource;
@@ -22,6 +23,7 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -34,10 +36,8 @@ import java.util.stream.Collectors;
  * Create Time:2023/2/20 16:31
  */
 @Component
+@Slf4j
 public class JobLoader {
-
-    private static final Logger logger = LoggerFactory.getLogger(JobLoader.class);
-
     private final Map<String, InstanceZoneProducer> producerMap;
 
     private Map<String, OnmyojiJob> jobs;
@@ -52,32 +52,38 @@ public class JobLoader {
 
     @SneakyThrows
     public Map<String, OnmyojiJob> loadAllJobs() {
-        logger.info("==============开始加载配置=============");
+        log.info("==============加载任务列表=============");
+        log.info("");
         if (jobs == null) {
             List<PropertiesPropertySource> sources = ymlLoader.loadAllYml("classpath:job/*.yml");
-            jobs = sources.stream().map(this::parseJob).collect(Collectors.toMap(r -> r.getId(), r -> r));
+            jobs = sources.stream().map(this::parseJob).collect(Collectors.toMap(OnmyojiJob::getId, r -> r));
         }
-        logger.info("==============加载配置完毕=============");
+        log.info("==============任务加载完毕=============");
 
         return jobs;
     }
 
 
+    /**
+     * Job解析
+     * @param source
+     * @return
+     */
     private OnmyojiJob parseJob(PropertiesPropertySource source) {
-
         OnmyojiJob job = new OnmyojiJob();
         job.setId(source.getName().replace(".yml", ""));
         job.setName((String) source.getProperty("name"));
         job.setSolo((Boolean) source.getProperty("solo"));
         job.setHangUpType(buildHangUpType(source));
-        logger.info("开始加载任务文件：" + job.getId());
-        logger.info("任务名称：" + job.getName());
+        log.info("开始加载任务文件：{}", job.getId());
+        log.info("任务名称：{}", job.getName());
         InstanceZoneProducer producer = producerMap.get(source.getProperty("producerBean"));
         Assert.notNull(producer, "未找到producerBean：" + source.getProperty("producerBean"));
         job.setProducer(producer);
-        logger.info("处理器：" + producer.getProducerName() + " 加载成功！ ");
+        log.info("处理器：{}", producer.getProducerName());
         job.setConfig(buildConfig(source, producer));
-        logger.info(JSON.toJSONString(job));
+//        logger.info("任务配置JSON：{}", JSON.toJSONString(job));
+        log.info("");
         return job;
     }
 
@@ -87,7 +93,11 @@ public class JobLoader {
                 .filter(s -> s.getKey().startsWith("hangUpType"))
                 .forEach(e -> {
                     try {
-                        setValue(hangUpType, e.getKey().replace("hangUpType.", ""), e.getValue());
+                        if (!e.getKey().contains("unit")) {
+                            setValue(hangUpType, e.getKey().replace("hangUpType.", ""), e.getValue());
+                        } else {
+                            hangUpType.setUnit(TimeUnit.valueOf(String.valueOf(e.getValue())));
+                        }
                     } catch (Exception ex) {
                         throw new RuntimeException(ex);
                     }
@@ -97,14 +107,14 @@ public class JobLoader {
 
     @SneakyThrows
     private OnmyojiScriptConfig buildConfig(PropertiesPropertySource source, InstanceZoneProducer producer) {
-        Method declaredMethod = producer.getClass().getDeclaredMethod("produce", OnmyojiJob.class);
+        Method declaredMethod = producer.getClass().getDeclaredMethod("prepare", OnmyojiJob.class);
         Type[] parameterTypes = declaredMethod.getGenericParameterTypes();
         ParameterizedType parameterizedType = (ParameterizedType) parameterTypes[0];
         Type[] actualTypeArguments = parameterizedType.getActualTypeArguments();
         OnmyojiScriptConfig config = (OnmyojiScriptConfig) ((Class) actualTypeArguments[0]).newInstance();
 
-
-        source.getSource().entrySet().stream()
+        source.getSource().entrySet()
+                .stream()
                 .filter(s -> s.getKey().startsWith("config"))
                 .forEach(e -> {
                     try {
@@ -113,7 +123,6 @@ public class JobLoader {
                         throw new RuntimeException(ex);
                     }
                 });
-
         return config;
     }
 

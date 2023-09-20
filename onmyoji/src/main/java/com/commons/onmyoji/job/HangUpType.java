@@ -3,6 +3,8 @@ package com.commons.onmyoji.job;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.concurrent.TimeUnit;
+
 /**
  * Title: 挂机类型
  * Description:
@@ -25,7 +27,12 @@ public class HangUpType {
     private Integer times;
 
     /**
-     * 时长：分钟
+     * 时长：默认分钟
      */
     private Integer time;
+
+    /**
+     * 单位
+     */
+    private TimeUnit unit;
 }

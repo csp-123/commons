@@ -8,12 +8,10 @@ import com.commons.onmyoji.entity.MatchResultItem;
 import com.commons.onmyoji.utils.ImageSimilarityUtil;
 import com.google.common.base.Throwables;
 import lombok.Getter;
-import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
-import org.springframework.util.StringUtils;
 
 import javax.annotation.Resource;
 import java.awt.*;
@@ -25,22 +23,21 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * Description:
- * 单刷图片匹配器
+ * 图片匹配器
  * Author: chish
  * Date: 2023/3/12 1:07
  */
 @Getter
-@Setter
 @Slf4j
 @Component
-public class Matcher {
-
+public class Matcher0920 {
 
     @Resource
     private Robot robot;
 
     @Resource
     private OnmyojiConfig onmyojiConfig;
+
 
     /**
      * rgb数据缓存
@@ -55,15 +52,13 @@ public class Matcher {
     /**
      * 来源图片路径
      */
-    private final List<String> targetImgPathList = new ArrayList<>();
+    private final Set<String> targetImgPathList = new HashSet<>();
 
-
-    public void init(List<String> targetImgPathList) {
-        log.info("匹配器初始化完成");
-        List<String> imgPathList = this.getTargetImgPathList();
+    public void init(Set<String> targetImgPathList) {
+        Set<String> imgPathList = this.getTargetImgPathList();
         imgPathList.addAll(targetImgPathList);
         this.load(targetImgPathList);
-
+        log.info("匹配器初始化完成");
     }
 
     /**
@@ -71,7 +66,7 @@ public class Matcher {
      *
      * @param targetImgPathList
      */
-    private void load(List<String> targetImgPathList) {
+    private void load(Collection<String> targetImgPathList) {
         // 加载RGB缓存
         for (String targetImgPath : targetImgPathList) {
             BufferedImage bfImage = ImageSimilarityUtil.getBfImageFromPath(targetImgPath);
@@ -194,9 +189,7 @@ public class Matcher {
             }
             CompletableFuture<Void> all = CompletableFuture.allOf(completableFutureList.toArray(new CompletableFuture[getTargetImgPathList().size()]));
             // 匹配所有图片 等待时间1秒，过长匹配结果无意义
-            log.info("==============");
             all.get(1, TimeUnit.SECONDS);
-            log.info("==============");
             return all.isDone();
         } catch (Exception e) {
             log.error("匹配异常：{}", Throwables.getStackTraceAsString(e));

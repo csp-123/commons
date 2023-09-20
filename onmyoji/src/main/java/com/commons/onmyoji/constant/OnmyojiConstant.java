@@ -15,36 +15,6 @@ public class OnmyojiConstant {
     public static final String COMMON_IMG_PATH = "onmyoji/src/main/resources/img/common/";
 
 
-    // 庭院加成灯笼图片名称
-    public static final String YARD_LANTERN = "yardLantern.png";
-
-    // 庭院探索灯笼图片名称
-//    public static final String TAN_SUO_YARD_LANTERN = "tanSuoLantern.png";
-
-
-
-    // 被好友邀请悬赏图片
-    public static final String OFFER_REWARD = "offerReward.png";
-
-    // 返回按钮
-    public static List<String> BACK_BUTTONS = new ArrayList<String>() {{
-        add("backButton.png");
-        add("backButton1.png");
-        add("backButton2.png");
-        add("backButton3.png");
-        add("backButton4.png");
-        add("backButton5.png");
-        add("backButton6.png");
-//        add("backButton7.png");
-//        add("backButton8.png");
-//        add("backButton9.png");
-//        add("backButton10.png");
-//        add("backButton11.png");
-//        add("backButton12.png");
-//        add("backButton13.png");
-
-    }};
-
     // 御魂 =================================================================================================================
 
     /**
