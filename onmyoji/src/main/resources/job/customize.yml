@@ -1,5 +1,6 @@
 name: 自定义场景
 teamType: 2
+solo: true
 hangUpType:
   type: 3
   times: 500

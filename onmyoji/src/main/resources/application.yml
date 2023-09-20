@@ -3,7 +3,7 @@ spring:
     name: onmyoji
 
 onmyoji:
-  threshold: 0.96
+  threshold: 0.97
 
 
 

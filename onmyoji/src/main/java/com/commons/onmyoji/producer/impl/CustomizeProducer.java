@@ -33,7 +33,7 @@ public class CustomizeProducer extends InstanceZoneBaseProducer<CustomizeConfig>
 
         // 配置： 层数、截图存放位置
         CustomizeConfig jobConfig = job.getConfig();
-        String imgDirectory = System.getProperty("user.dir") + "\\" + jobConfig.imgPath + "\\";
+        String imgDirectory = System.getProperty("user.dir") + "\\" + jobConfig.getImgPath() + "\\";
 
 
         // 开始图片

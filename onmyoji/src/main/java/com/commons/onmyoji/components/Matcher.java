@@ -187,7 +187,9 @@ public class Matcher {
             }
             CompletableFuture<Void> all = CompletableFuture.allOf(completableFutureList.toArray(new CompletableFuture[getTargetImgPathList().size()]));
             // 匹配所有图片 等待时间1秒，过长匹配结果无意义
+            log.info("==============");
             all.get(1, TimeUnit.SECONDS);
+            log.info("==============");
             return all.isDone();
         } catch (Exception e) {
             log.error("匹配异常：{}", Throwables.getStackTraceAsString(e));
