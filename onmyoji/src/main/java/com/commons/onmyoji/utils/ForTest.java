@@ -13,6 +13,7 @@ import java.math.RoundingMode;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @description: 测试
@@ -81,12 +82,7 @@ public class ForTest {
 //            System.out.println("找不到窗口");
 //        }
 
-        BigDecimal a = BigDecimal.valueOf(1);
-        BigDecimal b = BigDecimal.valueOf(8);
-
-        System.out.println(b.divide(a, 2, RoundingMode.CEILING));
-        System.out.println(a.divide(b, 2, RoundingMode.CEILING));
-        System.out.println(a.divide(b, RoundingMode.CEILING));
+        System.out.println(TimeUnit.DAYS.toString());
 
 //        System.out.println(matchResultItem.getWindowName());
     }

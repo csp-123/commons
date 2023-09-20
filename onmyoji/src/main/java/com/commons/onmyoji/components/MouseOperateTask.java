@@ -48,12 +48,8 @@ public class MouseOperateTask extends TimerTask {
                 continue;
             }
             // 点击并移除匹配结果
-            Iterator<MatchResultItem> iterator = resultItems.iterator();
-            while (iterator.hasNext()) {
-                clickImg(iterator.next(), true);
-                iterator.remove();
-            }
-            resultItemMap.put(targetImgPath, resultItems);
+            resultItems.forEach(item -> clickImg(item, true));
+            resultItems.clear();
             // 点击数++
             Integer count = clickCountMap.get(targetImgPath);
             if (count == null) {

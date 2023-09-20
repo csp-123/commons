@@ -55,5 +55,6 @@ public class JobPool {
         //持续运行【匹配结果点击器】
         mouseTimer.schedule(mouseOperateTask, new Date(), 500);
         job.start();
+
     }
 }

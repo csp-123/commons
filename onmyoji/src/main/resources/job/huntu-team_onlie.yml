@@ -1,5 +1,6 @@
 name: 魂土-在线组队
 teamType: 2
+solo: true
 hangUpType:
   type: 2
   times: 500

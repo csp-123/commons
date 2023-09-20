@@ -1,8 +1,10 @@
 name: 魂土-单人
 teamType: 1
+solo: true
 hangUpType:
   type: 1
   time: 30
+  unit: MINUTES
 producerBean: RoyalSoul
 config:
   imgPath: onmyoji\src\main\resources\img\royalsoul\

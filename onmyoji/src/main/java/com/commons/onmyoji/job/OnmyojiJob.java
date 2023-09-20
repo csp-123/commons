@@ -43,7 +43,7 @@ public class OnmyojiJob <JOB_CONFIG extends OnmyojiScriptConfig> {
     /**
      * 副本挂机处理器
      */
-    private InstanceZoneProducer producer;
+    private InstanceZoneProducer<JOB_CONFIG> producer;
 
     /**
      * 配置
