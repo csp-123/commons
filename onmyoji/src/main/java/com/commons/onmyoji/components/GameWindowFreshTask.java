@@ -33,7 +33,7 @@ public class GameWindowFreshTask extends TimerTask {
     /**
      * 窗口名列表
      */
-    private List<String> windowsNameList;
+    private Set<String> windowsNameList;
 
     @Resource
     private Robot robot;

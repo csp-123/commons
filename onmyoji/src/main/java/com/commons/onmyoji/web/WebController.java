@@ -26,4 +26,14 @@ public class WebController {
     public void run(String id){
         jobPool.runJob(id);
     }
+
+    @GetMapping("/stop")
+    public void stop(String id){
+        jobPool.stop(id);
+    }
+
+    @GetMapping("/stopAll")
+    public void stopAll(){
+        jobPool.stopAll();
+    }
 }
