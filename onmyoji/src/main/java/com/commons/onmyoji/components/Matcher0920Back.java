@@ -32,7 +32,7 @@ import java.util.concurrent.TimeUnit;
 @Slf4j
 @Setter
 @Component
-public class Matcher {
+public class Matcher0920Back {
 
     @Resource
     private Robot robot;
@@ -135,6 +135,39 @@ public class Matcher {
         int[][] rgbData = snapshotItem.getRGBData();
 
         boolean found = false;
+//
+//        for (int y = 0; y < rgbData.length; y++) {
+//            for (int x = 0; x < rgbData[0].length; x++) {
+//                // 与待匹配的图片的左上角像素点不匹配则跳过
+//                if (rgbData[y][x] != RGBData[0][0]) {
+//                    continue;
+//                }
+//                int realX = x + snapshotItem.getX();
+//                int realY = y + snapshotItem.getY();
+//                BufferedImage screenCaptureBfImage = robot.createScreenCapture(new Rectangle(realX, realY, width, height));
+//                double similarity = ImageSimilarityUtil.calSimilarity(screenCaptureBfImage, bufferedImage);
+//                log.info("img:{},x:{},y:{},similarity:{}", getNameFromPath(targetImgPath), x, y, similarity);
+//                if (similarity >= onmyojiConfig.getThreshold()) {
+//                    found = true;
+//                    MatchResultItem resultItem = new MatchResultItem(snapshotItem.getWindowName(), realX, realY, width, height);
+//                    clickImg(resultItem, true);
+//                    Map<String, Integer> clickCountMap = matchResult.getClickCountMap();
+//                    // 点击数++
+//                    Integer count = clickCountMap.get(targetImgPath);
+//                    if (count == null) {
+//                        count = 0;
+//                    }
+//                    count++;
+//                    clickCountMap.put(targetImgPath, count);
+//                    matchResult.setClickCountMap(clickCountMap);
+//                    if (solo) {
+//                        return found;
+//                    }
+//                }
+//            }
+//        }
+//
+//
 
         for (int y = 0; y < rgbData.length - height; y++) {
             for (int x = 0; x < rgbData[0].length - width; x++) {

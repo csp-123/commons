@@ -19,15 +19,15 @@ import java.util.Timer;
  */
 @Getter
 @Setter
-@EqualsAndHashCode
+@EqualsAndHashCode(callSuper = false)
 public class OnmyojiJob <JOB_CONFIG extends OnmyojiScriptConfig> {
 
-    private String id;
+    private String jobId;
 
     /**
      * 名称
      */
-    private String name;
+    private String jobName;
 
     /**
      * 是否单刷
@@ -55,6 +55,13 @@ public class OnmyojiJob <JOB_CONFIG extends OnmyojiScriptConfig> {
      */
     public void start() {
         producer.produce(this);
+    }
+
+    /**
+     * 启动
+     */
+    public void stop() {
+        producer.stop();
     }
 
 }

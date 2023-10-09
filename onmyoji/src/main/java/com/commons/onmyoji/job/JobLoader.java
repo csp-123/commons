@@ -2,6 +2,7 @@ package com.commons.onmyoji.job;
 
 import com.alibaba.fastjson.JSON;
 import com.commons.onmyoji.config.OnmyojiScriptConfig;
+import com.commons.onmyoji.enums.HangUpTypeEnum;
 import com.commons.onmyoji.loader.YmlLoader;
 import com.commons.onmyoji.producer.InstanceZoneProducer;
 import com.google.common.collect.Lists;
@@ -56,7 +57,7 @@ public class JobLoader {
         log.info("");
         if (jobs == null) {
             List<PropertiesPropertySource> sources = ymlLoader.loadAllYml("classpath:job/*.yml");
-            jobs = sources.stream().map(this::parseJob).collect(Collectors.toMap(OnmyojiJob::getId, r -> r));
+            jobs = sources.stream().map(this::parseJob).collect(Collectors.toMap(OnmyojiJob::getJobId, r -> r));
         }
         log.info("==============任务加载完毕=============");
 
@@ -71,12 +72,12 @@ public class JobLoader {
      */
     private OnmyojiJob parseJob(PropertiesPropertySource source) {
         OnmyojiJob job = new OnmyojiJob();
-        job.setId(source.getName().replace(".yml", ""));
-        job.setName((String) source.getProperty("name"));
+        job.setJobId(source.getName().replace(".yml", ""));
+        job.setJobName((String) source.getProperty("name"));
         job.setSolo((Boolean) source.getProperty("solo"));
         job.setHangUpType(buildHangUpType(source));
-        log.info("开始加载任务文件：{}", job.getId());
-        log.info("任务名称：{}", job.getName());
+        log.info("开始加载任务文件：{}", job.getJobId());
+        log.info("任务名称：{}", job.getJobName());
         InstanceZoneProducer producer = producerMap.get(source.getProperty("producerBean"));
         Assert.notNull(producer, "未找到producerBean：" + source.getProperty("producerBean"));
         job.setProducer(producer);
@@ -102,6 +103,9 @@ public class JobLoader {
                         throw new RuntimeException(ex);
                     }
                 });
+        if (hangUpType.getType().equals(HangUpTypeEnum.TIME.getCode()) && Objects.isNull(hangUpType.getUnit())) {
+            hangUpType.setUnit(TimeUnit.SECONDS);
+        }
         return hangUpType;
     }
 

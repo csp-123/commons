@@ -61,7 +61,15 @@ public class GameWindowFreshTask extends TimerTask {
         BufferedImage screenCapture = robot.createScreenCapture(new Rectangle(snapshotItem.getX(), snapshotItem.getY(), snapshotItem.getWindowWidth(), snapshotItem.getWindowHeight()));
         snapshotItem.setBufferedImage(screenCapture);
         snapshotItem.setRGBData(getImageRGB(screenCapture));
-        snapshot.getSnapshotItemList().add(snapshotItem);
+        Set<GameWindowSnapshotItem> snapshotItemList = snapshot.getSnapshotItemList();
+        Set<GameWindowSnapshotItem> newList = new HashSet<>();
+        for (GameWindowSnapshotItem windowSnapshotItem : snapshotItemList) {
+            if (!windowSnapshotItem.getWindowName().equals(snapshotItem.getWindowName())) {
+                newList.add(windowSnapshotItem);
+            }
+        }
+        newList.add(snapshotItem);
+        snapshot.setSnapshotItemList(newList);
     }
 
     private WinDef.RECT getRect(String windowName) {

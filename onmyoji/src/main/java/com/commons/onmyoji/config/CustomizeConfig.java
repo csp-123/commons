@@ -12,9 +12,5 @@ import lombok.Getter;
 @Getter
 public class CustomizeConfig extends OnmyojiScriptConfig {
 
-    /**
-     * 目录名
-     */
-    private final String imgPath = "royalsoul";
 
 }

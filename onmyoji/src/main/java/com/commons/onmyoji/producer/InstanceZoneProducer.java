@@ -10,9 +10,11 @@ import com.commons.onmyoji.job.OnmyojiJob;
  * Author: csp
  * Create Time:2023/2/21 22:34
  */
-public interface InstanceZoneProducer <CONFIG extends OnmyojiScriptConfig> {
+public interface InstanceZoneProducer<CONFIG extends OnmyojiScriptConfig> {
 
     void produce(OnmyojiJob<CONFIG> job);
 
     String getProducerName();
+
+    void stop();
 }

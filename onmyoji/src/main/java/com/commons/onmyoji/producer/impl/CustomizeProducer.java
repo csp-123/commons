@@ -1,6 +1,6 @@
 package com.commons.onmyoji.producer.impl;
 
-import com.commons.onmyoji.components.Matcher0920;
+import com.commons.onmyoji.components.Matcher;
 import com.commons.onmyoji.config.CustomizeConfig;
 import com.commons.onmyoji.constant.OnmyojiConstant;
 import com.commons.onmyoji.job.OnmyojiJob;
@@ -22,7 +22,7 @@ import java.util.Set;
 public class CustomizeProducer extends InstanceZoneBaseProducer<CustomizeConfig> {
 
     @Resource
-    Matcher0920 matcher0920;
+    Matcher matcher;
 
     @Override
     public String getProducerName() {
@@ -44,7 +44,7 @@ public class CustomizeProducer extends InstanceZoneBaseProducer<CustomizeConfig>
         imgList.add(start);
         imgList.add(reward);
         imgList.add(end);
-        matcher0920.init(imgList);
+        matcher.init(imgList);
 
     }
 }

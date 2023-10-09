@@ -17,7 +17,7 @@ import java.util.concurrent.TimeUnit;
 public class HangUpType {
 
     /**
-     * 1. 限时 2. 限次 3. 不限（不关程序刷到断电）
+     * 1. 限时    2. 限次    3. 不限（不关程序刷到断电）
      */
     private Integer type;
 

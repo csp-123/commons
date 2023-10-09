@@ -1,10 +1,11 @@
 name: 自定义场景
-teamType: 2
 solo: true
 hangUpType:
-  type: 3
-  times: 500
-  time: 120
+  type: 1
+  time: 4
+  unit: HOURS
 producerBean: Customize
 config:
   imgPath: onmyoji\src\main\resources\img\customize\
+  windowNameList:
+    - "今时月"

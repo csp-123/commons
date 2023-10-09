@@ -1,5 +1,4 @@
 name: 魂土-在线组队
-teamType: 2
 solo: true
 hangUpType:
   type: 2
@@ -7,3 +6,5 @@ hangUpType:
 producerBean: RoyalSoul
 config:
   imgPath: onmyoji\src\main\resources\img\royalsoul\
+  windowNameList:
+    - "念山行"

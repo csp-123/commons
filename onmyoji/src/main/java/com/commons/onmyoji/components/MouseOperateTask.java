@@ -29,7 +29,7 @@ public class MouseOperateTask extends TimerTask {
 
     @Override
     public void run() {
-        MatchResult matchResult = MatchResult.getInstance();
+        MatchResult matchResult = new MatchResult();
         Map<String, Set<MatchResultItem>> resultItemMap = matchResult.getResultItemMap();
         if (resultItemMap.isEmpty()) {
             log.info("无匹配结果");

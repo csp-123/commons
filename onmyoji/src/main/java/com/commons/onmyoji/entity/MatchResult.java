@@ -15,7 +15,7 @@ import java.util.*;
 @Getter
 public class MatchResult {
 
-    private static final MatchResult result = new MatchResult();
+//    private static final MatchResult result = new MatchResult();
 
     /**
      * key:imgPath，即图片
@@ -31,14 +31,14 @@ public class MatchResult {
     /**
      * 私有化构造函数，不允许外部通过构造函数实例化
      */
-    private MatchResult() {
+    public MatchResult() {
     }
 
-    /**
-     * 获取唯一可用的对象
-     *
-     */
-    public static MatchResult getInstance() {
-        return result;
-    }
+//    /**
+//     * 获取唯一可用的对象
+//     *
+//     */
+//    public static MatchResult getInstance() {
+//        return result;
+//    }
 }

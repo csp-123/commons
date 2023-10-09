@@ -13,6 +13,7 @@ public class OnmyojiConstant {
 
     // 通用图片位置
     public static final String COMMON_IMG_PATH = "onmyoji/src/main/resources/img/common/";
+    public static final String OFFER_REWARD = "offerReward.png";
 
 
     // 御魂 =================================================================================================================
@@ -33,72 +34,6 @@ public class OnmyojiConstant {
      */
     public static String ROYAL_SOUL_END_BUTTON = "end.png";
 
-
-
-
-
-    // 困28 =================================================================================================================
-
-    /**
-     * 开始探索按钮
-     */
-    public static String TAN_SUO_START_BUTTON = "startTanSuo_solo.png";
-
-
-    /**
-     * 挑战怪物按钮
-     */
-    public static String TAN_SUO_CHALLENGE_BUTTON = "challenge.png";
-
-    /**
-     * 挑战boss按钮
-     */
-    public static String TAN_SUO_CHALLENGE_BOSS_BUTTON = "challengeBoss.png";
-
-    /**
-     * 奖励按钮
-     */
-    public static String TAN_SUO_REWARD_BUTTON = "reward.png";
-
-    /**
-     * 结束
-     */
-    public static String TAN_SUO_END_BUTTON = "end.png";
-
-    /**
-     * 结界突破界面
-     */
-    public static String TAN_SUO_DEMARCATION_BUTTON = "demarcation.png";
-
-    /**
-     * 结界票满
-     */
-    public static String TAN_SUO_FULL_DEMARCATION_BUTTON = "fullDemarcation.png";
-
-
-    public static String TAN_SUO_MOVE_POINT_BUTTON = "auto.png";
-
-
-    /**
-     * 关闭探索准备界面
-     */
-    public static String TAN_SUO_CLOSE_BUTTON = "closeTanSuo.png";
-
-    /**
-     * 28章
-     */
-    public static String TAN_SUO_CHAPTER_28_BUTTON = "chapter28.png";
-
-
-    /**
-     * 结束探索
-     */
-    public static String TAN_SUO_END_TANSUO_BUTTON = "endTanSuo.png";
-
-    /**
-     * 确认结束探索
-     */
-    public static String TAN_SUO_CONFIRM_END_TANSUO_BUTTON = "confirmEndTanSuo.png";
 
 
     // 自定义场景 ==============================================================================================

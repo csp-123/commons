@@ -2,20 +2,16 @@ package com.commons.onmyoji.job;
 
 import com.commons.onmyoji.components.GameWindowFreshTask;
 import com.commons.onmyoji.components.MouseOperateTask;
+import com.commons.onmyoji.components.OnmyojiDaemonTask;
 import com.google.common.collect.Sets;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.collections.SetUtils;
 import org.springframework.stereotype.Component;
-import org.springframework.util.CollectionUtils;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.util.*;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 
 /**
  * Title:
@@ -26,18 +22,13 @@ import java.util.concurrent.TimeUnit;
  */
 @Component
 @Slf4j
-public class JobPool implements KeyListener {
+public class JobPool {
 
 
     /**
      * 任务集
      */
     Map<String, OnmyojiJob> jobMap;
-
-    /**
-     * 运行中的任务集
-     */
-    Map<String, OnmyojiJob> runningJobMap;
 
     private final JobLoader jobLoader;
 
@@ -47,9 +38,14 @@ public class JobPool implements KeyListener {
     @Resource
     private MouseOperateTask mouseOperateTask;
 
+    @Resource
+    private OnmyojiDaemonTask daemonTask;
+
     private final Timer gameWindowFreshTimer = new Timer();
 
     private final Timer mouseTimer = new Timer();
+
+    private final Timer daemonTimer = new Timer();
 
     public JobPool(JobLoader jobLoader) {
         this.jobLoader = jobLoader;
@@ -58,66 +54,30 @@ public class JobPool implements KeyListener {
     @PostConstruct
     public void initJob(){
         jobMap = jobLoader.loadAllJobs();
-        run();
-    }
-
-    public void run() {
-        boolean isRunning = false;
-        while (true) {
-            if (CollectionUtils.isEmpty(runningJobMap)) {
-                if (isRunning) {
-                    gameWindowFreshTimer.cancel();
-                    mouseTimer.cancel();
-                    isRunning = false;
-                }
-                continue;
-            }
-
-            for (OnmyojiJob job : runningJobMap.values()) {
-                if (!isRunning) {
-                    //持续运行【屏幕刷新器】
-                    gameWindowFreshTask.setWindowsNameList(Sets.newHashSet(job.getConfig().getWindowNameList()));
-                    gameWindowFreshTimer.schedule(gameWindowFreshTask, new Date(), 500);
-                    //持续运行【匹配结果点击器】
-                    mouseTimer.schedule(mouseOperateTask, new Date(), 500);
-                    isRunning = true;
-                }
-                job.start();
-            }
-        }
     }
 
     public void runJob(String id) {
         OnmyojiJob job = jobMap.get(id);
-        runningJobMap.put(id, job);
-    }
-
-    public void stop(String id) {
-        runningJobMap.remove(id);
+        //持续运行【屏幕刷新器】
+        gameWindowFreshTask.setWindowsNameList(Sets.newHashSet(job.getConfig().getWindowNameList()));
+        gameWindowFreshTimer.schedule(gameWindowFreshTask, new Date(), 200);
+        //持续运行【匹配结果点击器】
+//        mouseTimer.schedule(mouseOperateTask, new Date(), 500);
+        daemonTimer.schedule(daemonTask, new Date(), 200);
+        job.start();
+        gameWindowFreshTimer.cancel();
+        daemonTimer.cancel();
     }
 
     public void stopAll() {
-        runningJobMap.clear();
-    }
-
-    @Override
-    public void keyTyped(KeyEvent e) {
-
-    }
-
-    /**
-     * ctrl 退出
-     * @param e
-     */
-    @Override
-    public void keyPressed(KeyEvent e) {
-        if (e.isControlDown()) {
-            stopAll();
+//        mouseTimer.cancel();
+        log.info("正在结束任务");
+        gameWindowFreshTimer.cancel();
+        daemonTimer.cancel();
+        for (OnmyojiJob value : jobMap.values()) {
+            value.stop();
         }
+        log.info("任务调度已结束");
     }
 
-    @Override
-    public void keyReleased(KeyEvent e) {
-
-    }
 }

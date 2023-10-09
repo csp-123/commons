@@ -1,15 +1,14 @@
 name: 困28 - 单刷 - 带清理结界
-# 组队类型 1.单刷 2. 组队
-teamType: 1
 solo: true
 hangUpType:
-  # 1. 限时 2. 限次 3. 不限（不关程序刷到断电）
   type: 1
-  # 时长：分钟
   time: 150
+  unit: MINUTES
 producerBean: TanSuo
 config:
   imgPath: onmyoji\src\main\resources\img\tansuo\
   level: 28
   isKunNan: true
   cleanDemarcation: true
+  windowNameList:
+    - "今时月"

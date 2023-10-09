@@ -1,23 +1,19 @@
 package com.commons.onmyoji.producer;
 
 import com.commons.onmyoji.components.Matcher;
-import com.commons.onmyoji.components.Matcher0920;
 import com.commons.onmyoji.config.OnmyojiScriptConfig;
-import com.commons.onmyoji.config.RoyalSoulConfig;
-import com.commons.onmyoji.entity.MatchResult;
 import com.commons.onmyoji.enums.HangUpTypeEnum;
 import com.commons.onmyoji.job.HangUpType;
 import com.commons.onmyoji.job.OnmyojiJob;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
 import java.util.Collection;
 import java.util.Objects;
-import java.util.concurrent.TimeUnit;
 
 /**
  * Title:
@@ -28,10 +24,14 @@ import java.util.concurrent.TimeUnit;
  */
 @Component
 @Slf4j
+@Getter
+@Setter
 public abstract class InstanceZoneBaseProducer<CONFIG extends OnmyojiScriptConfig> implements InstanceZoneProducer<CONFIG> {
 
     @Resource
-    Matcher0920 matcher0920;
+    Matcher matcher;
+
+    private boolean toBeStop = false;
 
     /**
      * 预处理
@@ -53,15 +53,18 @@ public abstract class InstanceZoneBaseProducer<CONFIG extends OnmyojiScriptConfi
         HangUpType hangUpType = job.getHangUpType();
         // 限次
         if (hangUpType.getType().equals(HangUpTypeEnum.TIMES.getCode())) {
-            boolean stop;
+            boolean stop = false;
             do {
-                Collection<Integer> countValues = MatchResult.getInstance().getClickCountMap().values();
-                stop = countValues.stream().allMatch(it -> it.compareTo(hangUpType.getTimes()) >= 0);
-                matcher0920.matchAll(job.isSolo());
+                Collection<Integer> countValues = matcher.getMatchResult().getClickCountMap().values();
+                if (!CollectionUtils.isEmpty(countValues)) {
+                    stop = countValues.stream().allMatch(it -> it.compareTo(hangUpType.getTimes()) >= 0) || toBeStop;
+                }
+                matcher.matchAll(job.isSolo());
             } while (!stop);
         }
         //  限时
         if (hangUpType.getType().equals(HangUpTypeEnum.TIME.getCode())) {
+
             long endTime;
             if (Objects.nonNull(hangUpType.getUnit())) {
                 endTime = System.currentTimeMillis() + hangUpType.getUnit().toMillis(hangUpType.getTime());
@@ -70,15 +73,21 @@ public abstract class InstanceZoneBaseProducer<CONFIG extends OnmyojiScriptConfi
             }
             boolean stop;
             do {
-                stop = System.currentTimeMillis() == endTime;
-                matcher0920.matchAll(job.isSolo());
+                long now = System.currentTimeMillis();
+                stop = toBeStop || now >= endTime;
+                matcher.matchAll(job.isSolo());
             } while (!stop);
         }
         // 不限
         if (hangUpType.getType().equals(HangUpTypeEnum.FOREVER.getCode())) {
-            while (true) {
-                matcher0920.matchAll(job.isSolo());
+            while (!toBeStop) {
+                matcher.matchAll(job.isSolo());
             }
         }
+    }
+
+    @Override
+    public void stop() {
+        this.setToBeStop(true);
     }
 }

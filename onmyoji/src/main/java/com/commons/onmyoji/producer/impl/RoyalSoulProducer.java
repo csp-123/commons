@@ -1,6 +1,6 @@
 package com.commons.onmyoji.producer.impl;
 
-import com.commons.onmyoji.components.Matcher0920;
+import com.commons.onmyoji.components.Matcher;
 import com.commons.onmyoji.config.RoyalSoulConfig;
 import com.commons.onmyoji.constant.OnmyojiConstant;
 import com.commons.onmyoji.job.OnmyojiJob;
@@ -23,7 +23,7 @@ import java.util.*;
 public class RoyalSoulProducer extends InstanceZoneBaseProducer<RoyalSoulConfig> {
 
     @Resource
-    Matcher0920 matcher0920;
+    Matcher matcher;
 
     @Override
     public String getProducerName() {
@@ -58,7 +58,7 @@ public class RoyalSoulProducer extends InstanceZoneBaseProducer<RoyalSoulConfig>
         targetImgList.add(end);
         targetImgList.add(reward);
         //图片匹配器初始化
-        matcher0920.init(targetImgList);
+        matcher.init(targetImgList);
     }
 
 }
