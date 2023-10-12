@@ -16,7 +16,7 @@ import java.util.Collection;
 import java.util.Objects;
 
 /**
- * Title:
+ * Title:定制流程处理器
  * Description:
  * Project: commons
  * Author: csp
@@ -26,40 +26,25 @@ import java.util.Objects;
 @Slf4j
 @Getter
 @Setter
-public abstract class InstanceZoneBaseProducer<CONFIG extends OnmyojiScriptConfig> implements InstanceZoneProducer<CONFIG> {
-
-    @Resource
-    Matcher matcher;
+public abstract class CustomizeProcessBaseProducer<CONFIG extends OnmyojiScriptConfig> implements InstanceZoneProducer<CONFIG> {
 
     private boolean toBeStop = false;
 
-    /**
-     * 预处理
-     */
-    public abstract void prepare(OnmyojiJob<CONFIG> job);
+    public abstract void process(OnmyojiJob<CONFIG> job);
 
-    /**
-     * 从哪个界面开始，庭院？还是御魂界面？ 或者兼容？
-     * 1. 单刷 or 组队？
-     * 2. 限时 or 限次 or 刷到死？
-     * 容错机制：
-     * 1. 宠物发现额外奖励
-     * 2. 组队时队友超时，重新邀请队友
-     *
-     * @param job
-     */
+
     public void produce(OnmyojiJob job) {
-        prepare(job);
+
         HangUpType hangUpType = job.getHangUpType();
         // 限次
         if (hangUpType.getType().equals(HangUpTypeEnum.TIMES.getCode())) {
-            boolean stop = false;
+            Integer hangUpTypeTimes = hangUpType.getTimes();
+            int times = 0;
+            boolean stop;
             do {
-                Collection<Integer> countValues = matcher.getMatchResult().getClickCountMap().values();
-                if (!CollectionUtils.isEmpty(countValues)) {
-                    stop = countValues.stream().allMatch(it -> it.compareTo(hangUpType.getTimes()) >= 0) || toBeStop;
-                }
-                matcher.matchAll();
+                process(job);
+                times++;
+                stop = times>=hangUpTypeTimes || toBeStop;
             } while (!stop);
         }
         //  限时
@@ -75,13 +60,13 @@ public abstract class InstanceZoneBaseProducer<CONFIG extends OnmyojiScriptConfi
             do {
                 long now = System.currentTimeMillis();
                 stop = toBeStop || now >= endTime;
-                matcher.matchAll();
+                process(job);
             } while (!stop);
         }
         // 不限
         if (hangUpType.getType().equals(HangUpTypeEnum.FOREVER.getCode())) {
             while (!toBeStop) {
-                matcher.matchAll();
+                process(job);
             }
         }
     }
