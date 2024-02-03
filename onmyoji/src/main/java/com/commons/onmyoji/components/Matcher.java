@@ -82,9 +82,8 @@ public class Matcher {
      * 匹配单张图片
      *
      * @param targetImgPath
-     * @param solo
      */
-    public void matchOneImg(String targetImgPath, boolean solo) {
+    public void matchOneImg(String targetImgPath) {
         // 获取快照信息
         GameWindowSnapshot snapshot = GameWindowSnapshot.getInstance();
         Set<GameWindowSnapshotItem> snapshotItemList = snapshot.getSnapshotItemList();
@@ -94,7 +93,7 @@ public class Matcher {
         }
         // 遍历窗口快照列表
         snapshotItemList.forEach(snapshotItem -> {
-            boolean matched = match(targetImgPath, solo, snapshotItem);
+            boolean matched = doMatch(targetImgPath, snapshotItem);
             log.info("窗口[{}]匹配图片[{}]结果：[{}]", snapshotItem.getWindowName(), getNameFromPath(targetImgPath), matched);
         });
     }
@@ -124,11 +123,10 @@ public class Matcher {
      * 单刷模式下 找到一个点位即返回
      *
      * @param targetImgPath 目标图片
-     * @param solo          是否单刷
      * @param snapshotItem  窗口
      * @return true or false 是否匹配到结果
      */
-    private boolean match(String targetImgPath, boolean solo, GameWindowSnapshotItem snapshotItem) {
+    private boolean doMatch(String targetImgPath, GameWindowSnapshotItem snapshotItem) {
         int[][] RGBData = RGBDataMap.get(targetImgPath);
         BufferedImage bufferedImage = bfImageMap.get(targetImgPath);
         int width = bufferedImage.getWidth();
@@ -146,8 +144,9 @@ public class Matcher {
                         && (RGBData[height - 1][width - 1] ^ rgbData[y + height - 1][x + width - 1]) == 0
                         && (RGBData[height - 1][0] ^ rgbData[y + height - 1][x]) == 0) {
 
+                    // todo 待定
                     //如果比较结果大于阈值，则说明图片找到，填充查找到的位置坐标数据到查找结果数组。
-                    found = calSimilarity(y, x, rgbData, RGBData) >= onmyojiConfig.getThreshold();
+//                    found = calSimilarity(y, x, rgbData, RGBData) >= onmyojiConfig.getThreshold();
 
                     if (found) {
                         MatchResultItem resultItem = new MatchResultItem(snapshotItem.getWindowName(), realX, realY, width, height);
@@ -161,9 +160,7 @@ public class Matcher {
                         count++;
                         clickCountMap.put(targetImgPath, count);
                         matchResult.setClickCountMap(clickCountMap);
-                        if (solo) {
-                            return found;
-                        }
+                        return found;
                     }
                 }
             }
@@ -242,9 +239,9 @@ public class Matcher {
     }
 
 
-    public void matchAll(boolean solo) {
+    public void matchAll() {
         for (String targetImgPath : targetImgPathList) {
-            matchOneImg(targetImgPath, solo);
+            matchOneImg(targetImgPath);
         }
     }
 
@@ -260,7 +257,7 @@ public class Matcher {
             for (String targetImgPath : getTargetImgPathList()) {
                 // 不能传线程池，否则后来的任务会把前面的覆盖，解决方案是每个任务新建一个线程池
                 CompletableFuture<Void> completableFuture =
-                        CompletableFuture.runAsync(() -> matchOneImg(targetImgPath, solo));
+                        CompletableFuture.runAsync(() -> matchOneImg(targetImgPath));
                 completableFutureList.add(completableFuture);
                 completableFuture.get();
             }
