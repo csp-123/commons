@@ -57,7 +57,9 @@ public class TanSuoProducer extends InstanceZoneBaseProducer<TanSuoConfig> {
         String chapter28 = imgDirectory + "chapter28.png";
         String kunnan = imgDirectory + "dificulty-kunnan.png";
         String tansuo = imgDirectory + "tansuo.png";
-        String i = imgDirectory + "img.png";
+        String i = imgDirectory + "start_team.png";
+        String img_1 = imgDirectory + "inviteOther.png";
+        String boss = imgDirectory + "boss.png";
         String reward = imgDirectory + "reward.png";
         String end = imgDirectory + "end.png";
 
@@ -66,6 +68,8 @@ public class TanSuoProducer extends InstanceZoneBaseProducer<TanSuoConfig> {
         imgList.add(kunnan);
         imgList.add(tansuo);
         imgList.add(i);
+        imgList.add(img_1);
+        imgList.add(boss);
         imgList.add(reward);
         imgList.add(end);
         matcher.init(imgList);

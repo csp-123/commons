@@ -1,12 +1,11 @@
-name: 魂土
+name: 魂十组队
 solo: false
 hangUpType:
-  type: 2
-  times: 1000
+  type: 3
 producerBean: RoyalSoul
 config:
   imgPath: onmyoji\src\main\resources\img\royalsoul\
   windowNameList:
     - "今时月"
-#    - "念山行"
+    - "念山行"
 

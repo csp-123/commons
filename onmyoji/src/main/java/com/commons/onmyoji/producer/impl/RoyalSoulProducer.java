@@ -32,6 +32,7 @@ public class RoyalSoulProducer extends InstanceZoneBaseProducer<RoyalSoulConfig>
 
     @Override
     public void prepare(OnmyojiJob<RoyalSoulConfig> job) {
+        Set<String> targetImgList = new HashSet<>();
         // 配置： 层数、截图存放位置
         RoyalSoulConfig jobConfig = job.getConfig();
         String imgDirectory = System.getProperty("user.dir") + "\\" + jobConfig.imgPath + "\\";
@@ -52,8 +53,14 @@ public class RoyalSoulProducer extends InstanceZoneBaseProducer<RoyalSoulConfig>
             start = Arrays.stream(split)
                     .reduce((s1, s2) -> s1 + "_team." + s2)
                     .orElse(start);
+//            String acceptInvite = imgDirectory + "acceptInvite.png";
+//            String inviteConfirm = imgDirectory + "inviteConfirm.png";
+//            String inviteOther = imgDirectory + "inviteOther.png";
+//            targetImgList.add(acceptInvite);
+//            targetImgList.add(inviteConfirm);
+//            targetImgList.add(inviteOther);
         }
-        Set<String> targetImgList = new HashSet<>();
+
         targetImgList.add(start);
         targetImgList.add(end);
         targetImgList.add(reward);

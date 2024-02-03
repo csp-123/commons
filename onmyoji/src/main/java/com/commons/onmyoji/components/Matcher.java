@@ -89,6 +89,7 @@ public class Matcher {
         GameWindowSnapshot snapshot = GameWindowSnapshot.getInstance();
         Set<GameWindowSnapshotItem> snapshotItemList = snapshot.getSnapshotItemList();
         if (snapshotItemList.isEmpty()) {
+            log.info("窗口信息为空");
             return;
         }
         // 遍历窗口快照列表

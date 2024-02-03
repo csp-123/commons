@@ -1,5 +1,6 @@
 package com.commons.onmyoji.job;
 
+import com.alibaba.fastjson.JSON;
 import com.commons.onmyoji.components.GameWindowFreshTask;
 import com.commons.onmyoji.components.MouseOperateTask;
 import com.commons.onmyoji.components.OnmyojiDaemonTask;
@@ -60,10 +61,10 @@ public class JobPool {
         OnmyojiJob job = jobMap.get(id);
         //持续运行【屏幕刷新器】
         gameWindowFreshTask.setWindowsNameList(Sets.newHashSet(job.getConfig().getWindowNameList()));
-        gameWindowFreshTimer.schedule(gameWindowFreshTask, new Date(), 200);
+        gameWindowFreshTimer.schedule(gameWindowFreshTask, new Date(), 20);
         //持续运行【匹配结果点击器】
 //        mouseTimer.schedule(mouseOperateTask, new Date(), 500);
-        daemonTimer.schedule(daemonTask, new Date(), 200);
+        daemonTimer.schedule(daemonTask, new Date(), 5000);
         job.start();
         gameWindowFreshTimer.cancel();
         daemonTimer.cancel();

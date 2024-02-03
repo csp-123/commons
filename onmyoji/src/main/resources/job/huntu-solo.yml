@@ -1,12 +1,11 @@
 name: 魂土-单人
 solo: true
 hangUpType:
-  type: 1
-  time: 2
-  unit: MINUTES
+  type: 2
+  times: 500
 producerBean: RoyalSoul
 config:
   imgPath: onmyoji\src\main\resources\img\royalsoul\
   windowNameList:
-    - "念山行"
+    - "今时月"
 

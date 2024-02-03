@@ -83,8 +83,7 @@ public class JobLoader {
         job.setProducer(producer);
         log.info("处理器：{}", producer.getProducerName());
         job.setConfig(buildConfig(source, producer));
-//        logger.info("任务配置JSON：{}", JSON.toJSONString(job));
-        log.info("");
+        log.info("任务配置JSON：{}", JSON.toJSONString(job));
         return job;
     }
 

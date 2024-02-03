@@ -1,5 +1,6 @@
 package com.commons.onmyoji.components;
 
+import com.alibaba.fastjson.JSON;
 import com.commons.onmyoji.entity.GameWindowSnapshot;
 import com.commons.onmyoji.entity.GameWindowSnapshotItem;
 import com.sun.jna.platform.win32.User32;
@@ -46,7 +47,7 @@ public class GameWindowFreshTask extends TimerTask {
         for (String windowName : windowsNameList) {
             reloadScreenSnapShot(robot, windowName, instance);
         }
-        log.info("游戏窗口刷新完成，监测到当前游戏窗口数：{}", windowsNameList.size());
+        log.info("游戏窗口刷新完成，监测到当前游戏窗口数：{}, 窗口信息：{}", windowsNameList.size(), instance.toString());
     }
 
     private void reloadScreenSnapShot(Robot robot, String windowName, GameWindowSnapshot snapshot) {
