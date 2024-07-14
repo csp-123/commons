@@ -53,6 +53,10 @@ public class GameWindowSnapshotItem {
      */
     private int[][] RGBData;
 
+    public GameWindowSnapshotItem(String windowName) {
+        this.windowName = windowName;
+    }
+
     @Override
     public String toString() {
         return String.format("windowName:%s,x:%s,y:%s,width:%s,height:%s", windowName, x, y, windowWidth, windowHeight);

@@ -1,61 +1,53 @@
 package com.commons.onmyoji.enums;
 
 import com.google.common.collect.Maps;
+import lombok.Getter;
 
+import java.util.HashMap;
 import java.util.Map;
 
-/**
- * @description: 组队类型枚举
- * @author: chish
- * @date: 2023/3/11 23:56
- */
+@Getter
 public enum TeamTypeEnum {
 
     /**
      * 单刷
      */
-    SOLO(1, "单刷"),
+    SOLO("SOLO", "单刷"),
 
     /**
-     * 组队
+     * 组队 - 多开
      */
-    TEAM(2, "组队");
+    TEAM_MULTI_OPEN("TEAM_MULTI_OPEN", "组队-多开"),
 
     /**
-     * 状态码
+     * 组队 - 匹配
      */
-    private final Integer code;
+    TEAM_MATCHING("TEAM_MATCHING", "组队-匹配");
+
+    /**
+     * 类型
+     */
+    private final String type;
 
     /**
      * 描述
      */
     private final String desc;
 
-    private static final Map<Integer, TeamTypeEnum> lookUp = Maps.newHashMap();
-
-    static {
-        for (TeamTypeEnum value : TeamTypeEnum.values()) {
-            lookUp.put(value.code, value);
-        }
-    }
-
-    TeamTypeEnum(Integer code, String desc) {
-        this.code = code;
+    TeamTypeEnum(String type, String desc) {
+        this.type = type;
         this.desc = desc;
     }
 
+    private static final Map<String, TeamTypeEnum> lookUpFrom = new HashMap<>();
 
-
-    public Integer getCode() {
-        return code;
+    static {
+        for (TeamTypeEnum value : TeamTypeEnum.values()) {
+            lookUpFrom.put(value.getType(), value);
+        }
     }
 
-    public String getDesc() {
-        return desc;
-    }
-
-
-    public static TeamTypeEnum find(Integer code) {
-        return lookUp.get(code);
+    public static TeamTypeEnum findByType(String type) {
+        return lookUpFrom.get(type);
     }
 }

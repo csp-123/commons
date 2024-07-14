@@ -20,7 +20,7 @@ import java.util.List;
 
 
 /**
- * 游戏窗口刷新：实时监测游戏窗口位置、窗口大小
+ * 游戏窗口刷新：实时监测游戏窗口位置、窗口大小，刷新窗口RGB数据
  *
  * @author chishupeng
  * @date 2023/8/18 2:45 PM
@@ -63,14 +63,8 @@ public class GameWindowFreshTask extends TimerTask {
         snapshotItem.setBufferedImage(screenCapture);
         snapshotItem.setRGBData(getImageRGB(screenCapture));
         Set<GameWindowSnapshotItem> snapshotItemList = snapshot.getSnapshotItemList();
-        Set<GameWindowSnapshotItem> newList = new HashSet<>();
-        for (GameWindowSnapshotItem windowSnapshotItem : snapshotItemList) {
-            if (!windowSnapshotItem.getWindowName().equals(snapshotItem.getWindowName())) {
-                newList.add(windowSnapshotItem);
-            }
-        }
-        newList.add(snapshotItem);
-        snapshot.setSnapshotItemList(newList);
+        snapshotItemList.remove(new GameWindowSnapshotItem(windowName));
+        snapshotItemList.add(snapshotItem);
     }
 
     private WinDef.RECT getRect(String windowName) {

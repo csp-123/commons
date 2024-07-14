@@ -37,7 +37,7 @@ public class UserContext {
         userContext.set(userInfo);
     }
 
-    @Value("spring.profiles.active")
+    @Value("${spring.profiles.active}")
     private String env;
 
 

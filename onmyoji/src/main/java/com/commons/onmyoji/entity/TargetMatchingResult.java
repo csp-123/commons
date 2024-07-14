@@ -1,23 +1,37 @@
 package com.commons.onmyoji.entity;
 
-import lombok.EqualsAndHashCode;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.Objects;
 
 /**
+ * 匹配结果
  * @author chishupeng
  * @date 2023/8/23 11:28 AM
  */
 @Getter
 @Setter
-public class MatchResultItem {
+@NoArgsConstructor
+@AllArgsConstructor
+public class TargetMatchingResult {
 
     /**
      * 窗口名称
      */
     private String windowName;
+
+    /**
+     * 匹配图片名称
+     */
+    private String targetImgName;
+
+    /**
+     * 已匹配次数
+     */
+    private Integer count = 0;
 
     /**
      * x坐标
@@ -40,13 +54,17 @@ public class MatchResultItem {
     private Integer imgHeight;
 
 
-    public MatchResultItem(String windowName, Integer x, Integer y, Integer width, Integer height) {
+    public TargetMatchingResult(String windowName, String targetImgName,Integer x, Integer y, Integer width, Integer height) {
         this.windowName = windowName;
         this.locationX = x;
         this.locationY = y;
         this.imgWidth = width;
         this.imgHeight = height;
+        this.targetImgName = targetImgName;
+    }
 
+    public TargetMatchingResult(String targetImgName) {
+        this.targetImgName = targetImgName;
     }
 
     /**
@@ -56,14 +74,14 @@ public class MatchResultItem {
      */
     @Override
     public boolean equals(Object obj) {
-        if (!(obj instanceof MatchResultItem)) {
+        if (!(obj instanceof TargetMatchingResult)) {
             return false;
         }
-        return Objects.equals(this.getWindowName(),((MatchResultItem) obj).getWindowName());
+        return Objects.equals(this.getTargetImgName(),((TargetMatchingResult) obj).getTargetImgName());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(windowName);
+        return Objects.hash(targetImgName);
     }
 }

@@ -1,10 +1,8 @@
 package com.commons.onmyoji.producer.impl;
 
 import com.commons.onmyoji.components.Matcher;
-import com.commons.onmyoji.config.DailyJobConfig;
-import com.commons.onmyoji.config.OnmyojiScriptConfig;
-import com.commons.onmyoji.job.OnmyojiJob;
-import com.commons.onmyoji.producer.CustomizeProcessBaseProducer;
+import com.commons.onmyoji.entity.OnmyojiJob;
+import com.commons.onmyoji.producer.InstanceZoneProducer;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
@@ -19,10 +17,15 @@ import javax.annotation.Resource;
  */
 @Component("ChaoGuiWang")
 @Slf4j
-public class ChaoGuiWangProducer extends CustomizeProcessBaseProducer<OnmyojiScriptConfig> {
+public class ChaoGuiWangProducer implements InstanceZoneProducer {
 
     @Resource
     Matcher matcher;
+
+    @Override
+    public void produce(OnmyojiJob job) {
+
+    }
 
     @Override
     public String getProducerName() {
@@ -30,18 +33,6 @@ public class ChaoGuiWangProducer extends CustomizeProcessBaseProducer<OnmyojiScr
     }
 
 
-    /**
-     * 1. 探索、觉醒、御魂、御灵等
-     * 2. 使用鬼王票 -> 清鬼王
-     * 3. 以上流程循环
-     * @param job
-     */
-    @Override
-    public void process(OnmyojiJob<OnmyojiScriptConfig> job) {
-        // 配置： 层数、截图存放位置
-        OnmyojiScriptConfig jobConfig = job.getConfig();
-        String imgDirectory = System.getProperty("user.dir") + "\\" + jobConfig.imgPath + "\\";
 
-    }
 
 }

@@ -1,39 +1,38 @@
 package com.commons.onmyoji.enums;
 
-/**
- * @description: 挂机类型枚举
- * @author: chish
- * @date: 2023/3/11 23:56
- */
+import lombok.Getter;
+import lombok.Setter;
+
+import java.util.HashMap;
+import java.util.Map;
+
+@Getter
 public enum HangUpTypeEnum {
-    /**
-     * 按时间
-     */
-    TIME(1, "按时长"),
 
-    /**
-     * 按次
-     */
-    TIMES(2, "按次数"),
+    TIME_FROM_NOW("TIME_FROM_NOW", "时长"),
 
-    /**
-     * 刷到死
-     */
-    FOREVER(3, "只要不断电");
-    private Integer code;
+    TIMES("TIMES", "次数"),
+
+    ;
+    private String type;
 
     private String desc;
 
-    HangUpTypeEnum(Integer code, String desc) {
-        this.code = code;
+    HangUpTypeEnum(String type, String desc) {
+        this.type = type;
         this.desc = desc;
     }
 
-    public Integer getCode() {
-        return code;
+    private static final Map<String, HangUpTypeEnum> lookUpFrom = new HashMap<>();
+
+    static {
+        for (HangUpTypeEnum value : HangUpTypeEnum.values()) {
+            lookUpFrom.put(value.getType(), value);
+        }
     }
 
-    public String getDesc() {
-        return desc;
+    public static HangUpTypeEnum findByType(String type) {
+        return lookUpFrom.get(type);
     }
+
 }

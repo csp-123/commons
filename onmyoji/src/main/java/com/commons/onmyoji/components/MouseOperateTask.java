@@ -1,12 +1,8 @@
 package com.commons.onmyoji.components;
 
-import com.alibaba.fastjson.JSON;
-import com.commons.onmyoji.entity.MatchResult;
-import com.commons.onmyoji.entity.MatchResultItem;
+import com.commons.onmyoji.entity.TargetMatchingResult;
 import com.commons.onmyoji.utils.ImageSimilarityUtil;
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
@@ -29,43 +25,43 @@ public class MouseOperateTask extends TimerTask {
 
     @Override
     public void run() {
-        MatchResult matchResult = new MatchResult();
-        Map<String, Set<MatchResultItem>> resultItemMap = matchResult.getResultItemMap();
-        if (resultItemMap.isEmpty()) {
-            log.info("无匹配结果");
-            return;
-        }
-        Map<String, Integer> clickCountMap = matchResult.getClickCountMap();
-        // 按各图片遍历匹配结果
-        for (Map.Entry<String, Set<MatchResultItem>> entry : resultItemMap.entrySet()) {
-            // 图片路径
-            String targetImgPath = entry.getKey();
-            String name = ImageSimilarityUtil.getNameFromPath(targetImgPath);
-            Set<MatchResultItem> resultItems = entry.getValue();
-            log.info("图片{}匹配结果：{}", name, resultItems.size());
-            // 所有窗口的匹配结果
-            if (CollectionUtils.isEmpty(resultItems)) {
-                continue;
-            }
-            // 点击并移除匹配结果
-            resultItems.forEach(item -> clickImg(item, true));
-            resultItems.clear();
-            // 点击数++
-            Integer count = clickCountMap.get(targetImgPath);
-            if (count == null) {
-                count = 0;
-            }
-            count++;
-            clickCountMap.put(targetImgPath, count);
-        }
+//        MatchResult matchResult = new MatchResult();
+//        Map<String, Set<TargetMatchingResult>> resultItemMap = matchResult.getResultItemMap();
+//        if (resultItemMap.isEmpty()) {
+//            log.info("无匹配结果");
+//            return;
+//        }
+//        Map<String, Integer> clickCountMap = matchResult.getClickCountMap();
+//        // 按各图片遍历匹配结果
+//        for (Map.Entry<String, Set<TargetMatchingResult>> entry : resultItemMap.entrySet()) {
+//            // 图片路径
+//            String targetImgPath = entry.getKey();
+//            String name = ImageSimilarityUtil.getNameFromPath(targetImgPath);
+//            Set<TargetMatchingResult> resultItems = entry.getValue();
+//            log.info("图片{}匹配结果：{}", name, resultItems.size());
+//            // 所有窗口的匹配结果
+//            if (CollectionUtils.isEmpty(resultItems)) {
+//                continue;
+//            }
+//            // 点击并移除匹配结果
+//            resultItems.forEach(item -> clickImg(item, true));
+//            resultItems.clear();
+//            // 点击数++
+//            Integer count = clickCountMap.get(targetImgPath);
+//            if (count == null) {
+//                count = 0;
+//            }
+//            count++;
+//            clickCountMap.put(targetImgPath, count);
+//        }
     }
 
-    public void clickImg(MatchResultItem matchResultItem, boolean random) {
-        int x = matchResultItem.getLocationX();
-        int y = matchResultItem.getLocationY();
+    public void clickImg(TargetMatchingResult targetMatchingResult, boolean random) {
+        int x = targetMatchingResult.getLocationX();
+        int y = targetMatchingResult.getLocationY();
         if (random) {
-            x = buildRandomLocation(x, matchResultItem.getImgWidth());
-            y = buildRandomLocation(y, matchResultItem.getImgHeight());
+            x = buildRandomLocation(x, targetMatchingResult.getImgWidth());
+            y = buildRandomLocation(y, targetMatchingResult.getImgHeight());
         }
         click(x, y);
     }

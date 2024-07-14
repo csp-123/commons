@@ -1,7 +1,10 @@
 package com.commons.onmyoji.web;
 
+import com.commons.onmyoji.entity.OnmyojiJob;
 import com.commons.onmyoji.job.JobPool;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.commons.onmyoji.job.RunningJobPool;
+import com.commons.onmyoji.producer.InstanceZoneProducer;
+import org.springframework.context.ApplicationContext;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -22,15 +25,30 @@ public class WebController {
     @Resource
     JobPool jobPool;
 
-    @GetMapping("/run")
-    public String run(String id){
-        jobPool.runJob(id);
-        return "ok";
+    @Resource
+    RunningJobPool runningJobPool;
+
+    @Resource
+    ApplicationContext applicationContext;
+
+
+    @GetMapping("/runByJobId")
+    public void runByJobId(String jobId){
+        OnmyojiJob job = jobPool.getJobById(jobId);
+        InstanceZoneProducer producer = (InstanceZoneProducer)applicationContext.getBean(job.getProducerName());
+        producer.produce(job);
+    }
+
+    @GetMapping("/stopByJobId")
+    public void stopByJobId(String jobId){
+        if (!runningJobPool.containsJob(jobId)) {
+            return;
+        }
+        runningJobPool.removeJob(jobId);
     }
 
     @GetMapping("/stopAll")
-    public String stopAll(){
-        jobPool.stopAll();
-        return "ok";
+    public void stopAll(){
+        runningJobPool.stopAll();
     }
 }
