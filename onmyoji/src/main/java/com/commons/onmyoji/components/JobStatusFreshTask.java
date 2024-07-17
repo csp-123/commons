@@ -1,5 +1,6 @@
 package com.commons.onmyoji.components;
 
+import com.alibaba.fastjson.JSON;
 import com.commons.onmyoji.entity.*;
 import com.commons.onmyoji.enums.HangUpTypeEnum;
 import com.commons.onmyoji.job.RunningJobMatchResultPool;
@@ -53,6 +54,7 @@ public class JobStatusFreshTask extends TimerTask {
     private void checkJobDone(OnmyojiJob job) {
         if (HangUpTypeEnum.TIMES.equals(job.getHangUpType())) {
             MatchResult matchResult = runningJobMatchResultPool.get(job.getJobId());
+            log.info("===匹配结果：{}", JSON.toJSONString(matchResult));
             if (matchResult == null) {
                 log.info("【任务状态监测】[任务：{}，是否完成：{}]", job.getJobName(), false);
                 return;

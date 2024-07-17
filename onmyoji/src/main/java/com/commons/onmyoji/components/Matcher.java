@@ -11,9 +11,11 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
+import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
 import java.awt.*;
@@ -50,7 +52,7 @@ public class Matcher {
      * 近似阈值
      */
     @Value("${onmyoji.threshold}")
-    private String threshold;
+    private Double threshold;
 
 
     /**
@@ -176,7 +178,7 @@ public class Matcher {
                         && (RGBData[height - 1][0] ^ rgbData[y + height - 1][x]) == 0) {
 
                     //如果比较结果大于阈值，则说明图片找到，填充查找到的位置坐标数据到查找结果数组。
-                    found = calSimilarity(y, x, rgbData, RGBData) >= Double.parseDouble(threshold);
+                    found = calSimilarity(y, x, rgbData, RGBData) >= threshold;
 
                     if (found) {
                         TargetMatchingResult resultItem = new TargetMatchingResult(snapshotItem.getWindowName(), targetImgPath, realX, realY, width, height);
@@ -185,17 +187,17 @@ public class Matcher {
                         MatchResult matchResult = runningJobMatchResultPool.getMatchResultMap().get(job.getJobId());
                         if (matchResult == null) {
                             matchResult = new MatchResult();
+                            runningJobMatchResultPool.getMatchResultMap().put(job.getJobId(), matchResult);
                         }
                         Set<TargetMatchingResult> targetMatchingResults = matchResult.getResultItemMap().computeIfAbsent(snapshotItem.getWindowName(), k -> new HashSet<>());
-                        for (TargetMatchingResult targetMatchingResult : targetMatchingResults) {
-                            if (targetMatchingResult.getTargetImgName().equals(targetImgPath)) {
-                                targetMatchingResult.setCount(targetMatchingResult.getCount() + 1);
-                                targetMatchingResult.setLocationX(resultItem.getLocationX());
-                                targetMatchingResult.setLocationY(resultItem.getLocationY());
-                                targetMatchingResult.setImgHeight(resultItem.getImgHeight());
-                                targetMatchingResult.setImgWidth(resultItem.getImgWidth());
-                            }
+                        if (CollectionUtils.isEmpty(targetMatchingResults)) {
+                            TargetMatchingResult result = getMatchingResult(targetImgPath, snapshotItem, resultItem);
+                            targetMatchingResults.add(result);
+                        } else {
+                            reloadMatchingResults(targetImgPath, resultItem, targetMatchingResults);
                         }
+                        // 点击后等待，防止重复匹配，导致点击计数错误
+                        waitSomeTime(1000, 1000);
                         return found;
                     }
                 }
@@ -204,59 +206,30 @@ public class Matcher {
         return found;
     }
 
-    /**
-     * 近似匹配规则：
-     * 灰度匹配，相似度超过阈值即认定为匹配成功
-     * 单刷模式下 找到一个点位即返回
-     *
-     * @param targetImgPath 目标图片
-=     * @param snapshotItem  窗口
-     * @return true or false 是否匹配到结果
-     */
-    private boolean matchRU(String targetImgPath, GameWindowSnapshotItem snapshotItem, OnmyojiJob job) {
-        int[][] RGBData = RGBDataMap.get(targetImgPath);
-        BufferedImage bufferedImage = bfImageMap.get(targetImgPath);
-        int width = bufferedImage.getWidth();
-        int height = bufferedImage.getHeight();
-        int[][] rgbData = snapshotItem.getRGBData();
-
-        boolean found = false;
-
-        for (int y = 0; y < rgbData.length - height; y++) {
-            for (int x = 0; x < rgbData[0].length - width; x++) {
-                int realX = x + snapshotItem.getX();
-                int realY = y + snapshotItem.getY();
-                if ((RGBData[0][0] ^ rgbData[y][x]) == 0
-                        && (RGBData[0][width - 1] ^ rgbData[y][x + width - 1]) == 0
-                        && (RGBData[height - 1][width - 1] ^ rgbData[y + height - 1][x + width - 1]) == 0
-                        && (RGBData[height - 1][0] ^ rgbData[y + height - 1][x]) == 0) {
-
-                    //如果比较结果大于阈值，则说明图片找到，填充查找到的位置坐标数据到查找结果数组。
-                    found = calSimilarity(y, x, rgbData, RGBData) >= Double.parseDouble(threshold);
-
-                    if (found) {
-                        TargetMatchingResult resultItem = new TargetMatchingResult(snapshotItem.getWindowName(), targetImgPath, realX, realY, width, height);
-                        // 鼠标点击
-                        clickImgRU(resultItem);
-                        MatchResult matchResult = runningJobMatchResultPool.getMatchResultMap().get(job.getJobId());
-                        Set<TargetMatchingResult> targetMatchingResults = matchResult.getResultItemMap().get(snapshotItem.getWindowName());
-                        for (TargetMatchingResult targetMatchingResult : targetMatchingResults) {
-                            if (targetMatchingResult.getTargetImgName().equals(targetImgPath)) {
-                                targetMatchingResult.setCount(targetMatchingResult.getCount() + 1);
-                                targetMatchingResult.setLocationX(resultItem.getLocationX());
-                                targetMatchingResult.setLocationY(resultItem.getLocationY());
-                                targetMatchingResult.setImgHeight(resultItem.getImgHeight());
-                                targetMatchingResult.setImgWidth(resultItem.getImgWidth());
-                            }
-                        }
-                        return found;
-                    }
-                }
+    private void reloadMatchingResults(String targetImgPath, TargetMatchingResult resultItem, Set<TargetMatchingResult> targetMatchingResults) {
+        for (TargetMatchingResult targetMatchingResult : targetMatchingResults) {
+            if (targetMatchingResult.getTargetImgName().equals(targetImgPath)) {
+                targetMatchingResult.setCount(targetMatchingResult.getCount() + 1);
+                targetMatchingResult.setLocationX(resultItem.getLocationX());
+                targetMatchingResult.setLocationY(resultItem.getLocationY());
+                targetMatchingResult.setImgHeight(resultItem.getImgHeight());
+                targetMatchingResult.setImgWidth(resultItem.getImgWidth());
             }
         }
-        return found;
     }
 
+    @NotNull
+    private static TargetMatchingResult getMatchingResult(String targetImgPath, GameWindowSnapshotItem snapshotItem, TargetMatchingResult resultItem) {
+        TargetMatchingResult result = new TargetMatchingResult();
+        result.setWindowName(snapshotItem.getWindowName());
+        result.setTargetImgName(targetImgPath);
+        result.setCount(1);
+        result.setLocationX(resultItem.getLocationX());
+        result.setLocationY(resultItem.getLocationY());
+        result.setImgHeight(resultItem.getImgHeight());
+        result.setImgWidth(resultItem.getImgWidth());
+        return result;
+    }
 
 
     /**
@@ -322,13 +295,6 @@ public class Matcher {
         click(x, y);
     }
 
-    public void clickImgRU(TargetMatchingResult targetMatchingResult) {
-        int x = targetMatchingResult.getLocationX() + targetMatchingResult.getImgWidth();
-        int y = targetMatchingResult.getLocationY();
-        click(x, y);
-    }
-
-
     /**
      * 以中心点为构建随机位置
      * 例：（125，226） 64*58 横坐标：position = 125，横向长度： size = 64
@@ -349,6 +315,8 @@ public class Matcher {
     public void click(int x, int y) {
         mouseMove(x, y, true);
         leftClick(300, true);
+        // todo 点击完要不要将光标移走呢 随机移动一个位置？
+//        mouseMove(x + 300, y + 300, true);
     }
 
 
@@ -420,30 +388,21 @@ public class Matcher {
      * @param time2
      */
     private void waitSomeTime(int time1, int time2) {
-        Random random = new Random();
-        int max = Math.max(time1, time2);
-        int min = Math.max(time1, time2);
-        int randomTime = random.nextInt(max - min + 1) + min;
+        int randomTime;
+        if (time1 == time2) {
+            randomTime = time1;
+        } else {
+            Random random = new Random();
+            int max = Math.max(time1, time2);
+            int min = Math.max(time1, time2);
+            randomTime = random.nextInt(max - min + 1) + min;
+        }
 
         try {
             Thread.sleep(randomTime);
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
-    }
-
-    public void matchOneImgRU(String imgDirectory, OnmyojiJob job) {
-        // 获取快照信息
-        GameWindowSnapshot snapshot = GameWindowSnapshot.getInstance();
-        Set<GameWindowSnapshotItem> snapshotItemList = snapshot.getSnapshotItemList();
-        if (snapshotItemList.isEmpty()) {
-            return;
-        }
-        // 遍历窗口快照列表
-        snapshotItemList.forEach(snapshotItem -> {
-            boolean matched = matchRU(imgDirectory, snapshotItem, job);
-            log.info("窗口[{}]匹配图片[{}]结果：[{}]", snapshotItem.getWindowName(), getNameFromPath(imgDirectory), matched);
-        });
     }
 
     public void start(String jobId) {
@@ -453,8 +412,18 @@ public class Matcher {
     }
 
     public void matchAll(OnmyojiJob job) {
-        for (String targetImgPath : targetImgPathList) {
-            matchOneImg(targetImgPath, job);
+//        for (String targetImgPath : targetImgPathList) {
+//            matchOneImg(targetImgPath, job);
+//        }
+        try {
+            for (String targetImgPath : getTargetImgPathList()) {
+                // 不能传线程池，否则后来的任务会把前面的覆盖，解决方案是每个任务新建一个线程池
+                CompletableFuture<Void> completableFuture =
+                        CompletableFuture.runAsync(() -> matchOneImg(targetImgPath, job));
+                completableFuture.get();
+            }
+        } catch (Exception e) {
+            log.error("匹配异常：{}", Throwables.getStackTraceAsString(e));
         }
     }
 }

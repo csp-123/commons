@@ -3,10 +3,6 @@ package com.commons.onmyoji.producer.impl;
 import com.commons.onmyoji.components.GameWindowFreshTask;
 import com.commons.onmyoji.components.JobStatusFreshTask;
 import com.commons.onmyoji.components.Matcher;
-
-import com.commons.onmyoji.components.MouseOperateTask;
-import com.commons.onmyoji.constant.OnmyojiConstant;
-
 import com.commons.onmyoji.entity.OnmyojiJob;
 import com.commons.onmyoji.job.RunningJobPool;
 import com.commons.onmyoji.producer.InstanceZoneProducer;
@@ -17,7 +13,8 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.Arrays;
+import java.util.List;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
@@ -55,7 +52,7 @@ public class CommonProducer implements InstanceZoneProducer {
             runningJobPool.addJob(job);
             List<String> windowsNameList = Arrays.asList(job.getWindowNameList().split(","));
             // 持续刷新屏幕RGB数据
-            gameWindowFreshTask.setWindowsNameList(Sets.newHashSet(job.getWindowNameList()));
+            gameWindowFreshTask.setWindowsNameList(Sets.newHashSet(windowsNameList));
             gameWindowFreshExecutor.scheduleAtFixedRate(gameWindowFreshTask, 0, 500, TimeUnit.MILLISECONDS);
             // 持续检查任务是否完成
             checkJobDoneExecutor.scheduleAtFixedRate(jobStatusFreshTask, 0, 5, TimeUnit.SECONDS);
