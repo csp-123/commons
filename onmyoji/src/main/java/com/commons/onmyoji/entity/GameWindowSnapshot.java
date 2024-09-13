@@ -50,7 +50,7 @@ public class GameWindowSnapshot {
             int width = gameWindowSnapshotItem.getWindowWidth();
             int height = gameWindowSnapshotItem.getWindowHeight();
             int x = gameWindowSnapshotItem.getX();
-            int y = gameWindowSnapshotItem.getX();
+            int y = gameWindowSnapshotItem.getY();
             String info = String.format("[windowName:%s,width:%d,height:%d,x:%d,y:%d]", windowName,width,height,x,y);
             stringBuilder.append(info);
         }

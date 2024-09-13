@@ -296,9 +296,9 @@ public class Matcher {
     }
 
     /**
-     * 以中心点为构建随机位置
+     * 构建随机位置
      * 例：（125，226） 64*58 横坐标：position = 125，横向长度： size = 64
-     * 得出最终横坐标 125-(64/2)<result<125+(64/2) 即   93<result<157
+     * 得出最终横坐标 125<result<125+64 即   125<result<189
      *
      * @param position 像素单维度坐标
      * @param length   图像单维度长度
@@ -306,14 +306,13 @@ public class Matcher {
      */
     private int buildRandomLocation(int position, int length) {
         Random random = new Random();
-        int min = position - length / 2;
-        int max = position + length / 2;
-        return random.nextInt(max - min + 1) + min;
+        return random.nextInt(length) + position;
     }
 
 
     public void click(int x, int y) {
         mouseMove(x, y, true);
+        log.info("点击：[{}]", x+ "," + y) ;
         leftClick(300, true);
         // todo 点击完要不要将光标移走呢 随机移动一个位置？
 //        mouseMove(x + 300, y + 300, true);
