@@ -25,6 +25,7 @@ import static java.lang.Thread.sleep;
  * Created by long.tang on 2019/4/25.
  */
 @Getter
+@Deprecated
 public class FindRobot {
 
     private static final Logger logger = LoggerFactory.getLogger(FindRobot.class);
@@ -398,7 +399,7 @@ public class FindRobot {
     public static boolean findPoint(String path,boolean move){
         map.clear();
         FindRobot demo = new FindRobot(path,"",0,0);
-        if(map==null||map.size()==0){
+        if(map==null|| map.isEmpty()){
             logger.info("未找到");
             return false;
         } else {

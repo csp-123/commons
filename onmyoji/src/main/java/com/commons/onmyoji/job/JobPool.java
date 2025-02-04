@@ -6,6 +6,7 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
+import java.io.IOException;
 import java.util.Map;
 
 /**
@@ -34,7 +35,7 @@ public class JobPool {
     }
 
     @PostConstruct
-    public void initJob(){
+    public void initJob() throws IOException {
         jobMap = jobLoader.loadAllJobs();
     }
 

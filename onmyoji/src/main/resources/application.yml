@@ -3,7 +3,10 @@ spring:
     name: onmyoji
 
 onmyoji:
+  # 相似匹配阈值 超过阈值认为匹配成功
   threshold: 0.965
+  # 系统缩放比例，不配置的话自动读取
+  scale: 1.25
 
 
 

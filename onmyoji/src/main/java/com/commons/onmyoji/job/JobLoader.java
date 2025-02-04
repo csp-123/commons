@@ -1,5 +1,7 @@
 package com.commons.onmyoji.job;
 
+import cn.hutool.setting.yaml.YamlUtil;
+import com.alibaba.fastjson.JSON;
 import com.commons.onmyoji.entity.OnmyojiJob;
 import com.commons.onmyoji.enums.HangUpTypeEnum;
 import com.commons.onmyoji.enums.TeamTypeEnum;
@@ -9,8 +11,14 @@ import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.env.PropertiesPropertySource;
 import org.springframework.stereotype.Component;
+import org.yaml.snakeyaml.Yaml;
 
 import javax.annotation.Resource;
+import java.io.*;
+import java.lang.reflect.Constructor;
+import java.nio.file.Files;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -25,53 +33,37 @@ import java.util.stream.Collectors;
 @Component
 @Slf4j
 public class JobLoader {
-    private final Map<String, InstanceZoneProducer> producerMap;
 
     private Map<String, OnmyojiJob> jobs;
 
-    @Resource
-    private YmlLoader ymlLoader;
-
-
-    public JobLoader(Map<String, InstanceZoneProducer> producerMap, YmlLoader ymlLoader) {
-        this.producerMap = producerMap;
-        this.ymlLoader = ymlLoader;
-    }
-
-    @SneakyThrows
-    public Map<String, OnmyojiJob> loadAllJobs() {
-        log.info("==============加载任务列表=============");
-        log.info("");
-        if (jobs == null) {
-            List<PropertiesPropertySource> sources = ymlLoader.loadAllYml("classpath:job/*.yml");
-            jobs = sources.stream().map(this::parseJob).collect(Collectors.toMap(OnmyojiJob::getJobId, r -> r));
-        }
-        log.info("==============任务加载完毕=============");
-
-        return jobs;
-    }
-
 
     /**
-     * Job解析
-     * @param source
+     * 加载任务列表
      * @return
+     * @throws IOException
      */
-    private OnmyojiJob parseJob(PropertiesPropertySource source) {
-        log.info("开始加载任务文件：{}", source.getName().replace(".yml", ""));
-        log.info("任务名称：{}", (String) source.getProperty("jobName"));
-        OnmyojiJob job = new OnmyojiJob();
-        job.setJobId((String)source.getProperty("jobId"));
-        job.setJobName((String)source.getProperty("jobName"));
-        job.setTeamType(TeamTypeEnum.findByType((String) source.getProperty("teamType")));
-        job.setHangUpType(HangUpTypeEnum.findByType((String) source.getProperty("hangUpType")));
-        job.setTimes((Integer)source.getProperty("times"));
-        job.setTime((Integer)source.getProperty("time"));
-        job.setHangUpType(HangUpTypeEnum.findByType((String) source.getProperty("hangUpType")));
-        job.setProducerName((String)source.getProperty("producerName"));
-        job.setTerminal((String)source.getProperty("terminal"));
-        job.setWindowNameList((String)source.getProperty("windowNameList"));
-        return job;
+    public Map<String, OnmyojiJob> loadAllJobs() throws IOException {
+        log.info("==============加载任务列表=============");
+        if (jobs == null) {
+            List<OnmyojiJob> jobList = new ArrayList<>();
+            // 指定目录路径
+            String directoryPath = System.getProperty("user.dir") + "\\onmyoji\\src\\main\\resources\\job\\";
+            File directory = new File(directoryPath);
+            // 过滤YML文件
+            File[] files = directory.listFiles();
+
+            if (files != null) {
+                for (File file : files) {
+                    OnmyojiJob job = YamlUtil.load(Files.newInputStream(file.toPath()), OnmyojiJob.class);
+                    jobList.add(job);
+                }
+            } else {
+                throw new FileNotFoundException("Directory does not exist or is not readable.");
+            }
+            jobs = jobList.stream().peek(o -> log.info("已加载任务：{}", o.getJobName())).collect(Collectors.toMap(OnmyojiJob::getJobId, r -> r));
+        }
+        log.info("==============任务加载完毕=============");
+        return jobs;
     }
 
 }

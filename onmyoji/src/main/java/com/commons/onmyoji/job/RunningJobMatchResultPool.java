@@ -46,8 +46,7 @@ public class RunningJobMatchResultPool {
         MatchResult value = new MatchResult();
         HashMap<String, Set<TargetMatchingResult>> resultItemMap = new HashMap<>();
 
-        List<String> windowsNameList = Arrays.asList(job.getWindowNameList().split(","));
-        for (String windowName : windowsNameList) {
+        for (String windowName : job.getWindowNameList()) {
             File parentPath = new File(job.getImgDirectory());
             File[] files = parentPath.listFiles();
             if (files == null || files.length == 0) {

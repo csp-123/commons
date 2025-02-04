@@ -9,7 +9,6 @@ import org.springframework.boot.builder.SpringApplicationBuilder;
 public class OnmyojiApplication {
 
     public static void main(String[] args) {
-
         SpringApplication.run(OnmyojiApplication.class, args);
     }
 

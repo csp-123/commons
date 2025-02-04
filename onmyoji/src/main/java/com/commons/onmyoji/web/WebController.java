@@ -1,9 +1,11 @@
 package com.commons.onmyoji.web;
 
+import com.alibaba.fastjson.JSON;
 import com.commons.onmyoji.entity.OnmyojiJob;
 import com.commons.onmyoji.job.JobPool;
 import com.commons.onmyoji.job.RunningJobPool;
 import com.commons.onmyoji.producer.InstanceZoneProducer;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationContext;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -20,6 +22,7 @@ import javax.annotation.Resource;
  */
 @RestController
 @RequestMapping("job")
+@Slf4j
 public class WebController {
 
     @Resource
