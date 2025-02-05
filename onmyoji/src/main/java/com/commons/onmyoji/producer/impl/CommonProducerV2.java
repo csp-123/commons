@@ -59,9 +59,7 @@ public class CommonProducerV2 implements InstanceZoneProducer {
             gameWindowFreshTask.setWindowsNameList(Sets.newHashSet(job.getWindowNameList()));
             gameWindowFreshExecutor.scheduleAtFixedRate(gameWindowFreshTask, 0, 500, TimeUnit.MILLISECONDS);
             // 运行任务检查器
-            checkJobDoneExecutor.scheduleAtFixedRate(jobStatusFreshTask, 0, 5, TimeUnit.SECONDS);
-            // 加载截图
-            job.loadPictures();
+            checkJobDoneExecutor.scheduleAtFixedRate(jobStatusFreshTask, 0, 3, TimeUnit.SECONDS);
             // 循环执行，什么时间结束交给checkJobDoneExecutor判断
             while (runningJobPool.containsJob(job.getJobId())) {
                 matcherV2.run(job);

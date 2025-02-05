@@ -61,9 +61,9 @@ public class ImageSimilarityUtil {
         Assert.hasText(path, "图片路径为空");
         try {
             String[] dotSplits = path.split("\\.");
-            String pre = dotSplits[dotSplits.length-2];
-            String[] split = pre.split("/");
-            return split[split.length-1];
+            String pre = dotSplits[dotSplits.length - 2];
+            String[] split = pre.split("\\\\");
+            return split[split.length - 1];
         } catch (Exception e) {
             throw new UnknownFormatConversionException(e.getMessage());
         }

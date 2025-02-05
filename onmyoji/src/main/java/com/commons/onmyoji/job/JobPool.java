@@ -1,6 +1,7 @@
 package com.commons.onmyoji.job;
 
 import com.commons.onmyoji.entity.OnmyojiJob;
+import com.google.protobuf.ServiceException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
@@ -35,7 +36,7 @@ public class JobPool {
     }
 
     @PostConstruct
-    public void initJob() throws IOException {
+    public void initJob() throws IOException, ServiceException {
         jobMap = jobLoader.loadAllJobs();
     }
 

@@ -115,4 +115,11 @@ public class OnmyojiJob {
         }).collect(Collectors.toList());
         this.setPictureList(pictures);
     }
+
+    @Override
+    public String toString() {
+        return String.format("任务id：%s，任务名称：%s，组队类型：%s，挂机类型：%s，次数：%s，时长：%s，处理器：%s，设备：%s",
+                this.getJobId(), this.getJobName(), this.getTeamType(), this.getHangUpType(), this.getTimes(), this.getTime(),
+                this.getProducerName(), this.getTerminal());
+    }
 }

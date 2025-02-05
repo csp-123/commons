@@ -1,8 +1,9 @@
 jobId: juexing10_solo_10times
 jobName: 觉醒十-单刷-10次
 teamType: SOLO
-hangUpType: TIMES
-times: 100
+hangUpType: TIME_FROM_NOW
+times: 10
+time: 4
 producerName: CommonV2
 terminal: 4070ti
 windowNameList:

@@ -17,9 +17,7 @@ import javax.annotation.Resource;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.time.LocalDateTime;
-import java.util.Map;
-import java.util.Set;
-import java.util.TimerTask;
+import java.util.*;
 
 
 /**
@@ -52,31 +50,34 @@ public class JobStatusFreshTask extends TimerTask {
     }
 
     private void checkJobDone(OnmyojiJob job) {
+        // TIMES
         if (HangUpTypeEnum.TIMES.equals(job.getHangUpType())) {
             MatchResult matchResult = runningJobMatchResultPool.get(job.getJobId());
-            log.info("===匹配结果：{}", JSON.toJSONString(matchResult));
             if (matchResult == null) {
                 log.info("【任务状态监测】[任务：{}，是否完成：{}]", job.getJobName(), false);
                 return;
             }
             Map<String, Set<TargetMatchingResult>> resultItemMap = matchResult.getResultItemMap();
             for (Map.Entry<String, Set<TargetMatchingResult>> entry : resultItemMap.entrySet()) {
-                boolean done = entry.getValue().stream().anyMatch(o -> job.getTimes().compareTo(o.getCount()) <= 0);
-                log.info("【任务状态监测】[任务：{}，是否完成：{}]", job.getJobName(), done);
-                if (!done) {
-                    return;
+                // 任意图片匹配次数达标即为完成
+                Integer maxMatchCount = entry.getValue().stream().map(TargetMatchingResult::getCount).max(Comparator.comparingInt(o -> o)).orElse(0);
+                if (job.getTimes() <= maxMatchCount) {
+                    runningJobPool.removeJob(job);
                 }
-                runningJobPool.removeJob(job);
+                log.info("【任务状态监测】[任务：{}，当前进度：{}/{}]", job.getJobName(), maxMatchCount, job.getTimes());
             }
         }
-
+        // TIME_FROM_NOW
         if (HangUpTypeEnum.TIME_FROM_NOW.equals(job.getHangUpType())) {
-            boolean done = LocalDateTime.now().isBefore(job.getExecuteTime().plusMinutes(job.getTime()));
-            log.info("【任务状态监测】[任务：{}，是否完成：{}]", job.getJobName(), done);
-            if (done) {
+            LocalDateTime deadLine = job.getExecuteTime().plusMinutes(job.getTime());
+            log.info("deadLine:{}", deadLine);
+            // 到期
+            if (LocalDateTime.now().isAfter(deadLine)) {
+                runningJobPool.removeJob(job);
+                log.info("【任务状态监测】[任务：{}，剩余运行时间：0， 即将退出]", job.getJobName());
                 return;
             }
-            runningJobPool.removeJob(job);
+            log.info("【任务状态监测】[任务：{}，剩余运行时间（分钟）：{}]", job.getJobName(), deadLine.getMinute() - LocalDateTime.now().getMinute());
         }
     }
 

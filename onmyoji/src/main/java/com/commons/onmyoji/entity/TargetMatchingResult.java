@@ -84,4 +84,9 @@ public class TargetMatchingResult {
     public int hashCode() {
         return Objects.hash(targetImgName);
     }
+
+    @Override
+    public String toString() {
+        return super.toString();
+    }
 }
